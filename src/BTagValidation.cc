@@ -807,8 +807,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       if ( SubJetInfo.Jet_nSubJets[iJet] != 2 ) continue ;
 
-      int iSubJet1 = SubJetInfo.SubJetIdx[0] ;
-      int iSubJet2 = SubJetInfo.SubJetIdx[1] ;
+      int iSubJet1 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]] ;
+      int iSubJet2 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]+1] ;
 
       //// If  processing subjets, discard fat jet with any one subjet having pt = 0
       if( (usePrunedSubjets_ || useSoftDropSubjets_)
