@@ -44,6 +44,11 @@ options.register('fatJetDoubleBTagging', False,
     VarParsing.varType.bool,
     "Require fat jets to be double-b-tagged"
 )
+options.register('fatJetDoubleSVBTagging', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Require fat jets to be double-SV-b-tagged"
+)
 options.register('usePrunedSubjets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -118,6 +123,11 @@ options.register('fatJetBDiscrCut', 0.244,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "B discriminator cut for fat jets"
+)
+options.register('fatJetDoubleSVBDiscrCut', -0.2,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Double SV b discriminator cut for fat jets"
 )
 options.register('subJetBDiscrCut', 0.244,
     VarParsing.multiplicity.singleton,
@@ -226,12 +236,14 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     ApplyFatJetBTagging    = cms.bool(options.applyFatJetBTagging),
     FatJetDoubleTagging    = cms.bool(options.fatJetDoubleTagging),
     FatJetDoubleBTagging   = cms.bool(options.fatJetDoubleBTagging),
+    FatJetDoubleSVBTagging = cms.bool(options.fatJetDoubleSVBTagging),
     UsePrunedSubjets       = cms.bool(options.usePrunedSubjets),
     UseSoftDropSubjets     = cms.bool(options.useSoftDropSubjets),
     ApplySubJetMuonTagging = cms.bool(options.applySubJetMuonTagging),
     ApplySubJetBTagging    = cms.bool(options.applySubJetBTagging),
     DynamicMuonSubJetDR    = cms.bool(options.dynamicMuonSubJetDR),
     FatJetBDiscrCut        = cms.double(options.fatJetBDiscrCut),
+    FatJetDoubleSVBDiscrCut= cms.double(options.fatJetDoubleSVBDiscrCut), 
     SubJetBDiscrCut        = cms.double(options.subJetBDiscrCut),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
