@@ -124,7 +124,12 @@ options.register('fatJetBDiscrCut', 0.244,
     VarParsing.varType.float,
     "B discriminator cut for fat jets"
 )
-options.register('fatJetDoubleSVBDiscrCut', -0.2,
+options.register('fatJetDoubleSVBDiscrMin', -0.20,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Double SV b discriminator cut for fat jets"
+)
+options.register('fatJetDoubleSVBDiscrMax', 1.0,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Double SV b discriminator cut for fat jets"
@@ -243,7 +248,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     ApplySubJetBTagging    = cms.bool(options.applySubJetBTagging),
     DynamicMuonSubJetDR    = cms.bool(options.dynamicMuonSubJetDR),
     FatJetBDiscrCut        = cms.double(options.fatJetBDiscrCut),
-    FatJetDoubleSVBDiscrCut= cms.double(options.fatJetDoubleSVBDiscrCut), 
+    FatJetDoubleSVBDiscrMin= cms.double(options.fatJetDoubleSVBDiscrMin), 
+    FatJetDoubleSVBDiscrMax= cms.double(options.fatJetDoubleSVBDiscrMax), 
     SubJetBDiscrCut        = cms.double(options.subJetBDiscrCut),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),

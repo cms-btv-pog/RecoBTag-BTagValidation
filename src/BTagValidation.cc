@@ -202,7 +202,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      applySubJetBTagging_;
     const bool                      dynamicMuonSubJetDR_;
     const double                    fatJetBDiscrCut_;
-    const double                    fatJetDoubleSVBDiscrCut_;
+    const double                    fatJetDoubleSVBDiscrMin_;
+    const double                    fatJetDoubleSVBDiscrMax_;
     const double                    subJetBDiscrCut_;
     const double                    fatJetPtMin_;
     const double                    fatJetPtMax_;
@@ -273,7 +274,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   applySubJetBTagging_(iConfig.getParameter<bool>("ApplySubJetBTagging")),
   dynamicMuonSubJetDR_(iConfig.getParameter<bool>("DynamicMuonSubJetDR")),
   fatJetBDiscrCut_(iConfig.getParameter<double>("FatJetBDiscrCut")),
-  fatJetDoubleSVBDiscrCut_(iConfig.getParameter<double>("FatJetDoubleSVBDiscrCut")),
+  fatJetDoubleSVBDiscrMin_(iConfig.getParameter<double>("FatJetDoubleSVBDiscrMin")),
+  fatJetDoubleSVBDiscrMax_(iConfig.getParameter<double>("FatJetDoubleSVBDiscrMax")),
   subJetBDiscrCut_(iConfig.getParameter<double>("SubJetBDiscrCut")),
   fatJetPtMin_(iConfig.getParameter<double>("FatJetPtMin")),
   fatJetPtMax_(iConfig.getParameter<double>("FatJetPtMax")),
@@ -1005,7 +1007,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         else if( !fatJetDoubleBTagging_ && FatJetInfo.Jet_CombIVF[iJet]<=fatJetBDiscrCut_ ) continue;
       }
 
-      if (fatJetDoubleSVBTagging_ && FatJetInfo.Jet_DoubleSV[iJet] <= fatJetDoubleSVBDiscrCut_) continue ;  
+      if (fatJetDoubleSVBTagging_ 
+          && FatJetInfo.Jet_DoubleSV[iJet] < fatJetDoubleSVBDiscrMin_ || FatJetInfo.Jet_DoubleSV[iJet] > fatJetDoubleSVBDiscrMax_ ) continue ;  
 
       //// apply b-tagging scale factors
       double wtFatJet = 1.;
