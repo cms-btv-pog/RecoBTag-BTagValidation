@@ -204,7 +204,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    fatJetBDiscrCut_;
     const double                    fatJetDoubleSVBDiscrMin_;
     const double                    fatJetDoubleSVBDiscrMax_;
-    const double                    subJetBDiscrCut_;
+    const double                    subJetBDiscrMin_;
+    const double                    subJetBDiscrMax_;
     const double                    fatJetPtMin_;
     const double                    fatJetPtMax_;
     const double                    fatJetAbsEtaMax_;
@@ -276,7 +277,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetBDiscrCut_(iConfig.getParameter<double>("FatJetBDiscrCut")),
   fatJetDoubleSVBDiscrMin_(iConfig.getParameter<double>("FatJetDoubleSVBDiscrMin")),
   fatJetDoubleSVBDiscrMax_(iConfig.getParameter<double>("FatJetDoubleSVBDiscrMax")),
-  subJetBDiscrCut_(iConfig.getParameter<double>("SubJetBDiscrCut")),
+  subJetBDiscrMin_(iConfig.getParameter<double>("SubJetBDiscrMin")),
+  subJetBDiscrMax_(iConfig.getParameter<double>("SubJetBDiscrMax")),
   fatJetPtMin_(iConfig.getParameter<double>("FatJetPtMin")),
   fatJetPtMax_(iConfig.getParameter<double>("FatJetPtMax")),
   fatJetAbsEtaMax_(iConfig.getParameter<double>("FatJetAbsEtaMax")),
@@ -308,7 +310,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   btagSFType_(iConfig.getParameter<std::string>("btagSFType")),
   calib("csvv2", btagCSVFile_),  
   reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
-//reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
+  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
 {
   //now do what ever initialization is needed
   isData = true;
@@ -1003,7 +1005,10 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       if( applyFatJetBTagging_ ) //// if enabled, select b-tagged fat jets
       {
-        if( fatJetDoubleBTagging_ && !(SubJets.Jet_CombIVF[iSubJet1]>subJetBDiscrCut_ && SubJets.Jet_CombIVF[iSubJet2]>subJetBDiscrCut_) ) continue;
+        if( fatJetDoubleBTagging_ && 
+            !( SubJets.Jet_CombIVF[iSubJet1]>subJetBDiscrMin_ && SubJets.Jet_CombIVF[iSubJet1]<subJetBDiscrMax_ 
+              && SubJets.Jet_CombIVF[iSubJet2]>subJetBDiscrMin_ && SubJets.Jet_CombIVF[iSubJet2]<subJetBDiscrMax_ ) 
+          ) continue;
         else if( !fatJetDoubleBTagging_ && FatJetInfo.Jet_CombIVF[iJet]<=fatJetBDiscrCut_ ) continue;
       }
 
@@ -1014,8 +1019,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double wtFatJet = 1.;
       if( applySFs_ && !isData ) {
         if( applyFatJetBTagging_ && fatJetDoubleBTagging_ ) {
-          //wtFatJet *= ( scaleFactor(SubJets.Jet_flavour[iSubJet1], SubJets.Jet_pt[iSubJet1], SubJets.Jet_eta[iSubJet1], (subJetBDiscrCut_>0.25)) *
-          //    scaleFactor(SubJets.Jet_flavour[iSubJet2], SubJets.Jet_pt[iSubJet2], SubJets.Jet_eta[iSubJet2], (subJetBDiscrCut_>0.25)) );
+          //wtFatJet *= ( scaleFactor(SubJets.Jet_flavour[iSubJet1], SubJets.Jet_pt[iSubJet1], SubJets.Jet_eta[iSubJet1], (subJetBDiscrMin_>0.25)) *
+          //    scaleFactor(SubJets.Jet_flavour[iSubJet2], SubJets.Jet_pt[iSubJet2], SubJets.Jet_eta[iSubJet2], (subJetBDiscrMin_>0.25)) );
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet1]), SubJets.Jet_eta[iSubJet1], SubJets.Jet_pt[iSubJet1]); 
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet2]), SubJets.Jet_eta[iSubJet2], SubJets.Jet_pt[iSubJet2]); 
         }
@@ -1350,14 +1355,15 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               }
             }
 
-            if(applySubJetMuonTagging_ && nselmuonSubJet==0)                              continue;  //// if enabled, select muon-tagged subjets
-            if(applySubJetBTagging_ && SubJets.Jet_CombIVF[iSubJet]<=subJetBDiscrCut_) continue;  //// if enabled, select b-tagged subjets
+            if(applySubJetMuonTagging_ && nselmuonSubJet==0) continue;  //// if enabled, select muon-tagged subjets
+            if(applySubJetBTagging_ && 
+                SubJets.Jet_CombIVF[iSubJet]<=subJetBDiscrMin_ || SubJets.Jet_CombIVF[iSubJet]>subJetBDiscrMax_ ) continue;  //// if enabled, select b-tagged subjets
 
             //// apply b-tagging scale factors
             double wtSubJet = 1.;
             if( applySFs_ && !isData ) {
               if( applyFatJetBTagging_ && fatJetDoubleBTagging_ ) wtSubJet *= wtFatJet;
-              else                                               wtSubJet *= scaleFactor(SubJets.Jet_flavour[iSubJet], SubJets.Jet_pt[iSubJet], SubJets.Jet_eta[iSubJet], (subJetBDiscrCut_>0.25));
+              else wtSubJet *= scaleFactor(SubJets.Jet_flavour[iSubJet], SubJets.Jet_pt[iSubJet], SubJets.Jet_eta[iSubJet], (subJetBDiscrMin_>0.25));
             }
 
             //// subjet multiplicity

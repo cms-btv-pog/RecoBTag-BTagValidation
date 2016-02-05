@@ -134,10 +134,15 @@ options.register('fatJetDoubleSVBDiscrMax', 1.0,
     VarParsing.varType.float,
     "Double SV b discriminator cut for fat jets"
 )
-options.register('subJetBDiscrCut', 0.244,
+options.register('subJetBDiscrMin', 0.605,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "B discriminator cut for fat jets"
+    "B discriminator min for subjets"
+)
+options.register('subJetBDiscrMax', 1.000,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "B discriminator max for subjets"
 )
 options.register('SFbShift', 0.,
     VarParsing.multiplicity.singleton,
@@ -250,7 +255,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetBDiscrCut        = cms.double(options.fatJetBDiscrCut),
     FatJetDoubleSVBDiscrMin= cms.double(options.fatJetDoubleSVBDiscrMin), 
     FatJetDoubleSVBDiscrMax= cms.double(options.fatJetDoubleSVBDiscrMax), 
-    SubJetBDiscrCut        = cms.double(options.subJetBDiscrCut),
+    SubJetBDiscrMin        = cms.double(options.subJetBDiscrMin),
+    SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
     FatJetSoftDropMassMin    = cms.double(options.fatJetSoftDropMassMin),
@@ -275,6 +281,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
         options.triggerSelection
     ),
     TriggerPathNames       = cms.vstring(
+        "HLT_BTagMu_Jet300_Mu5_v",
         "HLT_PFJet200_v",
         "HLT_PFJet260_v",
         "HLT_PFJet320_v",
