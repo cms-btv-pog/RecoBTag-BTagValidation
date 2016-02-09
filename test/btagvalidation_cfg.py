@@ -99,12 +99,12 @@ options.register('fatJetPtMax', 1.E6,
     VarParsing.varType.float,
     "Maximum fat jet Pt"
     )
-options.register('fatJetSoftDropMassMin', 0.,
+options.register('fatJetGroomedMassMin', 0.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet softdrop mass"
     )
-options.register('fatJetSoftDropMassMax', 1.E6,
+options.register('fatJetGroomedMassMax', 1.E6,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum fat jet softdrop mass"
@@ -272,7 +272,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
-    FatJetSoftDropMassMin  = cms.double(options.fatJetSoftDropMassMin),
+    FatJetGroomedMassMin  = cms.double(options.fatJetGroomedMassMin),
     File_PVWt              = cms.string('hnpv_data_Run2015D_mc_RunIISpring15DR74-Asympt25ns_pvwt.root'),
     Hist_PVWt              = cms.string('hpvwt_data_mc'),
     File_PUDistMC          = cms.string('PUDistMC_2015_25ns_FallMC_matchData_PoissonOOTPU.root'),
@@ -283,7 +283,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_FatJetPtWt        = cms.string('jetptweight_mc_data'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
-    FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
+    FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
     FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki

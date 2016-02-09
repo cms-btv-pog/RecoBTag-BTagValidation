@@ -46,15 +46,6 @@ FileNames_QCD_Pt_800to1000 = [
 
 ### Do not remove the following lines
 FileNames = [
-    #'JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
-    #'JetTree_data_FatJets_Subjets_BoostedCommissioning_2.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_3.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_4.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_5.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_6.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_7.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_8.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_9.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_10.root',
+    #'file:/afs/cern.ch/user/d/devdatta/eos/cms/store/group/phys_btag/BoostedBTag/7_6_X_v1.02/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/JetTree_mc_FatJets_Subjets_BoostedCommissioning_1.root'
     ]
 
