@@ -82,6 +82,7 @@ cp -v MAIN_WORKDIR/jetpt_data_mc_RunIISpring15_25ns_MINIAOD.root $BATCHDIR/
 cp -v MAIN_WORKDIR/jetpt_data_mc_SingleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
 cp -v MAIN_WORKDIR/FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
 cp -v MAIN_WORKDIR/SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
+cp -v MAIN_WORKDIR/SoftDropSubJetPt_data_mc_SubJetMuTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
 cp -v MAIN_WORKDIR/CSVv2.csv $BATCHDIR/
 cd $BATCHDIR
 echo "Running CMSSW job"
@@ -160,6 +161,8 @@ def main():
     if re.search("^FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^SoftDropSubJetPt_data_mc_SubJetMuTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^CSVv2.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)

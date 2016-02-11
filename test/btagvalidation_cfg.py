@@ -204,7 +204,7 @@ options.register('FileFatJetPtWt', "FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnric
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
-options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root",
+options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_SubJetMuTagged_QCDMuEnriched_76XMiniAODv2.root", 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"

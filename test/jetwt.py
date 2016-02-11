@@ -3,7 +3,7 @@
 import ROOT
 
 files_data = [
-'FatJets_76X_FatJetsDoubleMuTagged_PUWt_07Feb2016/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets.root'
+'JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_performance_08Feb2016/Final_histograms_btagval.root'
 ]
 
 jetpt_data = ROOT.TH1D("jetpt_data", ";pT(all jets);;",500,0.,5000.)
@@ -18,9 +18,9 @@ jetmassweight_mc_data = ROOT.TH1D("jetmassweight_mc_data",";M(all jets);",40,0.,
 
 for f in files_data:
   fin = ROOT.TFile.Open(f, "READ")
-  #hptdata = fin.Get("DATA__h1_fatjet_pt")
-  #hptqcd  = fin.Get("QCD__h1_fatjet_pt")
-  hpt_data = fin.Get("DATA__SoftDropSubJet_pt_all_data")
+  #hpt_data = fin.Get("DATA__h1_fatjet_pt")
+  #hpt_qcd  = fin.Get("QCD__h1_fatjet_pt")
+  hpt_data   = fin.Get("DATA__SoftDropSubJet_pt_all_data")
   hpt_qcd_b  = fin.Get("QCD__SoftDropSubJet_pt_all_b")
   hpt_qcd_c  = fin.Get("QCD__SoftDropSubJet_pt_all_c")
   hpt_qcd_l  = fin.Get("QCD__SoftDropSubJet_pt_all_l")
@@ -74,7 +74,7 @@ for ibin in xrange(1, nbins+1):
   jetmass_mc_reweight.SetBinContent(ibin, nmc*wt)
   print "bin", ibin , " wt", wt
 
-fout = ROOT.TFile("SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root", "RECREATE")
+fout = ROOT.TFile("SoftDropSubJetPt_data_mc_SubJetMuTagged_QCDMuEnriched_76XMiniAODv2.root", "RECREATE")
 fout.cd()
 jetpt_data.Write()
 jetpt_mc_noweight.Write()
