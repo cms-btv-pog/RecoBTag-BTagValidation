@@ -845,7 +845,7 @@ void DrawStacked(TString name,
     histotitle = "Number of pixel hits" ; 
     yaxistitle="Tracks" ; 
   }
-  if (histotitle=="3D IP significance of all tracks") {
+  if (histotitle=="3D IP significance of tracks") {
     histotitle = "3D IP significance of tracks" ; 
     yaxistitle="Tracks / 1" ; 
   }
@@ -973,7 +973,7 @@ void DrawStacked(TString name,
   }
   else {
     if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*5000000 : histo_tot->GetMaximum()*5000000) ;
-    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*30000 : histo_tot->GetMaximum()*30000) ;
+    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*300000 : histo_tot->GetMaximum()*300000) ;
     else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000 : histo_tot->GetMaximum()*1000000) ; 
     else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000 : histo_tot->GetMaximum()*1000000) ;
 
