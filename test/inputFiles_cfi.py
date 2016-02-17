@@ -46,6 +46,6 @@ FileNames_QCD_Pt_800to1000 = [
 
 ### Do not remove the following lines
 FileNames = [
-    '/afs/cern.ch/user/d/devdatta/eos/cms/store/group/phys_btag/BoostedBTag/7_4_X_25ns_v3.00/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1_MINIAODSIM/JetTree_mc_FatJets_Subjets_BoostedCommissioning_43.root'
+    'file:/afs/cern.ch/user/d/devdatta/eos/cms/store/group/phys_btag/BoostedBTag/7_4_X_25ns_v3.00/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1_MINIAODSIM/JetTree_mc_FatJets_Subjets_BoostedCommissioning_8.root',
     ]
 
