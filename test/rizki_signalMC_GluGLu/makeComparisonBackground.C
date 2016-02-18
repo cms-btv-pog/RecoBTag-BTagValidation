@@ -21,22 +21,24 @@ TString reweight = "";
 if (Reweight) reweight = "reweightPT_";
 
 TFile * f ;
-f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_"+massp+"_fjPt"+option+"_bTagValPlots.root");
+f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_"+massp+"_fjPt"+option+"_bTagValPlots.root");
 
 f->cd();
 TH1D *h = new TH1D();
 h = (TH1D*) f->Get("btagval/FatJet_"+var);
-// h->Draw();//ptPruned>300 & ptPruned<500");
-//delete c1;
+// cout << "Variable Name = " << var << endl;
 h->SetLineColor(kBlue+2);
 h->SetLineWidth(3);
-// h->GetXaxis()->SetTitle(label);
-h->SetTitle("");
-double Ymax = h->GetMaximum();
-h->GetXaxis()->SetRangeUser(low, max);
-h->GetYaxis()->SetRangeUser(0.01, Ymax*3.);
-// h->DrawNormalized("");
 int nbin =  h->GetXaxis()->GetNbins();
+double Ymax = h->GetMaximum();
+// cout << "h max before scale = " << Ymax << endl;
+h->SetTitle("");
+h->GetXaxis()->SetRangeUser(low, max);
+h->Scale(1/(h->Integral(1,nbin)));
+h->Rebin(rebin);
+// cout << "h max after scale = " << h->GetMaximum() << endl;
+
+//---might be useful for coding reference--- -start
 // std::stringstream ss;
 // ss << nbin;
 // TString strNb = ss.str();
@@ -50,81 +52,38 @@ int nbin =  h->GetXaxis()->GetNbins();
 // ss2 << max;
 // TString strM= (ss2.str());
 // //Fjets->Draw(var+">>h("+strNb+","+strL+","+strM+")"," abs(int(flavour))==5 && nbHadrons<2 && massPruned>80 && massPruned<200");//ptPruned>300 & ptPruned<500");
-h->SetLineColor(kBlue+2);
-h->SetLineWidth(3);
-// h->GetXaxis()->SetTitle(label);
-h->SetTitle("");
-// h->SetName("h_");
-h->GetYaxis()->SetRangeUser(0.01, Ymax*3);
-h->Scale(1/(h->Integral(1,nbin)));
-h->Rebin(rebin);
-// h->DrawNormalized("HIST");
-// h->SetBins(nbin, low,max);
+//---might be useful for coding reference--- -end
 
 c1->Update();
 
-//std::cout<<nbin<< "  "<<low<<"  "<<max<<std::endl;
 leg->AddEntry(h,"Hbb (bfromg flavor)","l");
-// TCanvas * d = new TCanvas("d","d");
-// d->cd();
-
 
 TFile * f2 ;
 if(option=="330"){
-// 	f2 = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_"+reweight+"merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
-	f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_reweightPT_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
+	f2 = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_"+reweight+"merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
+// 	f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_reweightPT_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
 	}
 else if(option=="450"){
-	f2 = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_DoubleMuonTagged_50m200_tau21-1p0_fj450_usePruned_debug_ptRatioCut_"+reweight+"merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
+	f2 = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_DoubleMuonTagged_50m200_tau21-1p0_fj450_usePruned_debug_ptRatioCut_"+reweight+"merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
 	}
 f2->cd();
+
 TH1D *h2 = new TH1D();
 h2 = (TH1D*) f2->Get("QCD__FatJet_"+var);
+// cout << "h2 max = " << h2->GetMaximum() << endl;
 
-//h2->Draw("same");
 h2->SetLineColor(kAzure+1);
 h2->SetLineWidth(3);
 h2->GetXaxis()->SetTitle(var);
 h2->GetXaxis()->SetRangeUser(low, max);
 h2->SetTitle("");
-// h2->SetName("h2_");
-//h2->GetYaxis()->SetRangeUser(0., Ymax*2.);
 c1->cd();
 c1->Update();
 h2->Scale(1/(h2->Integral(1,nbin)));
 h2->Rebin(rebin);
-// h2->DrawNormalized("sameHIST");
-// h2->SetBins(nbin,low,max);
+// cout << "h2 max after scale = " << h2->GetMaximum() << endl;
 
 leg->AddEntry(h2,"QCDbb (bfromg flavor)","l");
-
-// THStack *stack = new THStack("stack","");
-// stack->Add(h,"hist");
-// stack->Add(h2,"hist");
-// stack->Draw("nostack");
-// if(isLog==1)stack->SetMaximum(Ymax*3);
-// stack->GetXaxis()->SetRangeUser(low, max);
-// stack->GetXaxis()->SetTitle(label);
-
-//delete h2;
-
-if(var=="tau2IVF/tau1IVF") var = "subIVF";
-if(var=="tau2/tau1") var = "sub";
-
-// c1->Update();
-// c1->Modified();
-// if(isLog==0){
-// 	c1->Print(("plots/"+var+"_"+massp+"_"+option+".png"));
-// 	c1->SaveAs("plots/"+var+"_"+massp+"_"+option+".pdf");
-// 	}
-// if(isLog==1){	
-// 	c1->SetLogy();
-// 	c1->Print(("plots/"+var+"_"+massp+"_"+option+"_log.png"));
-// 	c1->SaveAs("plots/"+var+"_"+massp+"_"+option+"_log.pdf");
-// 	}
-//delete c1;
-//delete strL;
-
 
 // RATIO PLOT
 
@@ -196,7 +155,7 @@ hratio->Divide(h2);
   h2->GetYaxis()->SetLabelSize(0.07);
   h2->GetYaxis()->SetTitleSize(0.08);
   h2->GetYaxis()->SetTitleOffset(0.76);
-  h2->SetMaximum(1.2*h->GetMaximum());
+//   h2->SetMaximum(1.2*h->GetMaximum());
 //   h2->GetYaxis()->SetRangeUser(1e-6, 1.2*h->GetMaximum());
   
   h->SetLineWidth(2);
@@ -206,8 +165,11 @@ THStack *stack = new THStack("stack","");
 stack->Add(h,"hist");
 stack->Add(h2,"hist");
 stack->Draw("nostack");
-if(isLog==1)stack->SetMaximum(Ymax*2);
 stack->GetXaxis()->SetRangeUser(low, max);
+// cout <<"stack maximum = " << stack->GetMaximum("nostack") << endl;
+if(isLog==1)stack->SetMaximum(stack->GetMaximum("nostack")*1e4);
+if(isLog==0)stack->SetMaximum(stack->GetMaximum("nostack")*1.2);
+// if(isLog==0)stack->SetMaximum(0.1);
 // stack->GetXaxis()->SetTitle(label);
 stack->GetXaxis()->SetLabelSize(0.0);
 stack->GetXaxis()->SetLabelOffset(999);
@@ -219,12 +181,12 @@ stack->GetXaxis()->SetLabelOffset(999);
 leg->Draw("same");
 c1->Modified();
 if(isLog==0){
-	c1->Print(("plots/"+var+"_"+massp+"_"+reweight+option+"_linear_ratio.png"));
+// 	c1->Print(("plots/"+var+"_"+massp+"_"+reweight+option+"_linear_ratio.png"));
 	c1->SaveAs("plots/"+var+"_"+massp+"_"+reweight+option+"_linear_ratio.pdf");
 	}
 if(isLog==1){	
 	c1->SetLogy();
-	c1->Print(("plots/"+var+"_"+massp+"_"+reweight+option+"_log_ratio.png"));
+// 	c1->Print(("plots/"+var+"_"+massp+"_"+reweight+option+"_log_ratio.png"));
 	c1->SaveAs("plots/"+var+"_"+massp+"_"+reweight+option+"_log_ratio.pdf");
 	}
 
