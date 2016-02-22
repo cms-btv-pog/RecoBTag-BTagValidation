@@ -1966,12 +1966,24 @@ double BTagValidation::getBTagSF_CSVv2L (double jetPt, double jetEta, double jet
 
   double pt(jetPt) ; 
   if ((jetFl == 5 || jetFl == 4)) {
-    if (jetPt < 30.) pt = 30; 
-    if (jetPt > 670.) pt = 670. ;
+    if (jetPt < 30.) {
+      pt = 30; 
+      errbc *= 2;
+    }
+    if (jetPt > 670.) {
+      pt = 670. ;
+      errbc *= 2;
+    }
   }
   else {
-    if (jetPt < 20.) pt= 20; 
-    if (jetPt > 1000.) pt = 1000. ;
+    if (jetPt < 20.) {
+      pt= 20; 
+      errl *= 2;
+    }
+    if (jetPt > 1000.) {
+      pt = 1000. ;
+      errl *= 2; 
+    }
   }
 
   TF1* SFb_CSVv2L = new TF1("SFb_CSVv2L", "0.908299+(2.70877e-06*(log(x+370.144)*(log(x+370.144)*(3-(-(104.614*log(x+370.144)))))))",30,670) ;
