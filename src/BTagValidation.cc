@@ -107,6 +107,7 @@ class BTagValidation : public edm::EDAnalyzer {
 
     double GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) ; 
     double GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
+    double GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
     // ----------member data ---------------------------
     EventInfoBranches EvtInfo;
     JetInfoBranches FatJetInfo;
@@ -222,15 +223,18 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_PUDistData_ ;
     const std::string               file_FatJetPtWt_ ;
     const std::string               file_SubJetPtWt_ ;
+    const std::string               file_SubJetPtBalanceWt_ ;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
     const std::string               hist_FatJetPtWt_ ;
     const std::string               hist_SubJetPtWt_ ;
+    const std::string               hist_SubJetPtBalanceWt_ ;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
     const bool                      doSubJetPtReweighting_ ;
+    const bool                      doSubJetPtBalanceReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
 
@@ -307,6 +311,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
   doSubJetPtReweighting_(iConfig.getParameter<bool>("DoSubJetPtReweighting")),
+  doSubJetPtBalanceReweighting_(iConfig.getParameter<bool>("DoSubJetPtBalanceReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
@@ -517,11 +522,15 @@ void BTagValidation::beginJob() {
     AddHisto("FatJet_prunedsubjet_dR"           ,";#DeltaR_{#eta-#phi}(pruned subjets);;",100,0,1);
     AddHisto("FatJet_prunedsubjet_dyphi"        ,";#DeltaR_{y-#phi}(pruned subjets);;",100,0,1);
     AddHisto("FatJet_massDrop_pruned"           ,";Mass drop (pruned AK8 jets) [GeV];;",100,0,1);
+    AddHisto("FatJet_prunedsubjet_ptBalance"    ,";Subjet pT_1/(pT_1+pT_2) (pruned subjets) ;;",100,0,1); //added by rizki - for signal proxy study   
+    AddHisto("FatJet_prunedsubjet_ptBalance_unw"    ,";Subjet pT_1/(pT_1+pT_2) (pruned subjets) unweighted;;",100,0,1); //added by rizki - for signal proxy study   
   }
   else if (useSoftDropSubjets_) {
     AddHisto("FatJet_softdropsubjet_dR"           ,";#DeltaR_{#eta-#phi}(soft drop subjets);;",100,0,1);
     AddHisto("FatJet_softdropsubjet_dyphi"        ,";#DeltaR_{y-#phi}(soft drop subjets);;",100,0,1);
     AddHisto("FatJet_massDrop_softdrop"           ,";Mass drop (soft drop AK8 jets) [GeV];;",100,0,1);
+    AddHisto("FatJet_softdropsubjet_ptBalance"    ,";Subjet pT_1/(pT_1+pT_2) (soft drop subjets) ;;",100,0,1); //added by rizki - for signal proxy study    
+    AddHisto("FatJet_softdropsubjet_ptBalance_unw"    ,";Subjet pT_1/(pT_1+pT_2) (soft drop subjets) unweighted ;;",100,0,1); //added by rizki - for signal proxy study    
   }
   AddHisto("FatJet_Mass"                        ,";M (AK8 jets) [GeV];;",200,0,400);
   AddHisto("FatJet_nsubjettiness"               ,";#tau_{2}/#tau_{1};;",50,0,1);
@@ -1042,10 +1051,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       }
 //added by Erich - jetPt reweighting factor
       double wtJetPt = 1.;
-      if (doJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-//       if (doJetPtReweighting_ && !isData) { //original UNCOMMENT!
-        wtJetPt *= GetLumiWeightsJetPtBased(file_JetPtWt_, hist_JetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
+//       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+      if (doFatJetPtReweighting_ && !isData) { //original UNCOMMENT!
+        wtJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
         wtFatJet *= wtJetPt ;
+      }
+//added by Rizki - subjet_ptBalance reweighting factor
+      double wtSubJetPtBalance = 1.;
+      if (doSubJetPtBalanceReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtSubJetPtBalance *= GetLumiWeightsSubJetPtBalanceBased(file_SubJetPtBalanceWt_, hist_SubJetPtBalanceWt_, SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]) ) ;
+        wtFatJet *= wtSubJetPtBalance ;
       }
       
 
@@ -1315,6 +1330,18 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       FillHisto2D("FatJet_BDTGSV_jetNTracks" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,jetNTracks ,wtPU*wtFatJet);
       FillHisto2D("FatJet_jetNTracks_trackSip3dSig_0" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,jetNTracks ,trackSip3dSig_0 , wtPU*wtFatJet);
+      
+      //for signal proxy study, for subjet pt balance reweight. - start    
+      float subjets_pT_balance = SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]); 
+      if (usePrunedSubjets_){
+      FillHisto("FatJet_prunedsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
+      FillHisto("FatJet_prunedsubjet_ptBalance_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet/wtSubJetPtBalance);      
+      }
+      else if (useSoftDropSubjets_){
+      FillHisto("FatJet_softdropsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
+      FillHisto("FatJet_softdropsubjet_ptBalance_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet/wtSubJetPtBalance);      
+      }
+      //for signal proxy study, for subjet pt balance reweight. - end
 
       // ------------------------------------------------
       // ---------- fill fat jet Hbb tagger information (end) -------------- added by rizki - end
@@ -1343,7 +1370,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       FillHisto("FatJet_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
       fillJetHistos(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, wtPU*wtFatJet);
       
-      FillHisto("FatJet_pt_all_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet] ,wtPU); //debug for signal vs proxy reweighting - rizki
+      FillHisto("FatJet_pt_all_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet] ,wtPU*wtFatJet/wtJetPt); //debug for signal vs proxy reweighting - rizki
 
 	
 
@@ -2109,6 +2136,19 @@ double BTagValidation::GetLumiWeightsJetPtBased (const std::string file, const s
   delete hwt ;
   return wtPt ;
 }
+
+// ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
+double BTagValidation::GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) {
+  double wtPtbalance(1) ;
+  TFile* f = new TFile(file.c_str()) ;
+  TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+  wtPtbalance = jetptbalance >= 0 && jetptbalance <= 1 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetptbalance)) : 1.;
+  f->Close() ;
+  delete f ;
+  delete hwt ;
+  return wtPtbalance ;
+}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(BTagValidation);
