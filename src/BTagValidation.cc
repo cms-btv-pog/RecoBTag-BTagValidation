@@ -37,6 +37,10 @@ Implementation:
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
 
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -55,6 +59,8 @@ Implementation:
 #include <string>
 #include <map>
 #include <vector>
+
+#include <boost/algorithm/string.hpp>
 
 //
 // class declaration
@@ -108,6 +114,10 @@ class BTagValidation : public edm::EDAnalyzer {
     double GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) ; 
     double GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
     double GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
+
+    void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
+    void GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ; 
+
     // ----------member data ---------------------------
     EventInfoBranches EvtInfo;
     JetInfoBranches FatJetInfo;
@@ -243,6 +253,13 @@ class BTagValidation : public edm::EDAnalyzer {
     const int                       btagOperatingPoint_ ; 
     const std::string               btagMeasurementType_ ; 
     const std::string               btagSFType_  ; 
+    const std::vector<std::string>  newJECPayloadNames_;
+    const std::string               jecUncPayloadName_;
+    const bool                      doNewJEC_;
+    const bool                      doJECUncert_;
+
+    boost::shared_ptr<JetCorrectionUncertainty> ptr_jecUnc_ ; 
+    boost::shared_ptr<FactorizedJetCorrector> ptr_newJEC_  ;
 
     const BTagCalibration calib; 
     const BTagCalibrationReader reader; 
@@ -319,14 +336,30 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   btagOperatingPoint_(iConfig.getParameter<int>("btagOperatingPoint")), 
   btagMeasurementType_(iConfig.getParameter<std::string>("btagMeasurementType")), 
   btagSFType_(iConfig.getParameter<std::string>("btagSFType")),
+  newJECPayloadNames_(iConfig.getParameter<std::vector<std::string>>("newJECPayloadNames")),
+  jecUncPayloadName_(iConfig.getParameter<std::string>("jecUncPayloadName")),
+  doNewJEC_(iConfig.getParameter<bool>("doNewJEC")), 
+  doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), 
   calib("csvv2", btagCSVFile_),  
   reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
-  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
+//reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
 {
   //now do what ever initialization is needed
   isData = true;
   nEventsAll = 0;
   nEventsStored = 0;
+
+  if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
+    std::vector<JetCorrectorParameters> vPar;  
+    for ( std::vector<std::string>::const_iterator it = newJECPayloadNames_.begin(); it != newJECPayloadNames_.end(); ++it) {
+      JetCorrectorParameters pars(*it);
+      vPar.push_back(pars) ; 
+    }
+    ptr_newJEC_ = boost::shared_ptr<FactorizedJetCorrector> ( new FactorizedJetCorrector(vPar) ); 
+
+  }
+
+  if ( doJECUncert_ ) ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
 
@@ -902,6 +935,22 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     //---------------------------- Start fat jet loop ---------------------------------------//
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
+
+      double jetpt(FatJetInfo.Jet_pt[iJet]) ;
+      double jeteta(FatJetInfo.Jet_eta[iJet]) ;
+
+      double jesup(1.0), jesdown(1.0);
+      if ( doJECUncert_ ) {
+        GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
+        GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
+      }
+
+      edm::LogInfo("JEC") << " jetpt = " << jetpt 
+        << " jes uncert up = " << jesup 
+        << " jes uncert down = " << jesdown
+        << " jetpt_up = " << jetpt*(1 + jesup)
+        << " jetpt_down = " << jetpt*(1+jesdown) ; 
+
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
           FatJetInfo.Jet_pt[iJet] > fatJetPtMax_ )                  continue; //// apply jet pT cut
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
@@ -1049,20 +1098,20 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           //wtFatJet *= scaleFactor(FatJetInfo.Jet_flavour[iJet], FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], (fatJetBDiscrCut_>0.25));
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]); 
       }
-//added by Erich - jetPt reweighting factor
+      //added by Erich - jetPt reweighting factor
       double wtJetPt = 1.;
-//       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+      //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
       if (doFatJetPtReweighting_ && !isData) { //original UNCOMMENT!
         wtJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
         wtFatJet *= wtJetPt ;
       }
-//added by Rizki - subjet_ptBalance reweighting factor
+      //added by Rizki - subjet_ptBalance reweighting factor
       double wtSubJetPtBalance = 1.;
       if (doSubJetPtBalanceReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
         wtSubJetPtBalance *= GetLumiWeightsSubJetPtBalanceBased(file_SubJetPtBalanceWt_, hist_SubJetPtBalanceWt_, SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]) ) ;
         wtFatJet *= wtSubJetPtBalance ;
       }
-      
+
 
 
       //// fat jet multiplicity
@@ -1330,16 +1379,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       FillHisto2D("FatJet_BDTGSV_jetNTracks" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,jetNTracks ,wtPU*wtFatJet);
       FillHisto2D("FatJet_jetNTracks_trackSip3dSig_0" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,jetNTracks ,trackSip3dSig_0 , wtPU*wtFatJet);
-      
+
       //for signal proxy study, for subjet pt balance reweight. - start    
       float subjets_pT_balance = SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]); 
       if (usePrunedSubjets_){
-      FillHisto("FatJet_prunedsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
-      FillHisto("FatJet_prunedsubjet_ptBalance_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet/wtSubJetPtBalance);      
+        FillHisto("FatJet_prunedsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
+        FillHisto("FatJet_prunedsubjet_ptBalance_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet/wtSubJetPtBalance);      
       }
       else if (useSoftDropSubjets_){
-      FillHisto("FatJet_softdropsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
-      FillHisto("FatJet_softdropsubjet_ptBalance_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet/wtSubJetPtBalance);      
+        FillHisto("FatJet_softdropsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
+        FillHisto("FatJet_softdropsubjet_ptBalance_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet/wtSubJetPtBalance);      
       }
       //for signal proxy study, for subjet pt balance reweight. - end
 
@@ -1369,10 +1418,10 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       h1_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
       FillHisto("FatJet_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
       fillJetHistos(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, wtPU*wtFatJet);
-      
+
       FillHisto("FatJet_pt_all_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet] ,wtPU*wtFatJet/wtJetPt); //debug for signal vs proxy reweighting - rizki
 
-	
+
 
       //// ------- start process subjets --------------
       if( usePrunedSubjets_ || useSoftDropSubjets_ ) {
@@ -1462,693 +1511,712 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if( !isData && nFatJet>0 ) h1_pt_hat_sel->Fill(EvtInfo.pthat,wtPU);
 
+    }
+    //----------------------------- End event loop ----------------------------------------//
   }
-  //----------------------------- End event loop ----------------------------------------//
-}
 
-// ------------------------------------------------------------------------------
-void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const int nmu, const int nselmuon, const int idxFirstMuon, const double wt) {
+  // ------------------------------------------------------------------------------
+  void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const int nmu, const int nselmuon, const int idxFirstMuon, const double wt) {
 
-  float ptjet      = JetInfo.Jet_pt[iJet];
-  float etajet     = JetInfo.Jet_eta[iJet];
-  float phijet     = JetInfo.Jet_phi[iJet];
-  float mass       = JetInfo.Jet_mass[iJet];
-  float ntrkjet    = JetInfo.Jet_ntracks[iJet];
-  int   flav       = JetInfo.Jet_flavour[iJet];
+    float ptjet      = JetInfo.Jet_pt[iJet];
+    float etajet     = JetInfo.Jet_eta[iJet];
+    float phijet     = JetInfo.Jet_phi[iJet];
+    float mass       = JetInfo.Jet_mass[iJet];
+    float ntrkjet    = JetInfo.Jet_ntracks[iJet];
+    int   flav       = JetInfo.Jet_flavour[iJet];
 
-  FillHisto(histoTag+"_pt_all", flav, isGSPbb , isGSPcc, ptjet , wt) ;
-  if (JetInfo.Jet_SV_multi[iJet] > 0) FillHisto(histoTag+"_pt_sv", flav, isGSPbb , isGSPcc ,ptjet , wt) ;
+    FillHisto(histoTag+"_pt_all", flav, isGSPbb , isGSPcc, ptjet , wt) ;
+    if (JetInfo.Jet_SV_multi[iJet] > 0) FillHisto(histoTag+"_pt_sv", flav, isGSPbb , isGSPcc ,ptjet , wt) ;
 
-  FillHisto(histoTag+"_eta"         ,flav ,isGSPbb , isGSPcc ,etajet     ,wt) ;
-  FillHisto(histoTag+"_phi"         ,flav ,isGSPbb , isGSPcc ,phijet     ,wt) ;
-  FillHisto(histoTag+"_mass"        ,flav ,isGSPbb , isGSPcc ,mass       ,wt) ;
-  FillHisto(histoTag+"_track_multi" ,flav ,isGSPbb , isGSPcc ,ntrkjet    ,wt) ;
+    FillHisto(histoTag+"_eta"         ,flav ,isGSPbb , isGSPcc ,etajet     ,wt) ;
+    FillHisto(histoTag+"_phi"         ,flav ,isGSPbb , isGSPcc ,phijet     ,wt) ;
+    FillHisto(histoTag+"_mass"        ,flav ,isGSPbb , isGSPcc ,mass       ,wt) ;
+    FillHisto(histoTag+"_track_multi" ,flav ,isGSPbb , isGSPcc ,ntrkjet    ,wt) ;
 
-  float mass_sv        = 0.;
-  int   n_sv           = 0 ;
-  float chi2norm_sv    = 0.;
-  float flightSig_sv   = 0.;
-  float flight2DSig_sv = 0.;
-  float sv_dR_jet      = 0.;
-  float sv_dR_dir_sum  = 0.;
-  float sv_dR_jet_sum  = 0.;
-  float sv_en_rat      = 0.;
-  //DMfloat sv_aboveC      = 0.;
-  float sv_pt          = 0.;
-  float sveta          = 0.;
-  float svphi          = 0.;
-  float sv_flight3D    = 0.;
-  float sv_flight3Derr = 0.;
-  float sv_flight2D    = 0.;
-  float sv_flight2Derr = 0.;
-  int   sv_totchar     = 0;
-  float sv_nTrk        = 0.;
-  //DMfloat sv_1st_nTrk    = 0.;
+    float mass_sv        = 0.;
+    int   n_sv           = 0 ;
+    float chi2norm_sv    = 0.;
+    float flightSig_sv   = 0.;
+    float flight2DSig_sv = 0.;
+    float sv_dR_jet      = 0.;
+    float sv_dR_dir_sum  = 0.;
+    float sv_dR_jet_sum  = 0.;
+    float sv_en_rat      = 0.;
+    //DMfloat sv_aboveC      = 0.;
+    float sv_pt          = 0.;
+    float sveta          = 0.;
+    float svphi          = 0.;
+    float sv_flight3D    = 0.;
+    float sv_flight3Derr = 0.;
+    float sv_flight2D    = 0.;
+    float sv_flight2Derr = 0.;
+    int   sv_totchar     = 0;
+    float sv_nTrk        = 0.;
+    //DMfloat sv_1st_nTrk    = 0.;
 
-  int   n1_ip     = -1;
-  int   n2_ip     = -1;
-  int   n3_ip     = -1;
-  float sig1_ip   = -9999;
-  float sig2_ip   = -9999;
-  float sig3_ip   = -9999;
-  float sig12D_ip = -9999;
-  float sig22D_ip = -9999;
-  float sig32D_ip = -9999;
+    int   n1_ip     = -1;
+    int   n2_ip     = -1;
+    int   n3_ip     = -1;
+    float sig1_ip   = -9999;
+    float sig2_ip   = -9999;
+    float sig3_ip   = -9999;
+    float sig12D_ip = -9999;
+    float sig22D_ip = -9999;
+    float sig32D_ip = -9999;
 
-  int ntracksel   = 0;
+    int ntracksel   = 0;
 
-  if ( useJetProbaTree_ ) {
-    //---------------------------- Start tracks loop ---------------------------------------//
-    for (int iTrk=JetInfo.Jet_nFirstTrack[iJet]; iTrk<JetInfo.Jet_nLastTrack[iJet] ; ++iTrk) {
-      // -----------------------------------------
-      // -------- track information --------------
-      // -----------------------------------------
-      bool passNhit=false;
-      bool passPix= false;
-      bool passIPz=false;
-      bool passPt=false;
-      bool passnormchi2=false;
-      bool passtrkdist=false;
-      bool passtrklen=false;
-      bool passTrackIP2D=false;
+    if ( useJetProbaTree_ ) {
+      //---------------------------- Start tracks loop ---------------------------------------//
+      for (int iTrk=JetInfo.Jet_nFirstTrack[iJet]; iTrk<JetInfo.Jet_nLastTrack[iJet] ; ++iTrk) {
+        // -----------------------------------------
+        // -------- track information --------------
+        // -----------------------------------------
+        bool passNhit=false;
+        bool passPix= false;
+        bool passIPz=false;
+        bool passPt=false;
+        bool passnormchi2=false;
+        bool passtrkdist=false;
+        bool passtrklen=false;
+        bool passTrackIP2D=false;
 
-      if (JetInfo.Track_nHitAll[iTrk]>=8)      passNhit=true;
-      if (JetInfo.Track_nHitPixel[iTrk]>=2)    passPix= true;
-      if (fabs(JetInfo.Track_dz[iTrk])<17)     passIPz=true;
-      if (JetInfo.Track_pt[iTrk]>1)            passPt=true;
-      if (JetInfo.Track_chi2[iTrk]<5)          passnormchi2=true;
-      if (fabs(JetInfo.Track_dist[iTrk])<0.07) passtrkdist=true;
-      if (JetInfo.Track_length[iTrk]<5)        passtrklen=true;
-      if (fabs(JetInfo.Track_IP2D[iTrk])<0.2)  passTrackIP2D=true;
+        if (JetInfo.Track_nHitAll[iTrk]>=8)      passNhit=true;
+        if (JetInfo.Track_nHitPixel[iTrk]>=2)    passPix= true;
+        if (fabs(JetInfo.Track_dz[iTrk])<17)     passIPz=true;
+        if (JetInfo.Track_pt[iTrk]>1)            passPt=true;
+        if (JetInfo.Track_chi2[iTrk]<5)          passnormchi2=true;
+        if (fabs(JetInfo.Track_dist[iTrk])<0.07) passtrkdist=true;
+        if (JetInfo.Track_length[iTrk]<5)        passtrklen=true;
+        if (fabs(JetInfo.Track_IP2D[iTrk])<0.2)  passTrackIP2D=true;
 
-      if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passTrackIP2D)
-        FillHisto(histoTag+"_track_len_cut",          flav, isGSPbb ,isGSPcc ,JetInfo.Track_length[iTrk] , wt);
+        if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passTrackIP2D)
+          FillHisto(histoTag+"_track_len_cut",          flav, isGSPbb ,isGSPcc ,JetInfo.Track_length[iTrk] , wt);
 
-      if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrklen && passTrackIP2D)
-        FillHisto(histoTag+"_track_dist_cut",         flav, isGSPbb ,isGSPcc ,fabs(JetInfo.Track_dist[iTrk])   , wt);
+        if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrklen && passTrackIP2D)
+          FillHisto(histoTag+"_track_dist_cut",         flav, isGSPbb ,isGSPcc ,fabs(JetInfo.Track_dist[iTrk])   , wt);
 
-      if (passNhit && passPix && passIPz && passPt && passtrkdist && passtrklen && passTrackIP2D)
-        FillHisto(histoTag+"_track_chi2_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_chi2[iTrk]         , wt);
+        if (passNhit && passPix && passIPz && passPt && passtrkdist && passtrklen && passTrackIP2D)
+          FillHisto(histoTag+"_track_chi2_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_chi2[iTrk]         , wt);
 
-      if (passNhit && passPix && passIPz && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D)
-      {
-        FillHisto(histoTag+"_track_pt_cut",           flav, isGSPbb ,isGSPcc ,JetInfo.Track_pt[iTrk]     , wt);
-        FillHisto(histoTag+"_track_pt15_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_pt[iTrk]     , wt);
+        if (passNhit && passPix && passIPz && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D)
+        {
+          FillHisto(histoTag+"_track_pt_cut",           flav, isGSPbb ,isGSPcc ,JetInfo.Track_pt[iTrk]     , wt);
+          FillHisto(histoTag+"_track_pt15_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_pt[iTrk]     , wt);
+        }
+
+        if (passNhit && passPix && passPt && passnormchi2 && passtrkdist && passtrklen)
+          FillHisto(histoTag+"_track_dz_cut",          flav, isGSPbb ,isGSPcc ,JetInfo.Track_dz[iTrk]      ,wt);
+
+        if (passNhit && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D)
+          FillHisto(histoTag+"_track_HPix_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_nHitPixel[iTrk],wt);
+
+        if (passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D)
+          FillHisto(histoTag+"_track_nHit_cut",       flav, isGSPbb ,isGSPcc ,JetInfo.Track_nHitAll[iTrk],wt);
+
+        if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen )
+          FillHisto(histoTag+"_track_IP2D_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_IP2D[iTrk],wt);
+
+        // -------------------- start selected tracks -------------------------
+        if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D) {
+          ++ntracksel;
+
+          FillHisto(histoTag+"_track_chi2",    flav, isGSPbb , isGSPcc ,JetInfo.Track_chi2[iTrk]      ,wt);
+          FillHisto(histoTag+"_track_nHit",    flav, isGSPbb , isGSPcc ,JetInfo.Track_nHitAll[iTrk]   ,wt);
+          FillHisto(histoTag+"_track_HPix",    flav, isGSPbb , isGSPcc ,JetInfo.Track_nHitPixel[iTrk] ,wt);
+          FillHisto(histoTag+"_track_IPs",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IPsig[iTrk]     ,wt);
+          FillHisto(histoTag+"_track_IP",      flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[iTrk]        ,wt);
+          FillHisto(histoTag+"_track_IP2Ds",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Dsig[iTrk]   ,wt);
+          FillHisto(histoTag+"_track_IP2D",    flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[iTrk]      ,wt);
+          FillHisto(histoTag+"_track_IP2Derr", flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[iTrk]   ,wt);
+          FillHisto(histoTag+"_track_IPerr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[iTrk]     ,wt);
+          FillHisto(histoTag+"_track_dz",      flav, isGSPbb , isGSPcc ,JetInfo.Track_dz[iTrk]        ,wt);
+          FillHisto(histoTag+"_track_isfromSV",flav, isGSPbb , isGSPcc ,JetInfo.Track_isfromSV[iTrk]  ,wt);
+          FillHisto(histoTag+"_track_len",     flav, isGSPbb , isGSPcc ,JetInfo.Track_length[iTrk]    ,wt);
+          FillHisto(histoTag+"_track_dist",    flav, isGSPbb , isGSPcc ,fabs(JetInfo.Track_dist[iTrk]),wt);
+          FillHisto(histoTag+"_track_pt",      flav, isGSPbb , isGSPcc ,JetInfo.Track_pt[iTrk]        ,wt);
+          FillHisto(histoTag+"_track_pt15",    flav, isGSPbb , isGSPcc ,JetInfo.Track_pt[iTrk]        ,wt);
+
+          // tracks sorted by IP
+          float sig   = JetInfo.Track_IP[iTrk]/JetInfo.Track_IPerr[iTrk];
+          float sig2D = JetInfo.Track_IP2D[iTrk]/JetInfo.Track_IP2Derr[iTrk];
+          if (sig>sig1_ip)
+          {
+            sig3_ip   = sig2_ip;
+            sig2_ip   = sig1_ip;
+            sig1_ip   = sig;
+            sig32D_ip = sig22D_ip;
+            sig22D_ip = sig12D_ip;
+            sig12D_ip = sig2D;
+            n3_ip     = n2_ip;
+            n2_ip     = n1_ip;
+            n1_ip     = iTrk;
+          }
+          else if (sig>sig2_ip)
+          {
+            sig3_ip   = sig2_ip;
+            sig2_ip   = sig;
+            sig32D_ip = sig22D_ip;
+            sig22D_ip = sig2D;
+            n3_ip     = n2_ip;
+            n2_ip     = iTrk;
+          }
+          else if (sig>sig3_ip)
+          {
+            sig3_ip   = sig;
+            sig32D_ip = sig2D;
+            n3_ip     = iTrk;
+          }
+        }
+        // -------------------- end selected tracks -------------------------
+      }
+      //---------------------------- End tracks loop ---------------------------------------//
+
+      if (n1_ip>-1)  {
+        FillHisto(histoTag+"_track_IPs1tr",    flav, isGSPbb , isGSPcc ,sig1_ip                          , wt) ;
+        FillHisto(histoTag+"_track_IP1tr",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[n1_ip]       , wt) ;
+        FillHisto(histoTag+"_track_IPerr1tr",  flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[n1_ip]    , wt) ;
+        FillHisto(histoTag+"_track_IP2Ds1tr",  flav, isGSPbb , isGSPcc ,sig12D_ip                        , wt) ;
+        FillHisto(histoTag+"_track_IP2D1tr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[n1_ip]     , wt) ;
+        FillHisto(histoTag+"_track_IP2Derr1tr",flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[n1_ip]  , wt) ;
       }
 
-      if (passNhit && passPix && passPt && passnormchi2 && passtrkdist && passtrklen)
-        FillHisto(histoTag+"_track_dz_cut",          flav, isGSPbb ,isGSPcc ,JetInfo.Track_dz[iTrk]      ,wt);
-
-      if (passNhit && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D)
-        FillHisto(histoTag+"_track_HPix_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_nHitPixel[iTrk],wt);
-
-      if (passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D)
-        FillHisto(histoTag+"_track_nHit_cut",       flav, isGSPbb ,isGSPcc ,JetInfo.Track_nHitAll[iTrk],wt);
-
-      if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen )
-        FillHisto(histoTag+"_track_IP2D_cut",         flav, isGSPbb ,isGSPcc ,JetInfo.Track_IP2D[iTrk],wt);
-
-      // -------------------- start selected tracks -------------------------
-      if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D) {
-        ++ntracksel;
-
-        FillHisto(histoTag+"_track_chi2",    flav, isGSPbb , isGSPcc ,JetInfo.Track_chi2[iTrk]      ,wt);
-        FillHisto(histoTag+"_track_nHit",    flav, isGSPbb , isGSPcc ,JetInfo.Track_nHitAll[iTrk]   ,wt);
-        FillHisto(histoTag+"_track_HPix",    flav, isGSPbb , isGSPcc ,JetInfo.Track_nHitPixel[iTrk] ,wt);
-        FillHisto(histoTag+"_track_IPs",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IPsig[iTrk]     ,wt);
-        FillHisto(histoTag+"_track_IP",      flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[iTrk]        ,wt);
-        FillHisto(histoTag+"_track_IP2Ds",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Dsig[iTrk]   ,wt);
-        FillHisto(histoTag+"_track_IP2D",    flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[iTrk]      ,wt);
-        FillHisto(histoTag+"_track_IP2Derr", flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[iTrk]   ,wt);
-        FillHisto(histoTag+"_track_IPerr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[iTrk]     ,wt);
-        FillHisto(histoTag+"_track_dz",      flav, isGSPbb , isGSPcc ,JetInfo.Track_dz[iTrk]        ,wt);
-        FillHisto(histoTag+"_track_isfromSV",flav, isGSPbb , isGSPcc ,JetInfo.Track_isfromSV[iTrk]  ,wt);
-        FillHisto(histoTag+"_track_len",     flav, isGSPbb , isGSPcc ,JetInfo.Track_length[iTrk]    ,wt);
-        FillHisto(histoTag+"_track_dist",    flav, isGSPbb , isGSPcc ,fabs(JetInfo.Track_dist[iTrk]),wt);
-        FillHisto(histoTag+"_track_pt",      flav, isGSPbb , isGSPcc ,JetInfo.Track_pt[iTrk]        ,wt);
-        FillHisto(histoTag+"_track_pt15",    flav, isGSPbb , isGSPcc ,JetInfo.Track_pt[iTrk]        ,wt);
-
-        // tracks sorted by IP
-        float sig   = JetInfo.Track_IP[iTrk]/JetInfo.Track_IPerr[iTrk];
-        float sig2D = JetInfo.Track_IP2D[iTrk]/JetInfo.Track_IP2Derr[iTrk];
-        if (sig>sig1_ip)
-        {
-          sig3_ip   = sig2_ip;
-          sig2_ip   = sig1_ip;
-          sig1_ip   = sig;
-          sig32D_ip = sig22D_ip;
-          sig22D_ip = sig12D_ip;
-          sig12D_ip = sig2D;
-          n3_ip     = n2_ip;
-          n2_ip     = n1_ip;
-          n1_ip     = iTrk;
-        }
-        else if (sig>sig2_ip)
-        {
-          sig3_ip   = sig2_ip;
-          sig2_ip   = sig;
-          sig32D_ip = sig22D_ip;
-          sig22D_ip = sig2D;
-          n3_ip     = n2_ip;
-          n2_ip     = iTrk;
-        }
-        else if (sig>sig3_ip)
-        {
-          sig3_ip   = sig;
-          sig32D_ip = sig2D;
-          n3_ip     = iTrk;
-        }
+      if (n2_ip>-1) {
+        FillHisto(histoTag+"_track_IPs2tr",    flav, isGSPbb , isGSPcc ,sig2_ip                          , wt) ;
+        FillHisto(histoTag+"_track_IP2tr",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[n2_ip]       , wt) ;
+        FillHisto(histoTag+"_track_IPerr2tr",  flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[n2_ip]    , wt) ;
+        FillHisto(histoTag+"_track_IP2Ds2tr",  flav, isGSPbb , isGSPcc ,sig22D_ip                        , wt) ;
+        FillHisto(histoTag+"_track_IP2D2tr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[n2_ip]     , wt) ;
+        FillHisto(histoTag+"_track_IP2Derr2tr",flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[n2_ip]  , wt) ;
       }
-      // -------------------- end selected tracks -------------------------
-    }
-    //---------------------------- End tracks loop ---------------------------------------//
 
-    if (n1_ip>-1)  {
-      FillHisto(histoTag+"_track_IPs1tr",    flav, isGSPbb , isGSPcc ,sig1_ip                          , wt) ;
-      FillHisto(histoTag+"_track_IP1tr",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[n1_ip]       , wt) ;
-      FillHisto(histoTag+"_track_IPerr1tr",  flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[n1_ip]    , wt) ;
-      FillHisto(histoTag+"_track_IP2Ds1tr",  flav, isGSPbb , isGSPcc ,sig12D_ip                        , wt) ;
-      FillHisto(histoTag+"_track_IP2D1tr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[n1_ip]     , wt) ;
-      FillHisto(histoTag+"_track_IP2Derr1tr",flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[n1_ip]  , wt) ;
-    }
+      if (n3_ip>-1) {
+        FillHisto(histoTag+"_track_IPs3tr",    flav, isGSPbb , isGSPcc ,sig3_ip                          , wt) ;
+        FillHisto(histoTag+"_track_IP3tr",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[n3_ip]       , wt) ;
+        FillHisto(histoTag+"_track_IPerr3tr",  flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[n3_ip]    , wt) ;
+        FillHisto(histoTag+"_track_IP2Ds3tr",  flav, isGSPbb , isGSPcc ,sig32D_ip                        , wt) ;
+        FillHisto(histoTag+"_track_IP2D3tr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[n3_ip]     , wt) ;
+        FillHisto(histoTag+"_track_IP2Derr3tr",flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[n3_ip]  , wt) ;
+      }
 
-    if (n2_ip>-1) {
-      FillHisto(histoTag+"_track_IPs2tr",    flav, isGSPbb , isGSPcc ,sig2_ip                          , wt) ;
-      FillHisto(histoTag+"_track_IP2tr",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[n2_ip]       , wt) ;
-      FillHisto(histoTag+"_track_IPerr2tr",  flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[n2_ip]    , wt) ;
-      FillHisto(histoTag+"_track_IP2Ds2tr",  flav, isGSPbb , isGSPcc ,sig22D_ip                        , wt) ;
-      FillHisto(histoTag+"_track_IP2D2tr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[n2_ip]     , wt) ;
-      FillHisto(histoTag+"_track_IP2Derr2tr",flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[n2_ip]  , wt) ;
-    }
+      FillHisto(histoTag+"_trk_multi_sel",     flav, isGSPbb , isGSPcc ,ntracksel           , wt);
+      FillHisto2D(histoTag+"_seltrack_vs_jetpt", flav, isGSPbb ,isGSPcc ,ptjet ,  ntracksel , wt);
+      FillHisto2D(histoTag+"_muon_ptrel_vs_nseltrack", flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxFirstMuon],  ntracksel , wt);
 
-    if (n3_ip>-1) {
-      FillHisto(histoTag+"_track_IPs3tr",    flav, isGSPbb , isGSPcc ,sig3_ip                          , wt) ;
-      FillHisto(histoTag+"_track_IP3tr",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IP[n3_ip]       , wt) ;
-      FillHisto(histoTag+"_track_IPerr3tr",  flav, isGSPbb , isGSPcc ,JetInfo.Track_IPerr[n3_ip]    , wt) ;
-      FillHisto(histoTag+"_track_IP2Ds3tr",  flav, isGSPbb , isGSPcc ,sig32D_ip                        , wt) ;
-      FillHisto(histoTag+"_track_IP2D3tr",   flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2D[n3_ip]     , wt) ;
-      FillHisto(histoTag+"_track_IP2Derr3tr",flav, isGSPbb , isGSPcc ,JetInfo.Track_IP2Derr[n3_ip]  , wt) ;
-    }
+    } // end useJetProbaTree
 
-    FillHisto(histoTag+"_trk_multi_sel",     flav, isGSPbb , isGSPcc ,ntracksel           , wt);
-    FillHisto2D(histoTag+"_seltrack_vs_jetpt", flav, isGSPbb ,isGSPcc ,ptjet ,  ntracksel , wt);
-    FillHisto2D(histoTag+"_muon_ptrel_vs_nseltrack", flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxFirstMuon],  ntracksel , wt);
+    // ------------------------------------------------
+    // -------------- SV information ------------------
+    // ------------------------------------------------
+    n_sv = JetInfo.Jet_SV_multi[iJet];
+    FillHisto(histoTag+"_sv_multi_0",      flav, isGSPbb , isGSPcc ,n_sv   ,         wt);
 
-  } // end useJetProbaTree
-
-  // ------------------------------------------------
-  // -------------- SV information ------------------
-  // ------------------------------------------------
-  n_sv = JetInfo.Jet_SV_multi[iJet];
-  FillHisto(histoTag+"_sv_multi_0",      flav, isGSPbb , isGSPcc ,n_sv   ,         wt);
-
-  if (n_sv>0)
-  {
-
-    chi2norm_sv    = JetInfo.SV_chi2[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_ndf[JetInfo.Jet_nFirstSV[iJet]];
-    flightSig_sv   = JetInfo.SV_flight[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_flightErr[JetInfo.Jet_nFirstSV[iJet]];
-    flight2DSig_sv = JetInfo.SV_flight2D[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_flight2DErr[JetInfo.Jet_nFirstSV[iJet]];
-    mass_sv        = JetInfo.SV_mass[JetInfo.Jet_nFirstSV[iJet]];
-    sv_dR_jet      = JetInfo.SV_deltaR_jet[JetInfo.Jet_nFirstSV[iJet]];
-    sv_dR_dir_sum  = JetInfo.SV_deltaR_sum_dir[JetInfo.Jet_nFirstSV[iJet]];
-    sv_dR_jet_sum  = JetInfo.SV_deltaR_sum_jet[JetInfo.Jet_nFirstSV[iJet]];
-    sv_en_rat      = JetInfo.SV_EnergyRatio[JetInfo.Jet_nFirstSV[iJet]];
-    //DMsv_aboveC       = JetInfo.SV_aboveC[JetInfo.Jet_nFirstSV[iJet]];
-    sv_pt          = JetInfo.SV_vtx_pt[JetInfo.Jet_nFirstSV[iJet]];
-    sveta          = JetInfo.SV_vtx_eta[JetInfo.Jet_nFirstSV[iJet]];
-    svphi          = JetInfo.SV_vtx_phi[JetInfo.Jet_nFirstSV[iJet]];
-
-    sv_flight3D     = JetInfo.SV_flight[JetInfo.Jet_nFirstSV[iJet]] ;
-    sv_flight3Derr  = JetInfo.SV_flightErr[JetInfo.Jet_nFirstSV[iJet]];
-    sv_flight2D     = JetInfo.SV_flight2D[JetInfo.Jet_nFirstSV[iJet]];
-    sv_flight2Derr  = JetInfo.SV_flight2DErr[JetInfo.Jet_nFirstSV[iJet]];
-    sv_totchar      = JetInfo.SV_totCharge[JetInfo.Jet_nFirstSV[iJet]] ;
-
-    sv_nTrk         = JetInfo.SV_nTrk[JetInfo.Jet_nFirstSV[iJet]] ;
-    //DMsv_1st_nTrk     = JetInfo.SV_nTrk_firstVxt[JetInfo.Jet_nFirstSV[iJet]];
-
-    // --------- SV histograms --------
-    FillHisto(histoTag+"_sv_multi",        flav, isGSPbb ,isGSPcc ,n_sv ,  wt);
-    FillHisto(histoTag+"_sv_chi2norm",     flav, isGSPbb ,isGSPcc ,chi2norm_sv        , wt);
-    FillHisto(histoTag+"_sv_mass",         flav, isGSPbb ,isGSPcc ,mass_sv,             wt);
-    FillHisto(histoTag+"_sv_deltaR_jet",   flav, isGSPbb ,isGSPcc ,sv_dR_jet,           wt);
-    FillHisto(histoTag+"_sv_deltaR_sumJet",flav, isGSPbb ,isGSPcc ,sv_dR_dir_sum,       wt);
-    FillHisto(histoTag+"_sv_deltaR_sumDir",flav, isGSPbb ,isGSPcc ,sv_dR_jet_sum,       wt);
-    FillHisto(histoTag+"_sv_en_ratio",     flav, isGSPbb ,isGSPcc ,sv_en_rat,           wt);
-    //DMFillHisto(histoTag+"_sv_aboveC",       flav, isGSPbb ,isGSPcc ,sv_aboveC,            wt);
-    FillHisto(histoTag+"_sv_pt",             flav, isGSPbb ,isGSPcc ,sv_pt,               wt);
-    FillHisto(histoTag+"_sv_flight2D",       flav, isGSPbb ,isGSPcc ,sv_flight2D,         wt);
-    FillHisto(histoTag+"_sv_flight2Derr",    flav, isGSPbb ,isGSPcc ,sv_flight2Derr,      wt);
-    FillHisto(histoTag+"_sv_flightSig2D",    flav, isGSPbb ,isGSPcc ,flight2DSig_sv,      wt);
-    FillHisto(histoTag+"_sv_tot_charge",     flav, isGSPbb ,isGSPcc ,sv_totchar,          wt);
-    FillHisto(histoTag+"_svnTrk",            flav, isGSPbb ,isGSPcc ,sv_nTrk,             wt);
-    //DMFillHisto(histoTag+"_svnTrk_firstVxt", flav, isGSPbb ,isGSPcc ,sv_1st_nTrk,         wt);
-    FillHisto(histoTag+"_sv_eta",            flav, isGSPbb ,isGSPcc ,sveta,               wt);
-    FillHisto(histoTag+"_sv_phi",            flav, isGSPbb ,isGSPcc ,svphi,               wt);
-    FillHisto(histoTag+"_sv_flight3D",       flav, isGSPbb ,isGSPcc ,sv_flight3D,         wt);
-    FillHisto(histoTag+"_sv_flight3Derr",    flav, isGSPbb ,isGSPcc ,sv_flight3Derr,      wt);
-    FillHisto(histoTag+"_sv_flight3DSig",    flav, isGSPbb ,isGSPcc ,flightSig_sv,        wt);
-
-    if (sv_nTrk >2)
+    if (n_sv>0)
     {
-      FillHisto(histoTag+"_sv_mass_3trk", flav, isGSPbb ,isGSPcc ,mass_sv,wt);
-      FillHisto(histoTag+"_sv_flightSig2D_3trk",  flav, isGSPbb ,isGSPcc ,flight2DSig_sv,        wt);
+
+      chi2norm_sv    = JetInfo.SV_chi2[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_ndf[JetInfo.Jet_nFirstSV[iJet]];
+      flightSig_sv   = JetInfo.SV_flight[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_flightErr[JetInfo.Jet_nFirstSV[iJet]];
+      flight2DSig_sv = JetInfo.SV_flight2D[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_flight2DErr[JetInfo.Jet_nFirstSV[iJet]];
+      mass_sv        = JetInfo.SV_mass[JetInfo.Jet_nFirstSV[iJet]];
+      sv_dR_jet      = JetInfo.SV_deltaR_jet[JetInfo.Jet_nFirstSV[iJet]];
+      sv_dR_dir_sum  = JetInfo.SV_deltaR_sum_dir[JetInfo.Jet_nFirstSV[iJet]];
+      sv_dR_jet_sum  = JetInfo.SV_deltaR_sum_jet[JetInfo.Jet_nFirstSV[iJet]];
+      sv_en_rat      = JetInfo.SV_EnergyRatio[JetInfo.Jet_nFirstSV[iJet]];
+      //DMsv_aboveC       = JetInfo.SV_aboveC[JetInfo.Jet_nFirstSV[iJet]];
+      sv_pt          = JetInfo.SV_vtx_pt[JetInfo.Jet_nFirstSV[iJet]];
+      sveta          = JetInfo.SV_vtx_eta[JetInfo.Jet_nFirstSV[iJet]];
+      svphi          = JetInfo.SV_vtx_phi[JetInfo.Jet_nFirstSV[iJet]];
+
+      sv_flight3D     = JetInfo.SV_flight[JetInfo.Jet_nFirstSV[iJet]] ;
+      sv_flight3Derr  = JetInfo.SV_flightErr[JetInfo.Jet_nFirstSV[iJet]];
+      sv_flight2D     = JetInfo.SV_flight2D[JetInfo.Jet_nFirstSV[iJet]];
+      sv_flight2Derr  = JetInfo.SV_flight2DErr[JetInfo.Jet_nFirstSV[iJet]];
+      sv_totchar      = JetInfo.SV_totCharge[JetInfo.Jet_nFirstSV[iJet]] ;
+
+      sv_nTrk         = JetInfo.SV_nTrk[JetInfo.Jet_nFirstSV[iJet]] ;
+      //DMsv_1st_nTrk     = JetInfo.SV_nTrk_firstVxt[JetInfo.Jet_nFirstSV[iJet]];
+
+      // --------- SV histograms --------
+      FillHisto(histoTag+"_sv_multi",        flav, isGSPbb ,isGSPcc ,n_sv ,  wt);
+      FillHisto(histoTag+"_sv_chi2norm",     flav, isGSPbb ,isGSPcc ,chi2norm_sv        , wt);
+      FillHisto(histoTag+"_sv_mass",         flav, isGSPbb ,isGSPcc ,mass_sv,             wt);
+      FillHisto(histoTag+"_sv_deltaR_jet",   flav, isGSPbb ,isGSPcc ,sv_dR_jet,           wt);
+      FillHisto(histoTag+"_sv_deltaR_sumJet",flav, isGSPbb ,isGSPcc ,sv_dR_dir_sum,       wt);
+      FillHisto(histoTag+"_sv_deltaR_sumDir",flav, isGSPbb ,isGSPcc ,sv_dR_jet_sum,       wt);
+      FillHisto(histoTag+"_sv_en_ratio",     flav, isGSPbb ,isGSPcc ,sv_en_rat,           wt);
+      //DMFillHisto(histoTag+"_sv_aboveC",       flav, isGSPbb ,isGSPcc ,sv_aboveC,            wt);
+      FillHisto(histoTag+"_sv_pt",             flav, isGSPbb ,isGSPcc ,sv_pt,               wt);
+      FillHisto(histoTag+"_sv_flight2D",       flav, isGSPbb ,isGSPcc ,sv_flight2D,         wt);
+      FillHisto(histoTag+"_sv_flight2Derr",    flav, isGSPbb ,isGSPcc ,sv_flight2Derr,      wt);
+      FillHisto(histoTag+"_sv_flightSig2D",    flav, isGSPbb ,isGSPcc ,flight2DSig_sv,      wt);
+      FillHisto(histoTag+"_sv_tot_charge",     flav, isGSPbb ,isGSPcc ,sv_totchar,          wt);
+      FillHisto(histoTag+"_svnTrk",            flav, isGSPbb ,isGSPcc ,sv_nTrk,             wt);
+      //DMFillHisto(histoTag+"_svnTrk_firstVxt", flav, isGSPbb ,isGSPcc ,sv_1st_nTrk,         wt);
+      FillHisto(histoTag+"_sv_eta",            flav, isGSPbb ,isGSPcc ,sveta,               wt);
+      FillHisto(histoTag+"_sv_phi",            flav, isGSPbb ,isGSPcc ,svphi,               wt);
+      FillHisto(histoTag+"_sv_flight3D",       flav, isGSPbb ,isGSPcc ,sv_flight3D,         wt);
+      FillHisto(histoTag+"_sv_flight3Derr",    flav, isGSPbb ,isGSPcc ,sv_flight3Derr,      wt);
+      FillHisto(histoTag+"_sv_flight3DSig",    flav, isGSPbb ,isGSPcc ,flightSig_sv,        wt);
+
+      if (sv_nTrk >2)
+      {
+        FillHisto(histoTag+"_sv_mass_3trk", flav, isGSPbb ,isGSPcc ,mass_sv,wt);
+        FillHisto(histoTag+"_sv_flightSig2D_3trk",  flav, isGSPbb ,isGSPcc ,flight2DSig_sv,        wt);
+      }
+
+      FillHisto2D(histoTag+"_sv_mass_vs_flightDist3D"     ,flav,isGSPbb ,isGSPcc ,sv_flight3D,mass_sv,wt);
+      FillHisto2D(histoTag+"_avg_sv_mass_vs_jetpt"        ,flav,isGSPbb ,isGSPcc ,ptjet,mass_sv,wt);
+      FillHisto2D(histoTag+"_sv_deltar_jet_vs_jetpt"      ,flav,isGSPbb ,isGSPcc ,ptjet,sv_dR_jet,wt);
+      FillHisto2D(histoTag+"_sv_deltar_sum_jet_vs_jetpt"  ,flav,isGSPbb ,isGSPcc ,ptjet,sv_dR_dir_sum,wt);
+      FillHisto2D(histoTag+"_sv_deltar_sum_dir_vs_jetpt"  ,flav,isGSPbb ,isGSPcc ,ptjet,sv_dR_jet_sum,wt);
+    } // if n_sv > 0
+
+    // ------------------------------------------------
+    // ------------- tagger information ---------------
+    // ------------------------------------------------
+    float tche      = JetInfo.Jet_Ip2P[iJet];
+    float tchp      = JetInfo.Jet_Ip3P[iJet];
+    float jetproba  = JetInfo.Jet_Proba[iJet];
+    float jetbproba = JetInfo.Jet_Bprob[iJet];
+    float ssvhe     = JetInfo.Jet_Svx[iJet] ;
+    float ssvhp     = JetInfo.Jet_SvxHP[iJet];
+    float csv       = JetInfo.Jet_CombSvx[iJet];
+    float csvivfv2  = JetInfo.Jet_CombIVF[iJet];
+    float cmvav2    = JetInfo.Jet_cMVAv2[iJet];
+    float doubleb   = JetInfo.Jet_DoubleSV[iJet];
+    float mass_TagVarCSV_sv = JetInfo.TagVarCSV_vertexMass[iJet];
+
+    FillHisto(histoTag+"_TCHE",     flav, isGSPbb, isGSPcc ,tche      ,wt);
+    FillHisto(histoTag+"_TCHP",     flav, isGSPbb, isGSPcc ,tchp      ,wt);
+    FillHisto(histoTag+"_JP",       flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+    FillHisto(histoTag+"_JBP",      flav, isGSPbb, isGSPcc ,jetbproba ,wt);
+    FillHisto(histoTag+"_SSV",      flav, isGSPbb, isGSPcc ,ssvhe     ,wt);
+    FillHisto(histoTag+"_SSVHP",    flav, isGSPbb, isGSPcc ,ssvhp     ,wt);
+    FillHisto(histoTag+"_CSV",      flav, isGSPbb, isGSPcc ,csv       ,wt);
+    FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
+    FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
+    FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
+    FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
+    FillHisto2D(histoTag+"_TagVarCSV_sv_mass_vs_jetpt"        ,flav,isGSPbb , isGSPcc, ptjet,mass_TagVarCSV_sv,wt);
+
+    FillHisto(histoTag+"_TCHE_extended1",  flav, isGSPbb, isGSPcc ,tche  , wt);
+    FillHisto(histoTag+"_TCHP_extended1",  flav, isGSPbb, isGSPcc ,tchp  , wt);
+    FillHisto(histoTag+"_TCHE_extended2",  flav, isGSPbb, isGSPcc ,tche  , wt);
+    FillHisto(histoTag+"_TCHP_extended2",  flav, isGSPbb, isGSPcc ,tchp  , wt);
+    FillHisto(histoTag+"_discri_ssche0",   flav, isGSPbb, isGSPcc ,ssvhe , wt);
+    FillHisto(histoTag+"_discri_sschp0",   flav, isGSPbb, isGSPcc ,ssvhp , wt);
+
+    float softmu       = JetInfo.Jet_SoftMu[iJet];
+    float solfel       = JetInfo.Jet_SoftEl[iJet];
+    //DM>>float combsl       = JetInfo.Jet_CombCSVSL[iJet];
+
+    FillHisto(histoTag+"_SoftMu",      flav, isGSPbb, isGSPcc ,softmu  ,   wt);
+    FillHisto(histoTag+"_SoftEl",      flav, isGSPbb, isGSPcc ,solfel  ,   wt);
+    //DM>>FillHisto(histoTag+"_CombCSVSL",   flav, isGSPbb, isGSPcc ,combsl  ,   wt);
+
+    // ------------------------------------------------
+    // ------------- muon information -----------------
+    // ------------------------------------------------
+    FillHisto(histoTag+"_muon_multi_sel",  flav, isGSPbb ,isGSPcc ,nselmuon   ,wt);
+    FillHisto(histoTag+"_muon_multi",      flav, isGSPbb ,isGSPcc ,nmu        ,wt);
+
+    if(idxFirstMuon > -1)
+    {
+      FillHisto(histoTag+"_mu_ptrel",    flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxFirstMuon] ,wt);
+      FillHisto(histoTag+"_mu_chi2",     flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_chi2[idxFirstMuon]  ,wt);
+      FillHisto(histoTag+"_muon_Pt",     flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_pt[idxFirstMuon] ,     wt);
+      FillHisto(histoTag+"_muon_eta",    flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_eta[idxFirstMuon] ,    wt);
+      FillHisto(histoTag+"_muon_phi",    flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_phi[idxFirstMuon] ,    wt);
+      FillHisto(histoTag+"_muon_Ip3d",   flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_IP[idxFirstMuon] ,     wt);
+      FillHisto(histoTag+"_muon_Ip2d",   flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_IP2D[idxFirstMuon] ,   wt);
+
+      TLorentzVector themuon, thejet;
+
+      thejet.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
+      themuon.SetPtEtaPhiM(JetInfo.PFMuon_pt[idxFirstMuon], JetInfo.PFMuon_eta[idxFirstMuon], JetInfo.PFMuon_phi[idxFirstMuon], 0);
+
+      FillHisto(histoTag+"_muon_DeltaR",         flav, isGSPbb, isGSPcc ,themuon.DeltaR(thejet) , wt);
+      FillHisto2D(histoTag+"_muon_ptrel_vs_jetpt", flav, isGSPbb, isGSPcc ,ptjet,JetInfo.PFMuon_ptrel[idxFirstMuon],wt);
+      FillHisto2D(histoTag+"_muon_DeltaR_vs_jetpt",flav, isGSPbb, isGSPcc ,ptjet,themuon.DeltaR(thejet),wt);
     }
 
-    FillHisto2D(histoTag+"_sv_mass_vs_flightDist3D"     ,flav,isGSPbb ,isGSPcc ,sv_flight3D,mass_sv,wt);
-    FillHisto2D(histoTag+"_avg_sv_mass_vs_jetpt"        ,flav,isGSPbb ,isGSPcc ,ptjet,mass_sv,wt);
-    FillHisto2D(histoTag+"_sv_deltar_jet_vs_jetpt"      ,flav,isGSPbb ,isGSPcc ,ptjet,sv_dR_jet,wt);
-    FillHisto2D(histoTag+"_sv_deltar_sum_jet_vs_jetpt"  ,flav,isGSPbb ,isGSPcc ,ptjet,sv_dR_dir_sum,wt);
-    FillHisto2D(histoTag+"_sv_deltar_sum_dir_vs_jetpt"  ,flav,isGSPbb ,isGSPcc ,ptjet,sv_dR_jet_sum,wt);
-  } // if n_sv > 0
-
-  // ------------------------------------------------
-  // ------------- tagger information ---------------
-  // ------------------------------------------------
-  float tche      = JetInfo.Jet_Ip2P[iJet];
-  float tchp      = JetInfo.Jet_Ip3P[iJet];
-  float jetproba  = JetInfo.Jet_Proba[iJet];
-  float jetbproba = JetInfo.Jet_Bprob[iJet];
-  float ssvhe     = JetInfo.Jet_Svx[iJet] ;
-  float ssvhp     = JetInfo.Jet_SvxHP[iJet];
-  float csv       = JetInfo.Jet_CombSvx[iJet];
-  float csvivfv2  = JetInfo.Jet_CombIVF[iJet];
-  float cmvav2    = JetInfo.Jet_cMVAv2[iJet];
-  float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-  float mass_TagVarCSV_sv = JetInfo.TagVarCSV_vertexMass[iJet];
-
-  FillHisto(histoTag+"_TCHE",     flav, isGSPbb, isGSPcc ,tche      ,wt);
-  FillHisto(histoTag+"_TCHP",     flav, isGSPbb, isGSPcc ,tchp      ,wt);
-  FillHisto(histoTag+"_JP",       flav, isGSPbb, isGSPcc ,jetproba  ,wt);
-  FillHisto(histoTag+"_JBP",      flav, isGSPbb, isGSPcc ,jetbproba ,wt);
-  FillHisto(histoTag+"_SSV",      flav, isGSPbb, isGSPcc ,ssvhe     ,wt);
-  FillHisto(histoTag+"_SSVHP",    flav, isGSPbb, isGSPcc ,ssvhp     ,wt);
-  FillHisto(histoTag+"_CSV",      flav, isGSPbb, isGSPcc ,csv       ,wt);
-  FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
-  FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
-  FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
-  FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
-  FillHisto2D(histoTag+"_TagVarCSV_sv_mass_vs_jetpt"        ,flav,isGSPbb , isGSPcc, ptjet,mass_TagVarCSV_sv,wt);
-
-  FillHisto(histoTag+"_TCHE_extended1",  flav, isGSPbb, isGSPcc ,tche  , wt);
-  FillHisto(histoTag+"_TCHP_extended1",  flav, isGSPbb, isGSPcc ,tchp  , wt);
-  FillHisto(histoTag+"_TCHE_extended2",  flav, isGSPbb, isGSPcc ,tche  , wt);
-  FillHisto(histoTag+"_TCHP_extended2",  flav, isGSPbb, isGSPcc ,tchp  , wt);
-  FillHisto(histoTag+"_discri_ssche0",   flav, isGSPbb, isGSPcc ,ssvhe , wt);
-  FillHisto(histoTag+"_discri_sschp0",   flav, isGSPbb, isGSPcc ,ssvhp , wt);
-
-  float softmu       = JetInfo.Jet_SoftMu[iJet];
-  float solfel       = JetInfo.Jet_SoftEl[iJet];
-  //DM>>float combsl       = JetInfo.Jet_CombCSVSL[iJet];
-
-  FillHisto(histoTag+"_SoftMu",      flav, isGSPbb, isGSPcc ,softmu  ,   wt);
-  FillHisto(histoTag+"_SoftEl",      flav, isGSPbb, isGSPcc ,solfel  ,   wt);
-  //DM>>FillHisto(histoTag+"_CombCSVSL",   flav, isGSPbb, isGSPcc ,combsl  ,   wt);
-
-  // ------------------------------------------------
-  // ------------- muon information -----------------
-  // ------------------------------------------------
-  FillHisto(histoTag+"_muon_multi_sel",  flav, isGSPbb ,isGSPcc ,nselmuon   ,wt);
-  FillHisto(histoTag+"_muon_multi",      flav, isGSPbb ,isGSPcc ,nmu        ,wt);
-
-  if(idxFirstMuon > -1)
-  {
-    FillHisto(histoTag+"_mu_ptrel",    flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxFirstMuon] ,wt);
-    FillHisto(histoTag+"_mu_chi2",     flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_chi2[idxFirstMuon]  ,wt);
-    FillHisto(histoTag+"_muon_Pt",     flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_pt[idxFirstMuon] ,     wt);
-    FillHisto(histoTag+"_muon_eta",    flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_eta[idxFirstMuon] ,    wt);
-    FillHisto(histoTag+"_muon_phi",    flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_phi[idxFirstMuon] ,    wt);
-    FillHisto(histoTag+"_muon_Ip3d",   flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_IP[idxFirstMuon] ,     wt);
-    FillHisto(histoTag+"_muon_Ip2d",   flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_IP2D[idxFirstMuon] ,   wt);
-
-    TLorentzVector themuon, thejet;
-
-    thejet.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
-    themuon.SetPtEtaPhiM(JetInfo.PFMuon_pt[idxFirstMuon], JetInfo.PFMuon_eta[idxFirstMuon], JetInfo.PFMuon_phi[idxFirstMuon], 0);
-
-    FillHisto(histoTag+"_muon_DeltaR",         flav, isGSPbb, isGSPcc ,themuon.DeltaR(thejet) , wt);
-    FillHisto2D(histoTag+"_muon_ptrel_vs_jetpt", flav, isGSPbb, isGSPcc ,ptjet,JetInfo.PFMuon_ptrel[idxFirstMuon],wt);
-    FillHisto2D(histoTag+"_muon_DeltaR_vs_jetpt",flav, isGSPbb, isGSPcc ,ptjet,themuon.DeltaR(thejet),wt);
   }
 
-}
+  // ------------ method called once each job just after ending the event loop  ------------
+  void BTagValidation::endJob() {
 
-// ------------ method called once each job just after ending the event loop  ------------
-void BTagValidation::endJob() {
-
-  h1_CutFlow->SetBinContent(1, nEventsAll); //// strictly speaking not correct since event weights not applied
-  h1_CutFlow->SetBinContent(2, nEventsStored); //// strictly speaking not correct since event weights not applied
-  h1_CutFlow_unw->SetBinContent(1, nEventsAll);
-  h1_CutFlow_unw->SetBinContent(2, nEventsStored);
-  h1_CutFlow->SetBinError(1, TMath::Sqrt(nEventsAll)); //// strictly speaking not correct since event weights not applied
-  h1_CutFlow->SetBinError(2, TMath::Sqrt(nEventsStored)); //// strictly speaking not correct since event weights not applied
-  h1_CutFlow_unw->SetBinError(1, TMath::Sqrt(nEventsAll));
-  h1_CutFlow_unw->SetBinError(2, TMath::Sqrt(nEventsStored));
-}
-
-// ------------ method called when starting to processes a run  ------------
-void BTagValidation::beginRun(edm::Run const&, edm::EventSetup const&) {
-}
-
-// ------------ method called when ending the processing of a run  ------------
-void BTagValidation::endRun(edm::Run const&, edm::EventSetup const&) {
-}
-
-// ------------ method called when starting to processes a luminosity block  ------------
-void BTagValidation::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {
-}
-
-// ------------ method called when ending the processing of a luminosity block  ------------
-void BTagValidation::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {
-}
-
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void BTagValidation::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
-  edm::ParameterSetDescription desc;
-  desc.setUnknown();
-  descriptions.addDefault(desc);
-}
-
-// ------------------------------------------------------------------------------
-void BTagValidation::AddHisto(const TString& name, const TString& title, const int nbins, const double min, const double max)  {
-
-  TH1D* h_b;
-  TH1D* h_bfromg;
-  TH1D* h_c;
-  TH1D* h_cfromg;
-  TH1D* h_l;
-  TH1D* h_mc;
-
-  if( useFlavorCategories_ )
-  {
-    h_b      = fs->make<TH1D>(name+"_b"     ,title+"_b"     ,nbins,min,max);
-    h_bfromg = fs->make<TH1D>(name+"_bfromg",title+"_bfromg",nbins,min,max);
-    h_c      = fs->make<TH1D>(name+"_c"     ,title+"_c"     ,nbins,min,max);
-    h_cfromg = fs->make<TH1D>(name+"_cfromg",title+"_cfromg",nbins,min,max);
-    h_l      = fs->make<TH1D>(name+"_l"     ,title+"_l"     ,nbins,min,max);
-
-    h_b      ->Sumw2();
-    h_bfromg ->Sumw2();
-    h_c      ->Sumw2();
-    h_cfromg ->Sumw2();
-    h_l      ->Sumw2();
-
-    HistoBtag_map[name+"_b"]      = h_b;
-    HistoBtag_map[name+"_bfromg"] = h_bfromg;
-    HistoBtag_map[name+"_c"]      = h_c;
-    HistoBtag_map[name+"_cfromg"] = h_cfromg;
-    HistoBtag_map[name+"_l"]      = h_l;
-  }
-  else
-  {
-    h_mc = fs->make<TH1D>(name+"_mc",title+"_mc",nbins,min,max);
-    h_mc->Sumw2();
-    HistoBtag_map[name+"_mc"] = h_mc;
+    h1_CutFlow->SetBinContent(1, nEventsAll); //// strictly speaking not correct since event weights not applied
+    h1_CutFlow->SetBinContent(2, nEventsStored); //// strictly speaking not correct since event weights not applied
+    h1_CutFlow_unw->SetBinContent(1, nEventsAll);
+    h1_CutFlow_unw->SetBinContent(2, nEventsStored);
+    h1_CutFlow->SetBinError(1, TMath::Sqrt(nEventsAll)); //// strictly speaking not correct since event weights not applied
+    h1_CutFlow->SetBinError(2, TMath::Sqrt(nEventsStored)); //// strictly speaking not correct since event weights not applied
+    h1_CutFlow_unw->SetBinError(1, TMath::Sqrt(nEventsAll));
+    h1_CutFlow_unw->SetBinError(2, TMath::Sqrt(nEventsStored));
   }
 
-  TH1D* h_data= fs->make<TH1D>(name+"_data",title+"_data",nbins,min,max);
-  h_data->Sumw2();
-  HistoBtag_map[name+"_data"] = h_data;
-}
-
-// ------------------------------------------------------------------------------
-void BTagValidation::AddHisto2D(const TString& name, const TString& title, const int nbins, const double min, const double max, const int nbins2, const double min2, const double max2) {
-  TH2D* h_b;
-  TH2D* h_bfromg;
-  TH2D* h_c;
-  TH2D* h_cfromg;
-  TH2D* h_l;
-  TH2D* h_mc;
-
-  if( useFlavorCategories_ ) {
-    h_b      = fs->make<TH2D>(name+"_b"     ,title+"_b"     ,nbins,min,max,nbins2,min2,max2);
-    h_bfromg = fs->make<TH2D>(name+"_bfromg",title+"_bfromg",nbins,min,max,nbins2,min2,max2);
-    h_c      = fs->make<TH2D>(name+"_c"     ,title+"_c"     ,nbins,min,max,nbins2,min2,max2);
-    h_cfromg = fs->make<TH2D>(name+"_cfromg",title+"_cfromg",nbins,min,max,nbins2,min2,max2);
-    h_l      = fs->make<TH2D>(name+"_l"     ,title+"_l"     ,nbins,min,max,nbins2,min2,max2);
-
-    h_b      ->Sumw2();
-    h_bfromg ->Sumw2();
-    h_c      ->Sumw2();
-    h_cfromg ->Sumw2();
-    h_l      ->Sumw2();
-
-    HistoBtag2D_map[name+"_b"]      = h_b;
-    HistoBtag2D_map[name+"_bfromg"] = h_bfromg;
-    HistoBtag2D_map[name+"_c"]      = h_c;
-    HistoBtag2D_map[name+"_cfromg"] = h_cfromg;
-    HistoBtag2D_map[name+"_l"]      = h_l;
-  } else {
-    h_mc = fs->make<TH2D>(name+"_mc",title+"_mc",nbins,min,max,nbins2,min2,max2);
-    h_mc->Sumw2();
-    HistoBtag2D_map[name+"_mc"] = h_mc;
+  // ------------ method called when starting to processes a run  ------------
+  void BTagValidation::beginRun(edm::Run const&, edm::EventSetup const&) {
   }
 
-  TH2D* h_data= fs->make<TH2D>(name+"_data",title+"_data",nbins,min,max,nbins2,min2,max2);
-  h_data->Sumw2();
-  HistoBtag2D_map[name+"_data"] = h_data;
-}
+  // ------------ method called when ending the processing of a run  ------------
+  void BTagValidation::endRun(edm::Run const&, edm::EventSetup const&) {
+  }
 
-// ------------------------------------------------------------------------------
-template <class Type>
-void BTagValidation::FillHisto(const TString& name, const int flavour, const bool isGSPbb , const bool isGSPcc , const Type value, const double weight) {
-  if (!isData) {
+  // ------------ method called when starting to processes a luminosity block  ------------
+  void BTagValidation::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {
+  }
+
+  // ------------ method called when ending the processing of a luminosity block  ------------
+  void BTagValidation::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {
+  }
+
+  // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+  void BTagValidation::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+    //The following says we do not know what parameters are allowed so do no validation
+    // Please change this to state exactly what you do use, even if it is no parameters
+    edm::ParameterSetDescription desc;
+    desc.setUnknown();
+    descriptions.addDefault(desc);
+  }
+
+  // ------------------------------------------------------------------------------
+  void BTagValidation::AddHisto(const TString& name, const TString& title, const int nbins, const double min, const double max)  {
+
+    TH1D* h_b;
+    TH1D* h_bfromg;
+    TH1D* h_c;
+    TH1D* h_cfromg;
+    TH1D* h_l;
+    TH1D* h_mc;
+
+    if( useFlavorCategories_ )
+    {
+      h_b      = fs->make<TH1D>(name+"_b"     ,title+"_b"     ,nbins,min,max);
+      h_bfromg = fs->make<TH1D>(name+"_bfromg",title+"_bfromg",nbins,min,max);
+      h_c      = fs->make<TH1D>(name+"_c"     ,title+"_c"     ,nbins,min,max);
+      h_cfromg = fs->make<TH1D>(name+"_cfromg",title+"_cfromg",nbins,min,max);
+      h_l      = fs->make<TH1D>(name+"_l"     ,title+"_l"     ,nbins,min,max);
+
+      h_b      ->Sumw2();
+      h_bfromg ->Sumw2();
+      h_c      ->Sumw2();
+      h_cfromg ->Sumw2();
+      h_l      ->Sumw2();
+
+      HistoBtag_map[name+"_b"]      = h_b;
+      HistoBtag_map[name+"_bfromg"] = h_bfromg;
+      HistoBtag_map[name+"_c"]      = h_c;
+      HistoBtag_map[name+"_cfromg"] = h_cfromg;
+      HistoBtag_map[name+"_l"]      = h_l;
+    }
+    else
+    {
+      h_mc = fs->make<TH1D>(name+"_mc",title+"_mc",nbins,min,max);
+      h_mc->Sumw2();
+      HistoBtag_map[name+"_mc"] = h_mc;
+    }
+
+    TH1D* h_data= fs->make<TH1D>(name+"_data",title+"_data",nbins,min,max);
+    h_data->Sumw2();
+    HistoBtag_map[name+"_data"] = h_data;
+  }
+
+  // ------------------------------------------------------------------------------
+  void BTagValidation::AddHisto2D(const TString& name, const TString& title, const int nbins, const double min, const double max, const int nbins2, const double min2, const double max2) {
+    TH2D* h_b;
+    TH2D* h_bfromg;
+    TH2D* h_c;
+    TH2D* h_cfromg;
+    TH2D* h_l;
+    TH2D* h_mc;
+
     if( useFlavorCategories_ ) {
-      if( isGSPbb ) HistoBtag_map[name+"_bfromg"]->Fill(double(value),weight);
-      else if( isGSPcc ) HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
-      //RS>>else if (isGSPcc&&abs(flavour)==4) 		  HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
+      h_b      = fs->make<TH2D>(name+"_b"     ,title+"_b"     ,nbins,min,max,nbins2,min2,max2);
+      h_bfromg = fs->make<TH2D>(name+"_bfromg",title+"_bfromg",nbins,min,max,nbins2,min2,max2);
+      h_c      = fs->make<TH2D>(name+"_c"     ,title+"_c"     ,nbins,min,max,nbins2,min2,max2);
+      h_cfromg = fs->make<TH2D>(name+"_cfromg",title+"_cfromg",nbins,min,max,nbins2,min2,max2);
+      h_l      = fs->make<TH2D>(name+"_l"     ,title+"_l"     ,nbins,min,max,nbins2,min2,max2);
+
+      h_b      ->Sumw2();
+      h_bfromg ->Sumw2();
+      h_c      ->Sumw2();
+      h_cfromg ->Sumw2();
+      h_l      ->Sumw2();
+
+      HistoBtag2D_map[name+"_b"]      = h_b;
+      HistoBtag2D_map[name+"_bfromg"] = h_bfromg;
+      HistoBtag2D_map[name+"_c"]      = h_c;
+      HistoBtag2D_map[name+"_cfromg"] = h_cfromg;
+      HistoBtag2D_map[name+"_l"]      = h_l;
+    } else {
+      h_mc = fs->make<TH2D>(name+"_mc",title+"_mc",nbins,min,max,nbins2,min2,max2);
+      h_mc->Sumw2();
+      HistoBtag2D_map[name+"_mc"] = h_mc;
+    }
+
+    TH2D* h_data= fs->make<TH2D>(name+"_data",title+"_data",nbins,min,max,nbins2,min2,max2);
+    h_data->Sumw2();
+    HistoBtag2D_map[name+"_data"] = h_data;
+  }
+
+  // ------------------------------------------------------------------------------
+  template <class Type>
+    void BTagValidation::FillHisto(const TString& name, const int flavour, const bool isGSPbb , const bool isGSPcc , const Type value, const double weight) {
+      if (!isData) {
+        if( useFlavorCategories_ ) {
+          if( isGSPbb ) HistoBtag_map[name+"_bfromg"]->Fill(double(value),weight);
+          else if( isGSPcc ) HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
+          //RS>>else if (isGSPcc&&abs(flavour)==4) 		  HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
+          else {
+            if (abs(flavour)==5)                          HistoBtag_map[name+"_b"]->Fill(double(value),weight);
+            else if (abs(flavour)==4)                     HistoBtag_map[name+"_c"]->Fill(double(value),weight);
+            else if (abs(flavour)< 4 || abs(flavour)==21) HistoBtag_map[name+"_l"]->Fill(double(value),weight);
+          }
+        }
+        else HistoBtag_map[name+"_mc"]->Fill(double(value),weight);
+      }
       else {
-        if (abs(flavour)==5)                          HistoBtag_map[name+"_b"]->Fill(double(value),weight);
-        else if (abs(flavour)==4)                     HistoBtag_map[name+"_c"]->Fill(double(value),weight);
-        else if (abs(flavour)< 4 || abs(flavour)==21) HistoBtag_map[name+"_l"]->Fill(double(value),weight);
+        HistoBtag_map[name+"_data"]->Fill(double(value));
       }
     }
-    else HistoBtag_map[name+"_mc"]->Fill(double(value),weight);
-  }
-  else {
-    HistoBtag_map[name+"_data"]->Fill(double(value));
-  }
-}
 
-// ------------------------------------------------------------------------------
-template <class Type1, class Type2>
-void BTagValidation::FillHisto2D(const TString& name, const int flavour, const bool isGSPbb ,const bool isGSPcc , const Type1 value, const Type2 value2, const double weight) {
-  if (!isData) {
-    if( useFlavorCategories_ ) {
-      if( isGSPbb ) HistoBtag2D_map[name+"_bfromg"]->Fill(double(value),double(value2),weight);
-      else if( isGSPcc ) HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
-      //RS>>else if (isGSPcc && abs(flavour)==4) 		  HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
-      else {
-        if (abs(flavour)==5)                          HistoBtag2D_map[name+"_b"]->Fill(double(value),double(value2),weight);
-        else if (abs(flavour)==4)                     HistoBtag2D_map[name+"_c"]->Fill(double(value),double(value2),weight);
-        else if (abs(flavour)< 4 || abs(flavour)==21) HistoBtag2D_map[name+"_l"]->Fill(double(value),double(value2),weight);
+  // ------------------------------------------------------------------------------
+  template <class Type1, class Type2>
+    void BTagValidation::FillHisto2D(const TString& name, const int flavour, const bool isGSPbb ,const bool isGSPcc , const Type1 value, const Type2 value2, const double weight) {
+      if (!isData) {
+        if( useFlavorCategories_ ) {
+          if( isGSPbb ) HistoBtag2D_map[name+"_bfromg"]->Fill(double(value),double(value2),weight);
+          else if( isGSPcc ) HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
+          //RS>>else if (isGSPcc && abs(flavour)==4) 		  HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
+          else {
+            if (abs(flavour)==5)                          HistoBtag2D_map[name+"_b"]->Fill(double(value),double(value2),weight);
+            else if (abs(flavour)==4)                     HistoBtag2D_map[name+"_c"]->Fill(double(value),double(value2),weight);
+            else if (abs(flavour)< 4 || abs(flavour)==21) HistoBtag2D_map[name+"_l"]->Fill(double(value),double(value2),weight);
+          }
+        }
+        else HistoBtag2D_map[name+"_mc"]->Fill(double(value),double(value2),weight);
       }
+      else HistoBtag2D_map[name+"_data"]->Fill(double(value),double(value2));
     }
-    else HistoBtag2D_map[name+"_mc"]->Fill(double(value),double(value2),weight);
-  }
-  else HistoBtag2D_map[name+"_data"]->Fill(double(value),double(value2));
-}
 
-// ------------------------------------------------------------------------------
-bool BTagValidation::passTrigger() {
-  bool ret = false;
+  // ------------------------------------------------------------------------------
+  bool BTagValidation::passTrigger() {
+    bool ret = false;
 
-  if(triggerSelection_.size()==0) ret = true;
-  else {
-    for(unsigned i=0; i<triggerSelection_.size(); ++i) {
-      std::string trigpath = triggerSelection_.at(i) ; 
-      std::vector<std::string>::const_iterator it ;
-      for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
-        if ( it->find(trigpath) < std::string::npos ) {
-          //int triggerIdx = ( it - triggerPathNames_.begin() );
-          //int bitIdx = int(triggerIdx/32);
-          ret = true;
-          break;
+    if(triggerSelection_.size()==0) ret = true;
+    else {
+      for(unsigned i=0; i<triggerSelection_.size(); ++i) {
+        std::string trigpath = triggerSelection_.at(i) ; 
+        std::vector<std::string>::const_iterator it ;
+        for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
+          if ( it->find(trigpath) < std::string::npos ) {
+            //int triggerIdx = ( it - triggerPathNames_.begin() );
+            //int bitIdx = int(triggerIdx/32);
+            ret = true;
+            break;
+          }
         }
       }
     }
+
+    return ret;
   }
 
-  return ret;
-}
+  // ------------------------------------------------------------------------------
+  bool BTagValidation::passMuonSelection(const int muIdx, const JetInfoBranches& JetInfo, const int iJet, const double deltaR) {
+    TLorentzVector muon, jet;
 
-// ------------------------------------------------------------------------------
-bool BTagValidation::passMuonSelection(const int muIdx, const JetInfoBranches& JetInfo, const int iJet, const double deltaR) {
-  TLorentzVector muon, jet;
+    jet.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
+    muon.SetPtEtaPhiM(JetInfo.PFMuon_pt[muIdx], JetInfo.PFMuon_eta[muIdx], JetInfo.PFMuon_phi[muIdx], 0);
 
-  jet.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
-  muon.SetPtEtaPhiM(JetInfo.PFMuon_pt[muIdx], JetInfo.PFMuon_eta[muIdx], JetInfo.PFMuon_phi[muIdx], 0);
+    bool cut_mu_pass = false;
+    if (JetInfo.PFMuon_pt[muIdx] > 7 && fabs(JetInfo.PFMuon_eta[muIdx]) < 2.4 
+        && JetInfo.PFMuon_isGlobal[muIdx] == 1 
+        && JetInfo.PFMuon_nMuHit[muIdx] > 0 
+        && JetInfo.PFMuon_nMatched[muIdx] > 1 
+        && JetInfo.PFMuon_nTkHit[muIdx] > (useRelaxedMuonID_ ? 7 : 10) 
+        && JetInfo.PFMuon_nPixHit[muIdx] > (useRelaxedMuonID_ ? 0 : 1) 
+        && JetInfo.PFMuon_nOutHit[muIdx] < (useRelaxedMuonID_ ? 99 : 3) 
+        && JetInfo.PFMuon_chi2Tk[muIdx] < 10 
+        && JetInfo.PFMuon_chi2[muIdx] < 10  
+        && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < 0.5 )
+        //&& JetInfo.PFMuon_vz[muIdx]< 2 
+        //DM&& fabs(JetInfo.PFMuon_vz[muIdx]-EvtInfo.PVz) < 2.
+       )
+      cut_mu_pass = true ;
 
-  bool cut_mu_pass = false;
-  if (JetInfo.PFMuon_pt[muIdx] > 7 && fabs(JetInfo.PFMuon_eta[muIdx]) < 2.4 
-      && JetInfo.PFMuon_isGlobal[muIdx] == 1 
-      && JetInfo.PFMuon_nMuHit[muIdx] > 0 
-      && JetInfo.PFMuon_nMatched[muIdx] > 1 
-      && JetInfo.PFMuon_nTkHit[muIdx] > (useRelaxedMuonID_ ? 7 : 10) 
-      && JetInfo.PFMuon_nPixHit[muIdx] > (useRelaxedMuonID_ ? 0 : 1) 
-      && JetInfo.PFMuon_nOutHit[muIdx] < (useRelaxedMuonID_ ? 99 : 3) 
-      && JetInfo.PFMuon_chi2Tk[muIdx] < 10 
-      && JetInfo.PFMuon_chi2[muIdx] < 10  
-      && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < 0.5 )
-      //&& JetInfo.PFMuon_vz[muIdx]< 2 
-      //DM&& fabs(JetInfo.PFMuon_vz[muIdx]-EvtInfo.PVz) < 2.
-     )
-    cut_mu_pass = true ;
-
-  return cut_mu_pass;
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor  ------------
-double BTagValidation::scaleFactor(const int partonFlavor, const double jetPt, const double jetEta, const bool isCSVM) {
-  if( isCSVM ) {
-    if( abs(partonFlavor)==5 ) return scaleFactorB_CSVM(jetPt,jetEta);
-    else if( abs(partonFlavor)==4 ) return scaleFactorC_CSVM(jetPt,jetEta);
-    else return scaleFactorUDSG_CSVM(jetPt,jetEta);
-  }
-  else {
-    if( abs(partonFlavor)==5 ) return scaleFactorB_CSVL(jetPt,jetEta);
-    else if( abs(partonFlavor)==4 ) return scaleFactorC_CSVL(jetPt,jetEta);
-    else return scaleFactorUDSG_CSVL(jetPt,jetEta);
-  }
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for b-jets and CSVL tagger  ------------
-double BTagValidation::scaleFactorB_CSVL(const double jetPt, const double jetEta) {
-  double Pt = jetPt;
-  // for scale factor extrapolation
-  if(Pt<20.) Pt = 20.;
-  if(Pt>800.) Pt = 800.;
-
-  return CSVL_SFb_0to2p4->Eval(Pt) + SFbShift_*CSVL_SFb_errors->GetBinContent(CSVL_SFb_errors->GetXaxis()->FindBin(jetPt));
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for c-jets and CSVL tagger  ------------
-double BTagValidation::scaleFactorC_CSVL(const double jetPt, const double jetEta) {
-  double Pt = jetPt;
-  // for scale factor extrapolation
-  if(Pt<20.) Pt = 20.;
-  if(Pt>800.) Pt = 800.;
-
-  return CSVL_SFb_0to2p4->Eval(Pt) + 2*SFbShift_*CSVL_SFb_errors->GetBinContent(CSVL_SFb_errors->GetXaxis()->FindBin(jetPt));
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for light flavor jets and CSVL tagger ------------
-double BTagValidation::scaleFactorUDSG_CSVL(const double jetPt, const double jetEta) {
-  double SF = 1.;
-  double Pt = jetPt;
-  double absEta = fabs(jetEta);
-  // for scale factor extrapolation
-  if(Pt<20.) Pt = 20.;
-
-  if(absEta<0.5) {
-    if(Pt>1000.) Pt = 1000.;
-
-    SF = CSVL_SFl_0to0p5->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_0to0p5_max->Eval(Pt) - CSVL_SFl_0to0p5->Eval(Pt)) : (CSVL_SFl_0to0p5_min->Eval(Pt) - CSVL_SFl_0to0p5->Eval(Pt)) );
-  }
-  else if(absEta>=0.5 && absEta<1.) {
-    if(Pt>1000.) Pt = 1000.;
-
-    SF = CSVL_SFl_0p5to1p0->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_0p5to1p0_max->Eval(Pt) - CSVL_SFl_0p5to1p0->Eval(Pt)) : (CSVL_SFl_0p5to1p0_min->Eval(Pt) - CSVL_SFl_0p5to1p0->Eval(Pt)) );
-  }
-  else if(absEta>=1. && absEta<1.5) {
-    if(Pt>1000.) Pt = 1000.;
-
-    SF = CSVL_SFl_1p0to1p5->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_1p0to1p5_max->Eval(Pt) - CSVL_SFl_1p0to1p5->Eval(Pt)) : (CSVL_SFl_1p0to1p5_min->Eval(Pt) - CSVL_SFl_1p0to1p5->Eval(Pt)) );
-  }
-  else {
-    if(Pt>850.) Pt = 850.;
-
-    SF = CSVL_SFl_1p5to2p4->Eval(Pt) + ( (jetPt<20. || jetPt>850.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_1p5to2p4_max->Eval(Pt) - CSVL_SFl_1p5to2p4->Eval(Pt)) : (CSVL_SFl_1p5to2p4_min->Eval(Pt) - CSVL_SFl_1p5to2p4->Eval(Pt)) );
+    return cut_mu_pass;
   }
 
-  return SF;
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for b-jets and CSVM tagger  ------------
-double BTagValidation::scaleFactorB_CSVM(const double jetPt, const double jetEta) {
-  double Pt = jetPt;
-  // for scale factor extrapolation
-  if(Pt<20.) Pt = 20.;
-  if(Pt>800.) Pt = 800.;
-
-  return CSVM_SFb_0to2p4->Eval(Pt) + SFbShift_*CSVM_SFb_errors->GetBinContent(CSVM_SFb_errors->GetXaxis()->FindBin(jetPt));
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for c-jets and CSVM tagger  ------------
-double BTagValidation::scaleFactorC_CSVM(const double jetPt, const double jetEta) {
-  double Pt = jetPt;
-  // for scale factor extrapolation
-  if(Pt<20.) Pt = 20.;
-  if(Pt>800.) Pt = 800.;
-
-  return CSVM_SFb_0to2p4->Eval(Pt) + 2*SFbShift_*CSVM_SFb_errors->GetBinContent(CSVM_SFb_errors->GetXaxis()->FindBin(jetPt));
-}
-
-// ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for light flavor jets and CSVM tagger ------------
-double BTagValidation::scaleFactorUDSG_CSVM(const double jetPt, const double jetEta) {
-  double SF = 1.;
-  double Pt = jetPt;
-  double absEta = fabs(jetEta);
-  // for scale factor extrapolation
-  if(Pt<20.) Pt = 20.;
-
-  if(absEta<0.8) {
-    if(Pt>1000.) Pt = 1000.;
-
-    SF = CSVM_SFl_0to0p8->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVM_SFl_0to0p8_max->Eval(Pt) - CSVM_SFl_0to0p8->Eval(Pt)) : (CSVM_SFl_0to0p8_min->Eval(Pt) - CSVM_SFl_0to0p8->Eval(Pt)) );
-  }
-  else if(absEta>=0.8 && absEta<1.6) {
-    if(Pt>1000.) Pt = 1000.;
-
-    SF = CSVM_SFl_0p8to1p6->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVM_SFl_0p8to1p6_max->Eval(Pt) - CSVM_SFl_0p8to1p6->Eval(Pt)) : (CSVM_SFl_0p8to1p6_min->Eval(Pt) - CSVM_SFl_0p8to1p6->Eval(Pt)) );
-  }
-  else {
-    if(Pt>850.) Pt = 850.;
-
-    SF = CSVM_SFl_1p6to2p4->Eval(Pt) + ( (jetPt<20. || jetPt>850.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVM_SFl_1p6to2p4_max->Eval(Pt) - CSVM_SFl_1p6to2p4->Eval(Pt)) : (CSVM_SFl_1p6to2p4_min->Eval(Pt) - CSVM_SFl_1p6to2p4->Eval(Pt)) );
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor  ------------
+  double BTagValidation::scaleFactor(const int partonFlavor, const double jetPt, const double jetEta, const bool isCSVM) {
+    if( isCSVM ) {
+      if( abs(partonFlavor)==5 ) return scaleFactorB_CSVM(jetPt,jetEta);
+      else if( abs(partonFlavor)==4 ) return scaleFactorC_CSVM(jetPt,jetEta);
+      else return scaleFactorUDSG_CSVM(jetPt,jetEta);
+    }
+    else {
+      if( abs(partonFlavor)==5 ) return scaleFactorB_CSVL(jetPt,jetEta);
+      else if( abs(partonFlavor)==4 ) return scaleFactorC_CSVL(jetPt,jetEta);
+      else return scaleFactorUDSG_CSVL(jetPt,jetEta);
+    }
   }
 
-  return SF;
-}
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for b-jets and CSVL tagger  ------------
+  double BTagValidation::scaleFactorB_CSVL(const double jetPt, const double jetEta) {
+    double Pt = jetPt;
+    // for scale factor extrapolation
+    if(Pt<20.) Pt = 20.;
+    if(Pt>800.) Pt = 800.;
 
-// ---- Method returns MC event weight for for reweighting to the NPV distribution in the data: substitute for official PU reweighting ----
-double BTagValidation::GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) { 
-  double wtPU(1) ;
-  TFile* f = new TFile(file.c_str()) ;
-  TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) ); 
-  wtPU = npv > 0 && npv <= 60 ? hwt->GetBinContent(npv) : 1.; 
-  f->Close() ; 
-  delete f ;
-  delete hwt ; 
-  return wtPU ;
-}
+    return CSVL_SFb_0to2p4->Eval(Pt) + SFbShift_*CSVL_SFb_errors->GetBinContent(CSVL_SFb_errors->GetXaxis()->FindBin(jetPt));
+  }
 
-// ----For calculating MC event weight for reweighting to the jetPt distribution in the data
-double BTagValidation::GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) {
-  double wtPt(1) ;
-  TFile* f = new TFile(file.c_str()) ;
-  TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
-  wtPt = jetpt > 0 && jetpt <= 5000 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetpt)) : 1.;
-  f->Close() ;
-  delete f ;
-  delete hwt ;
-  return wtPt ;
-}
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for c-jets and CSVL tagger  ------------
+  double BTagValidation::scaleFactorC_CSVL(const double jetPt, const double jetEta) {
+    double Pt = jetPt;
+    // for scale factor extrapolation
+    if(Pt<20.) Pt = 20.;
+    if(Pt>800.) Pt = 800.;
 
-// ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
-double BTagValidation::GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) {
-  double wtPtbalance(1) ;
-  TFile* f = new TFile(file.c_str()) ;
-  TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
-  wtPtbalance = jetptbalance >= 0 && jetptbalance <= 1 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetptbalance)) : 1.;
-  f->Close() ;
-  delete f ;
-  delete hwt ;
-  return wtPtbalance ;
-}
+    return CSVL_SFb_0to2p4->Eval(Pt) + 2*SFbShift_*CSVL_SFb_errors->GetBinContent(CSVL_SFb_errors->GetXaxis()->FindBin(jetPt));
+  }
 
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for light flavor jets and CSVL tagger ------------
+  double BTagValidation::scaleFactorUDSG_CSVL(const double jetPt, const double jetEta) {
+    double SF = 1.;
+    double Pt = jetPt;
+    double absEta = fabs(jetEta);
+    // for scale factor extrapolation
+    if(Pt<20.) Pt = 20.;
 
-//define this as a plug-in
-DEFINE_FWK_MODULE(BTagValidation);
+    if(absEta<0.5) {
+      if(Pt>1000.) Pt = 1000.;
+
+      SF = CSVL_SFl_0to0p5->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_0to0p5_max->Eval(Pt) - CSVL_SFl_0to0p5->Eval(Pt)) : (CSVL_SFl_0to0p5_min->Eval(Pt) - CSVL_SFl_0to0p5->Eval(Pt)) );
+    }
+    else if(absEta>=0.5 && absEta<1.) {
+      if(Pt>1000.) Pt = 1000.;
+
+      SF = CSVL_SFl_0p5to1p0->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_0p5to1p0_max->Eval(Pt) - CSVL_SFl_0p5to1p0->Eval(Pt)) : (CSVL_SFl_0p5to1p0_min->Eval(Pt) - CSVL_SFl_0p5to1p0->Eval(Pt)) );
+    }
+    else if(absEta>=1. && absEta<1.5) {
+      if(Pt>1000.) Pt = 1000.;
+
+      SF = CSVL_SFl_1p0to1p5->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_1p0to1p5_max->Eval(Pt) - CSVL_SFl_1p0to1p5->Eval(Pt)) : (CSVL_SFl_1p0to1p5_min->Eval(Pt) - CSVL_SFl_1p0to1p5->Eval(Pt)) );
+    }
+    else {
+      if(Pt>850.) Pt = 850.;
+
+      SF = CSVL_SFl_1p5to2p4->Eval(Pt) + ( (jetPt<20. || jetPt>850.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVL_SFl_1p5to2p4_max->Eval(Pt) - CSVL_SFl_1p5to2p4->Eval(Pt)) : (CSVL_SFl_1p5to2p4_min->Eval(Pt) - CSVL_SFl_1p5to2p4->Eval(Pt)) );
+    }
+
+    return SF;
+  }
+
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for b-jets and CSVM tagger  ------------
+  double BTagValidation::scaleFactorB_CSVM(const double jetPt, const double jetEta) {
+    double Pt = jetPt;
+    // for scale factor extrapolation
+    if(Pt<20.) Pt = 20.;
+    if(Pt>800.) Pt = 800.;
+
+    return CSVM_SFb_0to2p4->Eval(Pt) + SFbShift_*CSVM_SFb_errors->GetBinContent(CSVM_SFb_errors->GetXaxis()->FindBin(jetPt));
+  }
+
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for c-jets and CSVM tagger  ------------
+  double BTagValidation::scaleFactorC_CSVM(const double jetPt, const double jetEta) {
+    double Pt = jetPt;
+    // for scale factor extrapolation
+    if(Pt<20.) Pt = 20.;
+    if(Pt>800.) Pt = 800.;
+
+    return CSVM_SFb_0to2p4->Eval(Pt) + 2*SFbShift_*CSVM_SFb_errors->GetBinContent(CSVM_SFb_errors->GetXaxis()->FindBin(jetPt));
+  }
+
+  // ------------ method that returns pT- and eta-dependent b-tag efficiency scale factor for light flavor jets and CSVM tagger ------------
+  double BTagValidation::scaleFactorUDSG_CSVM(const double jetPt, const double jetEta) {
+    double SF = 1.;
+    double Pt = jetPt;
+    double absEta = fabs(jetEta);
+    // for scale factor extrapolation
+    if(Pt<20.) Pt = 20.;
+
+    if(absEta<0.8) {
+      if(Pt>1000.) Pt = 1000.;
+
+      SF = CSVM_SFl_0to0p8->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVM_SFl_0to0p8_max->Eval(Pt) - CSVM_SFl_0to0p8->Eval(Pt)) : (CSVM_SFl_0to0p8_min->Eval(Pt) - CSVM_SFl_0to0p8->Eval(Pt)) );
+    }
+    else if(absEta>=0.8 && absEta<1.6) {
+      if(Pt>1000.) Pt = 1000.;
+
+      SF = CSVM_SFl_0p8to1p6->Eval(Pt) + ( (jetPt<20. || jetPt>1000.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVM_SFl_0p8to1p6_max->Eval(Pt) - CSVM_SFl_0p8to1p6->Eval(Pt)) : (CSVM_SFl_0p8to1p6_min->Eval(Pt) - CSVM_SFl_0p8to1p6->Eval(Pt)) );
+    }
+    else {
+      if(Pt>850.) Pt = 850.;
+
+      SF = CSVM_SFl_1p6to2p4->Eval(Pt) + ( (jetPt<20. || jetPt>850.) ? 2. : 1. )*fabs(SFlShift_)*( SFlShift_ >= 0. ? (CSVM_SFl_1p6to2p4_max->Eval(Pt) - CSVM_SFl_1p6to2p4->Eval(Pt)) : (CSVM_SFl_1p6to2p4_min->Eval(Pt) - CSVM_SFl_1p6to2p4->Eval(Pt)) );
+    }
+
+    return SF;
+  }
+
+  // ---- Method returns MC event weight for for reweighting to the NPV distribution in the data: substitute for official PU reweighting ----
+  double BTagValidation::GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) { 
+    double wtPU(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) ); 
+    wtPU = npv > 0 && npv <= 60 ? hwt->GetBinContent(npv) : 1.; 
+    f->Close() ; 
+    delete f ;
+    delete hwt ; 
+    return wtPU ;
+  }
+
+  // ----For calculating MC event weight for reweighting to the jetPt distribution in the data
+  double BTagValidation::GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) {
+    double wtPt(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtPt = jetpt > 0 && jetpt <= 5000 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetpt)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtPt ;
+  }
+
+  // ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
+  double BTagValidation::GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) {
+    double wtPtbalance(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtPtbalance = jetptbalance >= 0 && jetptbalance <= 1 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetptbalance)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtPtbalance ;
+  }
+
+  void BTagValidation::ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) {
+    newjec = 1.0; 
+    TLorentzVector uncorrJetP4 = jetp4;
+    uncorrJetP4 *= jes != 0. ? 1./jes : 1. ; 
+    ptr_newJEC_->setJetPt ( uncorrJetP4.Pt()     );
+    ptr_newJEC_->setJetEta( uncorrJetP4.Eta()    );
+    ptr_newJEC_->setJetE  ( uncorrJetP4.Energy() );
+    ptr_newJEC_->setJetA  ( jetarea );
+    ptr_newJEC_->setRho   ( jetrho ) ;  
+    ptr_newJEC_->setNPV   ( npv ) ; 
+    newjec = ptr_newJEC_->getCorrection();
+  }
+
+  void BTagValidation::GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) {
+    ptr_jecUnc_->setJetPt ( jetpt );
+    ptr_jecUnc_->setJetEta( jeteta);
+    jesunc = ptr_jecUnc_->getUncertainty(true);
+    jesunc *= jecShift ; 
+  }
+
+  //define this as a plug-in
+  DEFINE_FWK_MODULE(BTagValidation);
