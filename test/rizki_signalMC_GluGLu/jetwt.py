@@ -2,14 +2,11 @@
 
 import ROOT
 
-pt = '330'
-# pt = '450'
+pt = '425'
 
-f = 'signalMC_M-1000_fjPt'+pt+'_bTagValPlots.root'
+f = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_M-1000_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root'
 
-if (pt=='330') : f2 = '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt'+pt+'_eta2p4_DoubleMuTag_50m200_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root'
-
-if (pt=='450') : f2 = '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_DoubleMuonTagged_50m200_tau21-1p0_fj450_usePruned_debug_ptRatioCut_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root'
+if (pt=='425') : f2 = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_reweight_merged/Final_histograms_btagval.root'
 
 jetpt_data = ROOT.TH1D("jetpt_signalmc", ";pT(all jets);;",500,0.,5000.)
 jetpt_mc_noweight = ROOT.TH1D("jetpt_mc_noweight",";pT(all jets);;",500,0.,5000.)
@@ -18,7 +15,7 @@ jetptweight_mc_data = ROOT.TH1D("jetptweight_mc_data",";pT(all jets);;",500,0.,5
 
 
 fin = ROOT.TFile.Open(f, "READ")
-h = fin.Get("btagval/FatJet_pt_all_bfromg")
+h = fin.Get("SIGNAL__FatJet_pt_all_bfromg")
 fin2 = ROOT.TFile.Open(f2, "READ")  
 h2 = fin2.Get("QCD__FatJet_pt_all_bfromg")
 integral = h.Integral()

@@ -18,14 +18,14 @@ TLegend *leg = new TLegend(0.4444465625,0.7021654,0.8365625,0.8603839,NULL,"brND
 TString massp = "M-1000";
 TString reweight = "";
 
-if (Reweight) reweight = "reweightPT_";
+if (Reweight) reweight = "reweight_";
 
 TFile * f ;
-f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_"+massp+"_fjPt"+option+"_bTagValPlots.root");
+f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
 
 f->cd();
 TH1D *h = new TH1D();
-h = (TH1D*) f->Get("btagval/FatJet_"+var);
+h = (TH1D*) f->Get("SIGNAL__FatJet_"+var);
 // cout << "Variable Name = " << var << endl;
 h->SetLineColor(kBlue+2);
 h->SetLineWidth(3);
@@ -59,13 +59,9 @@ c1->Update();
 leg->AddEntry(h,"Hbb (bfromg flavor)","l");
 
 TFile * f2 ;
-if(option=="330"){
-	f2 = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_"+reweight+"merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
-// 	f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_reweightPT_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
-	}
-else if(option=="450"){
-	f2 = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan24-2016_reweight/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BoostedTaggerValidation_DoubleMuonTagged_50m200_tau21-1p0_fj450_usePruned_debug_ptRatioCut_"+reweight+"merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root");
-	}
+
+f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_"+reweight+"merged/Final_histograms_btagval.root");
+
 f2->cd();
 
 TH1D *h2 = new TH1D();
@@ -181,13 +177,13 @@ stack->GetXaxis()->SetLabelOffset(999);
 leg->Draw("same");
 c1->Modified();
 if(isLog==0){
-// 	c1->Print(("plots/"+var+"_"+massp+"_"+reweight+option+"_linear_ratio.png"));
-	c1->SaveAs("plots/"+var+"_"+massp+"_"+reweight+option+"_linear_ratio.pdf");
+// 	c1->Print(("plots/"+var+"_"+"sig"+massp+"_"+reweight+"pt"+option+"_linear_ratio.png"));
+	c1->SaveAs("plots/"+var+"_"+"sig"+massp+"_"+reweight+"pt"+option+"_linear_ratio.pdf");
 	}
 if(isLog==1){	
 	c1->SetLogy();
-// 	c1->Print(("plots/"+var+"_"+massp+"_"+reweight+option+"_log_ratio.png"));
-	c1->SaveAs("plots/"+var+"_"+massp+"_"+reweight+option+"_log_ratio.pdf");
+// 	c1->Print(("plots/"+var+"_"+"sig"+massp+"_"+reweight+"pt"+option+"_log_ratio.png"));
+	c1->SaveAs("plots/"+var+"_"+"sig"+massp+"_"+reweight+"pt"+option+"_log_ratio.pdf");
 	}
 
 
