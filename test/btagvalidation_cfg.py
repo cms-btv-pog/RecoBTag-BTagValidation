@@ -214,7 +214,28 @@ options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_DoubleMuonTagged_QC
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
     )
-        
+options.register('newJECPayloadNames',  
+    "Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt,Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt,Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt", 
+    VarParsing.multiplicity.list,
+    VarParsing.varType.string,
+    "New JEC payload names"
+    ),
+options.register('jecUncPayloadName', 
+    "Summer15_25nsV7_MC_Uncertainty_AK8PFchs.txt",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string, 
+    "JEC uncertainty payload name"
+    ),
+options.register('doNewJEC', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Apply new JECs"
+    )
+options.register('doJECUncert', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Do JEC uncertainty"
+    )
 
 options.parseArguments()
 
@@ -225,7 +246,7 @@ elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
   print "!!!Warning: no subjets will be processed.!!!"
   print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
 
-#print options
+print options
 
 process = cms.Process("BTagVal")
 
@@ -320,6 +341,10 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),
     btagMeasurementType    = cms.string(options.btagMeasurementType),
     btagSFType             = cms.string(options.btagSFType), 
+    newJECPayloadNames     = cms.vstring(options.newJECPayloadNames), 
+    jecUncPayloadName      = cms.string(options.jecUncPayloadName), 
+    doNewJEC               = cms.bool(options.doNewJEC),
+    doJECUncert            = cms.bool(options.doJECUncert),  
 )
 
 #process.btagvalsubjetmu = process.btagval.clone(
