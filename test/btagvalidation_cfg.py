@@ -214,6 +214,7 @@ options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_DoubleMuonTagged_QC
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
     )
+        
 
 options.parseArguments()
 
@@ -288,10 +289,9 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_FatJetPtWt        = cms.string('jetptweight_mc_data'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
-#    File_JetPtWt           = cms.string('jetpt_Hbb_QCDbb_pt330_weight.root'), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for pt reweighting.
-    File_SubJetPtBalanceWt = cms.string('subjetptbalance_Hbb_QCDbb_pt425_weight.root'), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
-#     File_SubJetPtBalanceWt = cms.string(options.FileSubJetPtBalanceWt), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
-    Hist_SubJetPtBalanceWt = cms.string('subjetptbalanceweight_mc_data'), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
+    File_SubJetPtBalanceWt = cms.string('subjetptbalance_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
+#     File_SubJetPtBalanceWt = cms.string(options.FileSubJetPtBalanceWt), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
+    Hist_SubJetPtBalanceWt = cms.string('subjetptbalanceweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
     FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki

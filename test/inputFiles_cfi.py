@@ -46,9 +46,7 @@ FileNames_QCD_Pt_800to1000 = [
 
 ### Do not remove the following lines
 FileNames = [
-    #'JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
-    #'/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_GluGluToBulkGravitonToHHTo4B_M-800_JetTree_mc_FatJets_Subjets_BoostedCommissioning.root',
-    #'/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_GluGluToBulkGravitonToHHTo4B_M-900_JetTree_mc_FatJets_Subjets_BoostedCommissioning.root',
-    '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/BulkGravTohhTohbbhbb_narrow_M-1000_13TeV_JetTree_mc_FatJets_Subjets_BoostedCommissioning.root'
+    '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/QCD_test_BTagAnalyzer_ntuple.root',
+    #'/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/BulkGravTohhTohbbhbb_narrow_M-1000_13TeV-madgraph/JetTree_mc_FatJets_Subjets_BoostedCommissioning_1.root',
     ]
 
