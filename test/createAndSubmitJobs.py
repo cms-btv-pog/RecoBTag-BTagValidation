@@ -138,7 +138,7 @@ def main():
   # copy the CMSSW cfg file to the cfg_files_dir
   shutil.copyfile(cmssw_cfg,os.path.join(main_workdir,'CMSSW_cfg.py'))
 
-  # look for pileup distribution and CSV SF files and copy them into main_workdir
+  # look for pileup distribution, CSV SF files, pt and other weight files and copy them into main_workdir
   cfg_dirname = os.path.dirname(cmssw_cfg)
   if cfg_dirname=='':
     cfg_dirname = os.getcwd()
@@ -160,6 +160,8 @@ def main():
     if re.search("^FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^subjetptbalance_Hbb_QCDbb_pt425_weight.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^CSVv2.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
