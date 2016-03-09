@@ -85,6 +85,11 @@ cp -v MAIN_WORKDIR/SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMi
 cp -v MAIN_WORKDIR/subjetptbalance_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
 cp -v MAIN_WORKDIR/massSoftDrop_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
 cp -v MAIN_WORKDIR/CSVv2.csv $BATCHDIR/
+cp -v MAIN_WORKDIR/Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt $BATCHDIR/
+cp -v MAIN_WORKDIR/Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt $BATCHDIR/
+cp -v MAIN_WORKDIR/Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt $BATCHDIR/
+cp -v MAIN_WORKDIR/Summer15_25nsV7_MC_Uncertainty_AK8PFchs.txt $BATCHDIR/
+
 cd $BATCHDIR
 echo "Running CMSSW job"
 cmsRun CMSSW_cfg.py CFG_PARAMETERS
@@ -169,6 +174,15 @@ def main():
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^CSVv2.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^Summer15_25nsV7_MC_Uncertainty_AK8PFchs.txt$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+
   # open and read the dataset_list file
   dataset_list_file = open(dataset_list,"r")
   dataset_list_lines = dataset_list_file.readlines()
