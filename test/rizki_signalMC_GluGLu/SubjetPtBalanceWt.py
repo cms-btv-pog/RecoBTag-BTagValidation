@@ -11,7 +11,7 @@ if (pt=='425') : f2 = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_Sub
 subjetptbalance_data = ROOT.TH1D("subjetptbalance_signalmc", ";Subjets pT_1/(pT_1+pT_2);;",100,0.,1.)
 subjetptbalance_mc_noweight = ROOT.TH1D("subjetptbalance_mc_noweight",";Subjets pT_1/(pT_1+pT_2);;",100,0.,1.)
 subjetptbalance_mc_reweight = ROOT.TH1D("subjetptbalance_mc_reweight",";Subjets pT_1/(pT_1+pT_2);;",100,0.,1.)
-subjetptbalanceweight_mc_data = ROOT.TH1D("subjetptbalanceweight_mc_data",";Subjets pT_1/(pT_1+pT_2);;",100,0.,1.)
+subjetptbalanceweight_mc_data = ROOT.TH1D("subjetptbalanceweight_mc_data",";Subjets pT_1/(pT_1+pT_2);;",100,0.,1.) #its really for mc signal/bkg, NOT data/MC!
 
 
 fin = ROOT.TFile.Open(f, "READ")

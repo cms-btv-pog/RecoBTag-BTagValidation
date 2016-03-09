@@ -179,6 +179,11 @@ options.register('doSubJetPtBalanceReweighting', False,
     VarParsing.varType.bool,
     'Do subjet pt balance reweighting'
     )
+options.register('doMassSoftDropReweighting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do mass soft drop reweighting'
+    )
 options.register('applySFs', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -246,7 +251,7 @@ elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
   print "!!!Warning: no subjets will be processed.!!!"
   print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
 
-print options
+# print options
 
 process = cms.Process("BTagVal")
 
@@ -311,8 +316,9 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
     File_SubJetPtBalanceWt = cms.string('subjetptbalance_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
-#     File_SubJetPtBalanceWt = cms.string(options.FileSubJetPtBalanceWt), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
     Hist_SubJetPtBalanceWt = cms.string('subjetptbalanceweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
+    File_MassSoftDropWt = cms.string('massSoftDrop_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for mass reweighting.
+    Hist_MassSoftDropWt = cms.string('massSoftDropweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for mass reweighting.
     FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
@@ -324,6 +330,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     DoFatJetPtReweighting  = cms.bool(options.doFatJetPtReweighting),
     DoSubJetPtReweighting  = cms.bool(options.doSubJetPtReweighting),
     DoSubJetPtBalanceReweighting  = cms.bool(options.doSubJetPtBalanceReweighting),
+    DoMassSoftDropReweighting  = cms.bool(options.doMassSoftDropReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
       options.triggerSelection
       ),

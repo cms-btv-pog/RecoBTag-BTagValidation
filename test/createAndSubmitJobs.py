@@ -65,7 +65,7 @@ bash_template = """#!/bin/bash
 
 BATCHDIR=${PWD}
 
-export SCRAM_ARCH=slc6_amd64_gcc491
+export SCRAM_ARCH=slc6_amd64_gcc493
 cd MAIN_WORKDIR
 eval `scram runtime -sh`
 
@@ -82,6 +82,8 @@ cp -v MAIN_WORKDIR/jetpt_data_mc_RunIISpring15_25ns_MINIAOD.root $BATCHDIR/
 cp -v MAIN_WORKDIR/jetpt_data_mc_SingleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
 cp -v MAIN_WORKDIR/FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
 cp -v MAIN_WORKDIR/SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
+cp -v MAIN_WORKDIR/subjetptbalance_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
+cp -v MAIN_WORKDIR/massSoftDrop_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
 cp -v MAIN_WORKDIR/CSVv2.csv $BATCHDIR/
 cd $BATCHDIR
 echo "Running CMSSW job"
@@ -162,6 +164,8 @@ def main():
     if re.search("^SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^subjetptbalance_Hbb_QCDbb_pt425_weight.root$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^massSoftDrop_Hbb_QCDbb_pt425_weight.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^CSVv2.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)

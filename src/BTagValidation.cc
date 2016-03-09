@@ -114,6 +114,7 @@ class BTagValidation : public edm::EDAnalyzer {
     double GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) ; 
     double GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
     double GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
+    double GetLumiWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) ;
 
     void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
     void GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ; 
@@ -234,17 +235,20 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_FatJetPtWt_ ;
     const std::string               file_SubJetPtWt_ ;
     const std::string               file_SubJetPtBalanceWt_ ;
+    const std::string               file_MassSoftDropWt_ ;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
     const std::string               hist_FatJetPtWt_ ;
     const std::string               hist_SubJetPtWt_ ;
     const std::string               hist_SubJetPtBalanceWt_ ;
+    const std::string               hist_MassSoftDropWt_ ;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
     const bool                      doSubJetPtReweighting_ ;
     const bool                      doSubJetPtBalanceReweighting_ ;
+    const bool                      doMassSoftDropReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
 
@@ -320,17 +324,20 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_FatJetPtWt_(iConfig.getParameter<std::string>("File_FatJetPtWt")),
   file_SubJetPtWt_(iConfig.getParameter<std::string>("File_SubJetPtWt")),
   file_SubJetPtBalanceWt_(iConfig.getParameter<std::string>("File_SubJetPtBalanceWt")),
+  file_MassSoftDropWt_(iConfig.getParameter<std::string>("File_MassSoftDropWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
   hist_PUDistMC_(iConfig.getParameter<std::string>("Hist_PUDistMC")),
   hist_PUDistData_(iConfig.getParameter<std::string>("Hist_PUDistData")),
   hist_FatJetPtWt_(iConfig.getParameter<std::string>("Hist_FatJetPtWt")),
   hist_SubJetPtWt_(iConfig.getParameter<std::string>("Hist_SubJetPtWt")),
   hist_SubJetPtBalanceWt_(iConfig.getParameter<std::string>("Hist_SubJetPtBalanceWt")),
+  hist_MassSoftDropWt_(iConfig.getParameter<std::string>("Hist_MassSoftDropWt")),
   doPUReweightingOfficial_(iConfig.getParameter<bool>("DoPUReweightingOfficial")),
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
   doSubJetPtReweighting_(iConfig.getParameter<bool>("DoSubJetPtReweighting")),
   doSubJetPtBalanceReweighting_(iConfig.getParameter<bool>("DoSubJetPtBalanceReweighting")),
+  doMassSoftDropReweighting_(iConfig.getParameter<bool>("DoMassSoftDropReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
@@ -571,6 +578,7 @@ void BTagValidation::beginJob() {
   AddHisto("FatJet_nsubjettiness"               ,";#tau_{2}/#tau_{1};;",50,0,1);
   AddHisto("FatJet_prunedMass"                  ,";M_{pruned} (AK8 jets) [GeV];;",200,0,400);
   AddHisto("FatJet_softdropMass"                ,";M_{soft drop} (AK8 jets) [GeV];;",200,0,400);
+  AddHisto("FatJet_softdropMass_unw"                ,";unweighted M_{soft drop} (AK8 jets) [GeV];;",200,0,400);
   AddHisto2D("FatJet_prunedMass_nsubjettiness"  ,";M_{pruned} (AK8 jets) [GeV];#tau_{2}/#tau_{1};" ,200 ,0 ,400 ,50 ,0 ,1);
   AddHisto2D("FatJet_pt_prunedMass"             ,";p_{T} (AK8 jets) [GeV];M_{pruned} (AK8 jets) [GeV];",PtMax/10,0,PtMax,200,0,400);
   AddHisto2D("FatJet_softdropMass_nsubjettiness",";M_{soft drop} (AK8 jets) [GeV];#tau_{2}/#tau_{1};",200,0,400,50,0,1);
@@ -947,11 +955,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
       }
 
-      edm::LogInfo("JEC") << " jetpt = " << jetpt 
-        << " jes uncert up = " << jesup 
-        << " jes uncert down = " << jesdown
-        << " jetpt_up = " << jetpt*(1 + jesup)
-        << " jetpt_down = " << jetpt*(1+jesdown) ; 
+//       edm::LogInfo("JEC") << " jetpt = " << jetpt 
+//         << " jes uncert up = " << jesup 
+//         << " jes uncert down = " << jesdown
+//         << " jetpt_up = " << jetpt*(1 + jesup)
+//         << " jetpt_down = " << jetpt*(1+jesdown) ; 
 
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
           FatJetInfo.Jet_pt[iJet] > fatJetPtMax_ )                  continue; //// apply jet pT cut
@@ -1102,19 +1110,26 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       }
       //added by Erich - jetPt reweighting factor
       double wtJetPt = 1.;
-      //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+      //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
       if (doFatJetPtReweighting_ && !isData) { //original UNCOMMENT!
         wtJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
         wtFatJet *= wtJetPt ;
       }
       //added by Rizki - subjet_ptBalance reweighting factor
       double wtSubJetPtBalance = 1.;
-      if (doSubJetPtBalanceReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+      if (doSubJetPtBalanceReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
         wtSubJetPtBalance *= GetLumiWeightsSubJetPtBalanceBased(file_SubJetPtBalanceWt_, hist_SubJetPtBalanceWt_, SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]) ) ;
         wtFatJet *= wtSubJetPtBalance ;
       }
-
-
+      //added by Rizki - mass reweighting factor
+      double wtMassSoftDrop = 1.;
+      double wtMassSoftDrop_unw = 1.;
+      if (doMassSoftDropReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtMassSoftDrop *= GetLumiWeightsMassSoftDropBased(file_MassSoftDropWt_, hist_MassSoftDropWt_, FatJetInfo.Jet_massSoftDrop[iJet] ) ;
+        wtMassSoftDrop_unw = wtFatJet;
+        wtFatJet *= wtMassSoftDrop ;
+      }
+//       edm::LogInfo("MassSoftDropReweighting") << "massSoftDrop = " << FatJetInfo.Jet_massSoftDrop[iJet] << ", wtMassSoftDrop = " << wtMassSoftDrop ;
 
       //// fat jet multiplicity
       ++nFatJet;
@@ -1404,6 +1419,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       FillHisto2D("FatJet_prunedMass_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massPruned[iJet] ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
       FillHisto2D("FatJet_pt_prunedMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_massPruned[iJet] ,wtPU*wtFatJet);
       FillHisto("FatJet_softdropMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtFatJet);
+      FillHisto("FatJet_softdropMass_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtMassSoftDrop_unw);
       FillHisto2D("FatJet_softdropMass_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
 
       if (usePrunedSubjets_) {
@@ -2199,6 +2215,19 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     delete hwt ;
     return wtPtbalance ;
   }
+
+  // ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
+  double BTagValidation::GetLumiWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) {
+    double wtMass(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtMass = jetmass >= 0 && jetmass <= 400 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetmass)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtMass ;
+  }
+
 
   void BTagValidation::ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) {
     newjec = 1.0; 
