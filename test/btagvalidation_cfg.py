@@ -189,6 +189,11 @@ options.register('doJetNTracksReweighting', False,
     VarParsing.varType.bool,
     'Do mass jetNTracks reweighting'
     )
+options.register('doSV1EnergyRatioReweighting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do mass SV1 energy ratio reweighting'
+    )
 options.register('applySFs', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -326,6 +331,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_MassSoftDropWt = cms.string('massSoftDropweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for mass reweighting.
     File_JetNTracksWt = cms.string('jetNTracks_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
     Hist_JetNTracksWt = cms.string('jetNTracksweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
+    File_SV1EnergyRatioWt = cms.string('SV1EnergyRatio_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
+    Hist_SV1EnergyRatioWt = cms.string('SV1EnergyRatioweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
     FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
@@ -339,6 +346,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     DoSubJetPtBalanceReweighting  = cms.bool(options.doSubJetPtBalanceReweighting),
     DoMassSoftDropReweighting  = cms.bool(options.doMassSoftDropReweighting),
     DoJetNTracksReweighting  = cms.bool(options.doJetNTracksReweighting),
+    DoSV1EnergyRatioReweighting  = cms.bool(options.doSV1EnergyRatioReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
       options.triggerSelection
       ),

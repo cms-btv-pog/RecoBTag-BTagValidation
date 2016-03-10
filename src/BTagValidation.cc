@@ -116,6 +116,7 @@ class BTagValidation : public edm::EDAnalyzer {
     double GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
     double GetLumiWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) ;
     double GetLumiWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) ;
+    double GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) ;
 
     void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
     void GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ; 
@@ -238,6 +239,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_SubJetPtBalanceWt_ ;
     const std::string               file_MassSoftDropWt_ ;
     const std::string               file_JetNTracksWt_ ;
+    const std::string               file_SV1EnergyRatioWt_ ;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
@@ -246,6 +248,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               hist_SubJetPtBalanceWt_ ;
     const std::string               hist_MassSoftDropWt_ ;
     const std::string               hist_JetNTracksWt_ ;
+    const std::string               hist_SV1EnergyRatioWt_ ;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
@@ -253,6 +256,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      doSubJetPtBalanceReweighting_ ;
     const bool                      doMassSoftDropReweighting_ ;
     const bool                      doJetNTracksReweighting_ ;
+    const bool                      doSV1EnergyRatioReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
 
@@ -330,6 +334,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_SubJetPtBalanceWt_(iConfig.getParameter<std::string>("File_SubJetPtBalanceWt")),
   file_MassSoftDropWt_(iConfig.getParameter<std::string>("File_MassSoftDropWt")),
   file_JetNTracksWt_(iConfig.getParameter<std::string>("File_JetNTracksWt")),
+  file_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("File_SV1EnergyRatioWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
   hist_PUDistMC_(iConfig.getParameter<std::string>("Hist_PUDistMC")),
   hist_PUDistData_(iConfig.getParameter<std::string>("Hist_PUDistData")),
@@ -338,6 +343,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   hist_SubJetPtBalanceWt_(iConfig.getParameter<std::string>("Hist_SubJetPtBalanceWt")),
   hist_MassSoftDropWt_(iConfig.getParameter<std::string>("Hist_MassSoftDropWt")),
   hist_JetNTracksWt_(iConfig.getParameter<std::string>("Hist_JetNTracksWt")),
+  hist_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("Hist_SV1EnergyRatioWt")),
   doPUReweightingOfficial_(iConfig.getParameter<bool>("DoPUReweightingOfficial")),
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
@@ -345,6 +351,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doSubJetPtBalanceReweighting_(iConfig.getParameter<bool>("DoSubJetPtBalanceReweighting")),
   doMassSoftDropReweighting_(iConfig.getParameter<bool>("DoMassSoftDropReweighting")),
   doJetNTracksReweighting_(iConfig.getParameter<bool>("DoJetNTracksReweighting")),
+  doSV1EnergyRatioReweighting_(iConfig.getParameter<bool>("DoSV1EnergyRatioReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
@@ -619,6 +626,7 @@ void BTagValidation::beginJob() {
 
   AddHisto("FatJet_tau1_vertexMass"    	       ,";tau1_vertexMass;;",500,0.,500);
   AddHisto("FatJet_tau1_vertexEnergyRatio"      ,";tau1_vertexEnergyRatio;;",100,-1,4);
+  AddHisto("FatJet_tau1_vertexEnergyRatio_unw"      ,";tau1_vertexEnergyRatio (unweighted);;",100,-1,4);
   AddHisto("FatJet_tau1_vertexDeltaR"    	   ,";tau1_vertexDeltaR;;",100,-1,1);
   AddHisto("FatJet_tau1_flightDistance2dSig"    ,";tau1_flightDistance2dSig;;",100,-20,20);
 
@@ -1146,7 +1154,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtJetNTracks_unw = wtFatJet;
         wtFatJet *= wtJetNTracks ;
       }
-      edm::LogInfo("JetNTracksReweighting") << "JetNTracks = " << FatJetInfo.TagVarCSV_jetNTracks[iJet] << ", wtJetNTracks = " << wtJetNTracks ;
+//       edm::LogInfo("JetNTracksReweighting") << "JetNTracks = " << FatJetInfo.TagVarCSV_jetNTracks[iJet] << ", wtJetNTracks = " << wtJetNTracks ;
+      //added by Rizki - jetNTracks reweighting factor
+      double wtSV1EnergyRatio = 1.;
+      double wtSV1EnergyRatio_unw = 1.;
+      if (doSV1EnergyRatioReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtSV1EnergyRatio *= GetLumiWeightsSV1EnergyRatioBased(file_SV1EnergyRatioWt_, hist_SV1EnergyRatioWt_, FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] ) ;
+        wtSV1EnergyRatio_unw = wtFatJet;
+        wtFatJet *= wtSV1EnergyRatio ;
+      }
+      edm::LogInfo("SV1EnergyRatioReweighting") << "SV1 Energy ratio = " << FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] << ", wtSV1EnergyRatio = " << wtSV1EnergyRatio ;
 
 
       
@@ -1396,6 +1413,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       FillHisto("FatJet_tau1_vertexMass"		,      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexMass ,   wtPU*wtFatJet);
       FillHisto("FatJet_tau1_vertexEnergyRatio"	,      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexEnergyRatio ,   wtPU*wtFatJet);
+      FillHisto("FatJet_tau1_vertexEnergyRatio_unw"	,      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexEnergyRatio ,   wtPU*wtSV1EnergyRatio_unw);
       FillHisto("FatJet_tau1_vertexDeltaR"	,      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexDeltaR ,   wtPU*wtFatJet);
       FillHisto("FatJet_tau1_flightDistance2dSig"	,      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_flightDistance2dSig ,   wtPU*wtFatJet);
 
@@ -2259,6 +2277,18 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     delete f ;
     delete hwt ;
     return wtNTracks ;
+  }
+
+  // ----For calculating bkg MC event weight for reweighting to the SV1EnergyRatio distribution in signal MC
+  double BTagValidation::GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) {
+    double wtRatio(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtRatio = ratio >= -1 && ratio <= 4 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(ratio)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtRatio ;
   }
 
 
