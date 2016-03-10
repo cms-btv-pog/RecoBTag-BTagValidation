@@ -59,7 +59,7 @@ TFile * f2 ;
 if(option=="425_sjptbalancereweight")f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_reweight_merged/Final_histograms_btagval.root");
 if(option=="425_ptreweight")f2= new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/Final_histograms_btagval_QCD76x_pt425_m50_pTreweighted_fromAlice.root");
 if(option=="425_massSoftDropreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_massSoftDrop_reweight_merged/Final_histograms_btagval.root");
-
+if(option=="425_jetNTracksreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_jetNTracks_reweight_merged/Final_histograms_btagval.root");
 
 f2->cd();
 
@@ -219,6 +219,8 @@ TLatex *tex;
 if(option=="425_sjptbalancereweight") tex = new TLatex(.15,.85,"Subjet p_{T} asymmetry reweighted");
 if(option=="425_ptreweight") tex = new TLatex(.15,.85,"p_{T} reweighted");
 if(option=="425_massSoftDropreweight") tex = new TLatex(.15,.85,"Mass_{SoftDrop} reweighted");
+if(option=="425_jetNTracksreweight") tex = new TLatex(.15,.85,"Num. of tracks reweighted");
+
 tex->SetNDC();
 tex->SetTextAlign(13);
 tex->SetTextFont(42);
