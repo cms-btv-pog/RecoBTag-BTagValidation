@@ -29,11 +29,13 @@ using namespace std;
 TString ptcut = "425";
 
 //TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_08Feb2016/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets.root"; 
+//TString filename    = "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsDoubleMuTagged_PUWt_07Feb2016/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets.root";
 //TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsSingleMuTagged_PUWt_FatJetPtWt_07Feb2016/Final_histograms_btagval_JetHT_MuonTaggedFatJets_MuonEnrichedJets.root";
 TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016/Final_histograms_btagval_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016.root";
 
 TString filename_ext="" ;
 
+//TString dir4plots   = "FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_NoNormLight_08Feb2016";
 //TString dir4plots   = "FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_NoNormLight_08Feb2016";
 //TString dir4plots   = "FatJets_76X_JetHT_FatJetsSingleMuTagged_PUWt_YesNormLight_07Feb2016";
 TString dir4plots   = "FatJets_76X_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016";
@@ -54,7 +56,7 @@ bool prunedjets= 0;
 bool logy      = 1;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
-double norm_lightjets = 1.00;//1.27 ; // used only for QCD MuEnriched.
+double norm_lightjets = 1.00; //1.27 ; // used only for QCD MuEnriched.
 
 
 bool inclTTbar = 0;
@@ -1023,10 +1025,10 @@ void DrawStacked(TString name,
 
   int move_legend=0;
   //  if ( name.Contains("jet_phi") || name.Contains("sv_phi") || name.Contains("muon_phi") ) move_legend=1;
-  if (log && name.Contains("sv_en_ratio") ) move_legend=1;
+  //if (log && name.Contains("sv_en_ratio") ) move_legend=1;
   TLegend *leg ;
   if (move_legend==1) {
-    leg =  new TLegend(0.1,0.55,0.40,.90,NULL,"brNDC");
+    leg =  new TLegend(0.12,0.55,0.43,.90,NULL,"brNDC");
   }
   else {
     leg = new TLegend(0.65,0.55,0.90,0.90,NULL,"brNDC");
@@ -1042,9 +1044,9 @@ void DrawStacked(TString name,
   leg->SetTextSize( (dodata? 0.05:0.035) ); //added by rizki
 
   if (doData) leg->AddEntry(hist_data,     datacaption,     "e1p");
-  leg->AddEntry(hist_b,        "b quark"           ,         "f");
-  leg->AddEntry(hist_c,        "c quark"           ,         "f");
-  leg->AddEntry(hist_l,        "uds quark or gluon"     ,    "f");
+  leg->AddEntry(hist_b,        "b"           ,         "f");
+  leg->AddEntry(hist_c,        "c"           ,         "f");
+  leg->AddEntry(hist_l,        "udsg"     ,    "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
   //   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
   if (inclTTbar) leg->AddEntry(hist_ttbar,    "t#bar{t}"               ,    "f");
@@ -1369,11 +1371,11 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
   TLegend* leg = 0;
   leg = new TLegend(0.6,0.73,0.95,1.);
   if (doData) leg->AddEntry(TagRate_Data,        datacaption                     ,"p");
-  leg->AddEntry(TagRate_MC_b,        "b quark"                  ,"f");
-  leg->AddEntry(TagRate_MC_gspl,     "b from gluon splitting"   ,"f");
-  leg->AddEntry(TagRate_MC_gspl_c,     "c from gluon splitting"   ,"f");
-  leg->AddEntry(TagRate_MC_c,        "c quark"                  ,"f");
-  leg->AddEntry(TagRate_MC_udsg,     "uds quark or gluon"     ,"f");
+  leg->AddEntry(TagRate_MC_b,        "b"        ,"f");
+  leg->AddEntry(TagRate_MC_gspl,     "b from gluon splitting" ,"f");
+  leg->AddEntry(TagRate_MC_gspl_c,   "c from gluon splitting" ,"f");
+  leg->AddEntry(TagRate_MC_c,        "c"        ,"f");
+  leg->AddEntry(TagRate_MC_udsg,     "udsg"     ,"f");
 
   leg->SetFillColor(0);
   leg->Draw();
@@ -1645,11 +1647,11 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
     leg =  new TLegend(0.6,0.73,0.95,1.);
     leg->AddEntry(pro_data,        datacaption              ,"p") ;
     leg->AddEntry(pro_mc,          "total "                 ,"l") ;
-    leg->AddEntry(pro_mc_b,        "b quark"                ,"l") ;
+    leg->AddEntry(pro_mc_b,        "b"                ,"l") ;
     leg->AddEntry(pro_mc_gspl,     "b from gluon splitting" ,"l") ;
-    leg->AddEntry(pro_mc_c,        "c quark"                ,"l") ;
-    leg->AddEntry(pro_mc_gspl_c,     "c from gluon splitting" ,"l") ;
-    leg->AddEntry(pro_mc_udsg,     "uds quark or gluon"     ,"l") ;
+    leg->AddEntry(pro_mc_c,        "c"                ,"l") ;
+    leg->AddEntry(pro_mc_gspl_c,   "c from gluon splitting" ,"l") ;
+    leg->AddEntry(pro_mc_udsg,     "udsg"     ,"l") ;
   }
   else {
     leg->AddEntry(hist_data,  datacaption ,"p") ;
