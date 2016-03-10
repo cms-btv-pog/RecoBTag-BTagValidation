@@ -1,6 +1,8 @@
 #!/bin/bash
 
-./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_massSoftDrop_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_massSoftDrop76x_reweight.txt -q cmscaf1nh
+./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_jetNTracks_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_jetNTracks76x_reweight.txt -q cmscaf1nh
+
+# ./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_massSoftDrop_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_massSoftDrop76x_reweight.txt -q cmscaf1nh
 
 # ./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_subjetPtBalance76x_reweight.txt -q cmscaf1nh
 

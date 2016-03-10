@@ -184,6 +184,11 @@ options.register('doMassSoftDropReweighting', False,
     VarParsing.varType.bool,
     'Do mass soft drop reweighting'
     )
+options.register('doJetNTracksReweighting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do mass jetNTracks reweighting'
+    )
 options.register('applySFs', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -319,6 +324,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_SubJetPtBalanceWt = cms.string('subjetptbalanceweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
     File_MassSoftDropWt = cms.string('massSoftDrop_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for mass reweighting.
     Hist_MassSoftDropWt = cms.string('massSoftDropweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for mass reweighting.
+    File_JetNTracksWt = cms.string('jetNTracks_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
+    Hist_JetNTracksWt = cms.string('jetNTracksweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
     FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
@@ -331,6 +338,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     DoSubJetPtReweighting  = cms.bool(options.doSubJetPtReweighting),
     DoSubJetPtBalanceReweighting  = cms.bool(options.doSubJetPtBalanceReweighting),
     DoMassSoftDropReweighting  = cms.bool(options.doMassSoftDropReweighting),
+    DoJetNTracksReweighting  = cms.bool(options.doJetNTracksReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
       options.triggerSelection
       ),

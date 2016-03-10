@@ -84,6 +84,7 @@ cp -v MAIN_WORKDIR/FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.
 cp -v MAIN_WORKDIR/SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
 cp -v MAIN_WORKDIR/subjetptbalance_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
 cp -v MAIN_WORKDIR/massSoftDrop_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
+cp -v MAIN_WORKDIR/jetNTracks_Hbb_QCDbb_pt425_weight.root $BATCHDIR/
 cp -v MAIN_WORKDIR/CSVv2.csv $BATCHDIR/
 cp -v MAIN_WORKDIR/Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt $BATCHDIR/
 cp -v MAIN_WORKDIR/Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt $BATCHDIR/
@@ -171,6 +172,8 @@ def main():
     if re.search("^subjetptbalance_Hbb_QCDbb_pt425_weight.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^massSoftDrop_Hbb_QCDbb_pt425_weight.root$", filename):
+      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
+    if re.search("^jetNTracks_Hbb_QCDbb_pt425_weight.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^CSVv2.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
