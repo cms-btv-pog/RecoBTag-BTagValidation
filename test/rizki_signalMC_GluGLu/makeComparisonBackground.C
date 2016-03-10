@@ -170,6 +170,15 @@ if(isLog==0)stack->SetMaximum(stack->GetMaximum("nostack")*1.2);
 stack->GetXaxis()->SetLabelSize(0.0);
 stack->GetXaxis()->SetLabelOffset(999);
 
+TLatex *   cmstex = new TLatex(0.42,0.97,"CMS Simulation, #sqrt{s} = 13 TeV");
+cmstex->SetNDC();
+cmstex->SetTextAlign(13);
+cmstex->SetTextFont(42);
+cmstex->SetTextFont(62);
+cmstex->SetTextSize(0.055);
+cmstex->SetLineWidth(2);
+cmstex->Draw();
+
 
   c1_2->SetLogy(isLog);
   // End top plot

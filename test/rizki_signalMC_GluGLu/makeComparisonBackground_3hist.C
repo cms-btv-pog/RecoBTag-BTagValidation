@@ -58,6 +58,8 @@ leg->AddEntry(h,"Hbb (bfromg flavor)","l");
 TFile * f2 ;
 if(option=="425_sjptbalancereweight")f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_reweight_merged/Final_histograms_btagval.root");
 if(option=="425_ptreweight")f2= new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/Final_histograms_btagval_QCD76x_pt425_m50_pTreweighted_fromAlice.root");
+if(option=="425_massSoftDropreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_massSoftDrop_reweight_merged/Final_histograms_btagval.root");
+
 
 f2->cd();
 
@@ -115,8 +117,8 @@ hratio2->Divide(h3);
   TString yTitle2 = "Hbb/QCDbb"; // bottom plot y axis title
 
   vector<int> histColors; 
-  histColors.push_back(kBlue);  // change colors as you like
-  histColors.push_back(kRed);
+  histColors.push_back(kRed);  // change colors as you like
+  histColors.push_back(kAzure+1);
 //   histColors.push_back(kGreen-1);
 
 //   int histDenominatorColor = kBlack;
@@ -211,6 +213,26 @@ if(isLog==0)stack->SetMaximum(stack->GetMaximum("nostack")*1.2);
 // stack->GetXaxis()->SetTitle(label);
 stack->GetXaxis()->SetLabelSize(0.0);
 stack->GetXaxis()->SetLabelOffset(999);
+
+TLatex *tex;
+// latex.SetTextAlign(12);  //centered
+if(option=="425_sjptbalancereweight") tex = new TLatex(.15,.85,"Subjet p_{T} asymmetry reweighted");
+if(option=="425_ptreweight") tex = new TLatex(.15,.85,"p_{T} reweighted");
+if(option=="425_massSoftDropreweight") tex = new TLatex(.15,.85,"Mass_{SoftDrop} reweighted");
+tex->SetNDC();
+tex->SetTextAlign(13);
+tex->SetTextFont(42);
+tex->SetTextSize(0.035);
+tex->Draw();
+
+TLatex *   cmstex = new TLatex(0.42,0.97,"CMS Simulation, #sqrt{s} = 13 TeV");
+cmstex->SetNDC();
+cmstex->SetTextAlign(13);
+cmstex->SetTextFont(42);
+cmstex->SetTextFont(62);
+cmstex->SetTextSize(0.055);
+cmstex->SetLineWidth(2);
+cmstex->Draw();
 
 
   c1_2->SetLogy(isLog);
