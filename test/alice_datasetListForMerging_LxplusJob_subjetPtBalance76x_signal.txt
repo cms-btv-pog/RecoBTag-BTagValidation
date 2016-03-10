@@ -1,0 +1,2 @@
+SIGNAL:
+/BulkGravTohhTohbbhbb_narrow_M-1000_13TeV-madgraph/ -1 -1
