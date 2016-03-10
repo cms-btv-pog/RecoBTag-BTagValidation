@@ -1,16 +1,18 @@
 {
 	gROOT->ProcessLine(".L makeComparisonBackground_3hist.C");
 
-	vector<string> option;
+	std::vector<TString> option;
 	option.push_back("425_ptreweight");
 	option.push_back("425_sjptbalancereweight");
 	option.push_back("425_massSoftDropreweight");
+	option.push_back("425_jetNTracksreweight");
 
-	vector<int> isLog;
+	std::vector<int> isLog;
 	isLog.push_back(0);
 	isLog.push_back(1);	
 
 	for (int i=0 ; i<option.size();i++){
+		cout << "option[" << i << "] = " << option[i] << endl;
 		for (int j=0 ; j<isLog.size();j++){
 			makeComparisonBackground_3hist("DoubleB_bfromg", -1, 1, "Final Discriminator",2,option[i], isLog[j]);
 			makeComparisonBackground_3hist("jetNTracks_bfromg", 0, 40, "Number of tracks",1,option[i], isLog[j]);
