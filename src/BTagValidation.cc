@@ -117,6 +117,8 @@ class BTagValidation : public edm::EDAnalyzer {
     double GetLumiWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) ;
     double GetLumiWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) ;
     double GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) ;
+    double GetLumiWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) ;
+
 
     void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
     void GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ; 
@@ -240,6 +242,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_MassSoftDropWt_ ;
     const std::string               file_JetNTracksWt_ ;
     const std::string               file_SV1EnergyRatioWt_ ;
+    const std::string               file_IPSig1stAboveBWt_ ;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
@@ -249,6 +252,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               hist_MassSoftDropWt_ ;
     const std::string               hist_JetNTracksWt_ ;
     const std::string               hist_SV1EnergyRatioWt_ ;
+    const std::string               hist_IPSig1stAboveBWt_ ;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
@@ -257,6 +261,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      doMassSoftDropReweighting_ ;
     const bool                      doJetNTracksReweighting_ ;
     const bool                      doSV1EnergyRatioReweighting_ ;
+    const bool                      doIPSig1stAboveBReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
 
@@ -335,6 +340,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_MassSoftDropWt_(iConfig.getParameter<std::string>("File_MassSoftDropWt")),
   file_JetNTracksWt_(iConfig.getParameter<std::string>("File_JetNTracksWt")),
   file_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("File_SV1EnergyRatioWt")),
+  file_IPSig1stAboveBWt_(iConfig.getParameter<std::string>("File_IPSig1stAboveBWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
   hist_PUDistMC_(iConfig.getParameter<std::string>("Hist_PUDistMC")),
   hist_PUDistData_(iConfig.getParameter<std::string>("Hist_PUDistData")),
@@ -344,6 +350,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   hist_MassSoftDropWt_(iConfig.getParameter<std::string>("Hist_MassSoftDropWt")),
   hist_JetNTracksWt_(iConfig.getParameter<std::string>("Hist_JetNTracksWt")),
   hist_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("Hist_SV1EnergyRatioWt")),
+  hist_IPSig1stAboveBWt_(iConfig.getParameter<std::string>("Hist_IPSig1stAboveBWt")),
   doPUReweightingOfficial_(iConfig.getParameter<bool>("DoPUReweightingOfficial")),
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
@@ -352,6 +359,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doMassSoftDropReweighting_(iConfig.getParameter<bool>("DoMassSoftDropReweighting")),
   doJetNTracksReweighting_(iConfig.getParameter<bool>("DoJetNTracksReweighting")),
   doSV1EnergyRatioReweighting_(iConfig.getParameter<bool>("DoSV1EnergyRatioReweighting")),
+  doIPSig1stAboveBReweighting_(iConfig.getParameter<bool>("DoIPSig1stAboveBReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
@@ -614,6 +622,7 @@ void BTagValidation::beginJob() {
 
   AddHisto("FatJet_trackSip2dSigAboveCharm_0",";trackSip2dSigAboveCharm_0;;",100,-20,20);
   AddHisto("FatJet_trackSip2dSigAboveBottom_0",";trackSip2dSigAboveBottom_0;;",100,-20,20);
+  AddHisto("FatJet_trackSip2dSigAboveBottom_0_unw",";trackSip2dSigAboveBottom_0;;",100,-20,20);
   AddHisto("FatJet_trackSip2dSigAboveBottom_1",";trackSip2dSigAboveBottom_1;;",100,-20,20);
 
   AddHisto("FatJet_tau2_trackEtaRel_0",";tau2_trackEtaRel_0;;",400,-20,20);
@@ -1155,7 +1164,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtFatJet *= wtJetNTracks ;
       }
 //       edm::LogInfo("JetNTracksReweighting") << "JetNTracks = " << FatJetInfo.TagVarCSV_jetNTracks[iJet] << ", wtJetNTracks = " << wtJetNTracks ;
-      //added by Rizki - jetNTracks reweighting factor
+      //added by Rizki - SV1EnergyRatio reweighting factor
       double wtSV1EnergyRatio = 1.;
       double wtSV1EnergyRatio_unw = 1.;
       if (doSV1EnergyRatioReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
@@ -1163,7 +1172,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtSV1EnergyRatio_unw = wtFatJet;
         wtFatJet *= wtSV1EnergyRatio ;
       }
-      edm::LogInfo("SV1EnergyRatioReweighting") << "SV1 Energy ratio = " << FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] << ", wtSV1EnergyRatio = " << wtSV1EnergyRatio ;
+//       edm::LogInfo("SV1EnergyRatioReweighting") << "SV1 Energy ratio = " << FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] << ", wtSV1EnergyRatio = " << wtSV1EnergyRatio ;
+      //added by Rizki - IPSig1stAboveB reweighting factor
+      double wtIPSig1stAboveB = 1.;
+      double wtIPSig1stAboveB_unw = 1.;
+      if (doIPSig1stAboveBReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtIPSig1stAboveB *= GetLumiWeightsIPSig1stAboveBBased(file_IPSig1stAboveBWt_, hist_IPSig1stAboveBWt_, FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] ) ;
+        wtIPSig1stAboveB_unw = wtFatJet;
+        wtFatJet *= wtIPSig1stAboveB ;
+      }
+      edm::LogInfo("IPSig1stAboveBReweighting") << "IPSig1stAboveB = " << FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] << ", wtIPSig1stAboveB = " << wtIPSig1stAboveB ;
 
 
       
@@ -1401,6 +1419,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       FillHisto("FatJet_trackSip2dSigAboveCharm_0",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveCharm_0 ,   wtPU*wtFatJet);
       FillHisto("FatJet_trackSip2dSigAboveBottom_0",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_0 ,   wtPU*wtFatJet);
+      FillHisto("FatJet_trackSip2dSigAboveBottom_0_unw",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_0 ,   wtPU*wtIPSig1stAboveB_unw);
       FillHisto("FatJet_trackSip2dSigAboveBottom_1",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_1 ,   wtPU*wtFatJet);
 
       FillHisto("FatJet_tau2_trackEtaRel_0",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_0  ,   wtPU*wtFatJet);
@@ -2289,6 +2308,18 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     delete f ;
     delete hwt ;
     return wtRatio ;
+  }
+
+  // ----For calculating bkg MC event weight for reweighting to the IPSig1stAboveB distribution in signal MC
+  double BTagValidation::GetLumiWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) {
+    double wtIPSig(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtIPSig = IPSig >= -20 && IPSig <= 20 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(IPSig)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtIPSig ;
   }
 
 

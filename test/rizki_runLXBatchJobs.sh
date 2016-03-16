@@ -1,6 +1,11 @@
 #!/bin/bash
 
-./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_SV1EnergyRatio_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_SV1EnergyRatio76x_reweight.txt -q cmscaf1nh
+./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_IPSig1stAboveB_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_IPSig1stAboveB76x_reweight.txt -q cmscaf1nh
+
+
+# ./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_SV1EnergyRatio_jetNTracks_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_SV1EnergyRatio76x_jetNTracks76x_reweight.txt -q cmscaf1nh
+
+# ./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_SV1EnergyRatio_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_SV1EnergyRatio76x_reweight.txt -q cmscaf1nh
 
 # ./createAndSubmitJobs.py -w rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_jetNTracks_reweight -c btagvalidation_cfg.py -d alice_datasetList_LxplusJob_jetNTracks76x_reweight.txt -q cmscaf1nh
 
