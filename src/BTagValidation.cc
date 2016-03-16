@@ -802,6 +802,7 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_muon_Sip2d",      ";Muon 2D IP significance;;",100,-50,50);
   AddHisto(histoTag+"_muon_DeltaR",     ";Muon1 #DeltaR;;",100,0,1.0); 
   AddHisto(histoTag+"_muComb_ptRatio",  ";(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet);;",50,0,1);  
+  AddHisto(histoTag+"_muon_ptRatio",  ";(p_{T}(#mu_{1}))/p_{T}(jet);;",50,0,1);  
 
   AddHisto(histoTag+"_sv_deltaR_jet",      ";#DeltaR(SV, jet);;",50,0.,0.5);
   AddHisto(histoTag+"_sv_deltaR_sumJet",   ";#DeltaR(SV,sumJet);;",50,0.,0.5);
@@ -908,6 +909,10 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto2D(histoTag+"_muon_ptrel_vs_jetpt"       ,";PFMuon_p{T}^{rel} vs jet pt;;",PtMax/20,0,PtMax,50,0,5);
   AddHisto2D(histoTag+"_muon_DeltaR_vs_jetpt"      ,";Muon1 DeltaR vs jet pt;;",PtMax/20,0,PtMax,50,0,0.5);
   AddHisto2D(histoTag+"_muon_ptrel_vs_nseltrack"   ,";PFMuon_p{T}^{rel} vs N(sel. track);;",100,0.,1.0,100,-0.5,99.5);
+  
+  AddHisto2D(histoTag+"_muon_DoubleB_vs_ptRatio"   ,";DoubleB vs (p_{T}(#mu_{1}))/p_{T}(jet) ;;",100,-1.,1.0,50,0,1);
+  AddHisto2D(histoTag+"_muon_DoubleB_vs_DeltaR"   ,";DoubleB vs dR(jet,#mu) ;;",100,-1.,1.0,100,0,1.0);
+
 }
 
 // ------------ method called for each event  ------------
@@ -1909,6 +1914,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       thejet.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
       themuon.SetPtEtaPhiM(JetInfo.PFMuon_pt[idxFirstMuon], JetInfo.PFMuon_eta[idxFirstMuon], JetInfo.PFMuon_phi[idxFirstMuon], 0);
+      
+      //Fill DoubleB vs pt(muon)/pt(jet) here !
+      FillHisto(histoTag+"_muon_ptRatio",     flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_pt[idxFirstMuon]/ptjet ,     wt);
+      FillHisto2D(histoTag+"_muon_DoubleB_vs_DeltaR",flav, isGSPbb, isGSPcc ,doubleb,themuon.DeltaR(thejet),wt);
+      FillHisto2D(histoTag+"_muon_DoubleB_vs_ptRatio",flav, isGSPbb, isGSPcc ,doubleb,JetInfo.PFMuon_pt[idxFirstMuon]/ptjet,wt);
 
       FillHisto(histoTag+"_muon_DeltaR",         flav, isGSPbb, isGSPcc ,themuon.DeltaR(thejet) , wt);
       FillHisto2D(histoTag+"_muon_ptrel_vs_jetpt", flav, isGSPbb, isGSPcc ,ptjet,JetInfo.PFMuon_ptrel[idxFirstMuon],wt);
