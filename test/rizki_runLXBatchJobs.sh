@@ -1,8 +1,16 @@
 #!/bin/bash
 
 
-./createAndSubmitJobs.py -w rizki_LXBatch_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_reweightPT -c btagvalidation_cfg.py -d rizki_datasetList_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_m50to200_reweightPT.txt -q cmscaf1nh
+#./createAndSubmitJobs.py -w rizki_LXBatch_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_reweightPT -c btagvalidation_cfg.py -d rizki_datasetList_BoostedTaggerValidation_cutFlow_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_m50to200_reweightPT.txt -q cmscaf1nh
 
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_Xtra -c btagvalidation_cfg.py -d alice_doubleperformance76X.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_Xtra -c btagvalidation_cfg.py -d alice_performance76X.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_Xtra_ntracks -c btagvalidation_cfg.py -d alice_doubleperformance76X_ntracks.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_Xtra_ntracks -c btagvalidation_cfg.py -d alice_performance76X_ntracks.txt -q 1nd
+./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_MuonTight -c btagvalidation_cfg.py -d alice_performance76X.txt -q 1nd  
 
 # ./createAndSubmitJobs.py -w rizki_LXBatch_BoostedTaggerValidation_cutFlow_usePruned_fjpt450_eta2p4_DoubleMuTag_50m200_tau0p5 -c btagvalidation_cfg.py -d rizki_datasetList_BoostedTaggerValidation_cutFlow_usePruned_fjpt450_eta2p4_DoubleMuTag_m50to200_tau0p5.txt -q cmscaf1nh
 # ./createAndSubmitJobs.py -w rizki_LXBatch_BoostedTaggerValidation_cutFlow_usePruned_fjpt450_eta2p4_DoubleMuTag_50m200_tau0p7 -c btagvalidation_cfg.py -d rizki_datasetList_BoostedTaggerValidation_cutFlow_usePruned_fjpt450_eta2p4_DoubleMuTag_m50to200_tau0p7.txt -q cmscaf1nh

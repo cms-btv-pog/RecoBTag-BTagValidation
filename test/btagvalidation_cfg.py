@@ -99,12 +99,12 @@ options.register('fatJetPtMax', 1.E6,
     VarParsing.varType.float,
     "Maximum fat jet Pt"
     )
-options.register('fatJetSoftDropMassMin', 0.,
+options.register('fatJetPrunedMassMin', 0.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet softdrop mass"
     )
-options.register('fatJetSoftDropMassMax', 1.E6,
+options.register('fatJetPrunedMassMax', 1.E6,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum fat jet softdrop mass"
@@ -169,6 +169,11 @@ options.register('doFatJetPtReweighting', False,
     VarParsing.varType.bool,
     'Do fat jet pt reweighting'
     )
+options.register('doNtracksReweighting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do ntracks reweighting'
+    )
 options.register('doSubJetPtReweighting', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -209,19 +214,24 @@ options.register('FileFatJetPtWt', "FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnric
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
+options.register('FileNtracksWt', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/dataMCntracks/ntracks_dataMC_weight_single.root",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File with data/MC weights for fat jet ntracks reweighting"
+    )
 options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
     )
 options.register('newJECPayloadNames',  
-    "Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt,Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt,Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt", 
+    "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt,/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt,/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt", 
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     "New JEC payload names"
     ),
 options.register('jecUncPayloadName', 
-    "Summer15_25nsV7_MC_Uncertainty_AK8PFchs.txt",
+    "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_Uncertainty_AK8PFchs.txt",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string, 
     "JEC uncertainty payload name"
@@ -299,22 +309,24 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
-    FatJetSoftDropMassMin  = cms.double(options.fatJetSoftDropMassMin),
+    FatJetPrunedMassMin  = cms.double(options.fatJetPrunedMassMin),
     File_PVWt              = cms.string('hnpv_data_Run2015D_mc_RunIISpring15DR74-Asympt25ns_pvwt.root'),
     Hist_PVWt              = cms.string('hpvwt_data_mc'),
     File_PUDistMC          = cms.string('PUDistMC_2015_25ns_FallMC_matchData_PoissonOOTPU.root'),
     Hist_PUDistMC          = cms.string('pileup'),
     File_PUDistData        = cms.string('RunII2015_25ns_PUXsec69000nb.root'),
     Hist_PUDistData        = cms.string('pileup'),
-    File_FatJetPtWt        = cms.string(options.FileFatJetPtWt), 
+    File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
     Hist_FatJetPtWt        = cms.string('jetptweight_mc_data'),
+    File_NtracksWt         = cms.string(options.FileNtracksWt),                             
+    Hist_NtracksWt         = cms.string('jetptweight_mc_data'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
 #    File_JetPtWt           = cms.string('jetpt_Hbb_QCDbb_pt330_weight.root'), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for pt reweighting.
     File_SubJetPtBalanceWt = cms.string('subjetptbalance_Hbb_QCDbb_pt425_weight.root'), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
 #     File_SubJetPtBalanceWt = cms.string(options.FileSubJetPtBalanceWt), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
     Hist_SubJetPtBalanceWt = cms.string('subjetptbalanceweight_mc_data'), #added by rizki only temporarily for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
-    FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
+    FatJetPrunedMassMax  = cms.double(options.fatJetPrunedMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
     FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki
@@ -323,6 +335,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     DoPUReweightingOfficial= cms.bool(options.doPUReweightingOfficial),
     DoPUReweightingNPV     = cms.bool(options.doPUReweightingNPV),
     DoFatJetPtReweighting  = cms.bool(options.doFatJetPtReweighting),
+    DoNtracksReweighting  = cms.bool(options.doNtracksReweighting),
     DoSubJetPtReweighting  = cms.bool(options.doSubJetPtReweighting),
     DoSubJetPtBalanceReweighting  = cms.bool(options.doSubJetPtBalanceReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied

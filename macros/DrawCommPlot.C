@@ -27,7 +27,7 @@
 using namespace std;
 
 // TString ptcut = "300";
-TString ptcut = "330";
+TString ptcut = "425";
 // TString ptcut = "360";
 // TString ptcut = "425";
 // TString ptcut = "450";
@@ -45,8 +45,9 @@ TString ptcut = "330";
 // TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_DoubleMuonTagged_50m200_tau21-1p0_fj450_usePruned_debug_ptRatioCut_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root" ;
 
 // TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_merged_wrongSubjetSelection/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root" ;
-TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root" ;
-
+//TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root" ;
+//TString filename = "../test/alice_LXBatch_Templates_Single_Xtra_merged/MuonEnrichedJets_MuonTaggedFatJets_FatJet_final_hists.root" ;
+TString filename = "../test/alice_LXBatch_Templates_Double_Xtra_merged/MuonEnrichedJets_DoubleMuonTaggedFatJets_FatJet_final_hists.root" ;
 
 // TString filename    ="../test/rizki_LXBatch_Jobs_fatJetPtMin_"+ptcut+"_tau-0p5_merged_2ndTime_fjPtReweighted/Final_histograms_btagval_InclusiveJets_ptReweighted.root" ;
 
@@ -57,9 +58,10 @@ TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMu
 
 //TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_08Feb2016/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets.root"; 
 //TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsSingleMuTagged_PUWt_FatJetPtWt_07Feb2016/Final_histograms_btagval_JetHT_MuonTaggedFatJets_MuonEnrichedJets.root";
-TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016/Final_histograms_btagval_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016.root";
+//TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016/Final_histograms_btagval_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016.root";
 
 TString filename_ext="" ;
+TString dir4plots = "Double" ;
 
 // TString dir4plots   ="btagvalplots_BoostedBB_DoubleMuonTagged_50m200_tau21-1p0_fj330_log" ;
 // TString dir4plots   ="btagvalplots_BoostedBB_DoubleMuonTagged_50m200_tau21-1p0_fj330_MuEnriched_log" ;
@@ -76,7 +78,7 @@ TString filename_ext="" ;
 // TString dir4plots   ="btagvalplots_BoostedBB_DoubleMuonTagged_50m200_tau21-1p0_fj450_MuEnriched_Pruned_w1p27scale_debug_ptRatioCut_log" ;
 
 // TString dir4plots   ="btagvalplots_BoostedBB_BTagMu_DoubleMuonTagged_50m200_tau21-1p0_fj330_MuEnriched_Pruned_w1p27scale_debug_ptRatioCut_wrongSubjetSelection_log" ;
-TString dir4plots   ="btagvalplots_BoostedBB_BTagMu_DoubleMuonTagged_50m200_tau21-1p0_fj330_MuEnriched_Pruned_w1p27scale_debug_ptRatioCut_log" ;
+//TString dir4plots   ="btagvalplots_BoostedBB_BTagMu_DoubleMuonTagged_50m200_tau21-1p0_fj330_MuEnriched_Pruned_w1p27scale_debug_ptRatioCut_log" ;
 
 
 // TString dir4plots   ="btagvalplots_fatJetPtMin_"+ptcut+"_tau-0p5_2ndTime_withJetPtWeight_log" ;
@@ -91,7 +93,7 @@ TString dir4plots   ="btagvalplots_BoostedBB_BTagMu_DoubleMuonTagged_50m200_tau2
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
-TString title1 = "#sqrt{s} = 13 TeV, 25 ns";
+//TString title1 = "#sqrt{s} = 13 TeV, 25 ns";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
@@ -101,10 +103,10 @@ TString formatc=".root";
 bool bOverflow = 1;
 bool web       = 0;
 bool prunedjets= 0;
-bool logy      = 1;
+bool logy      = 0;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
-double norm_lightjets = 1.00;//1.27 ; // used only for QCD MuEnriched.
+double norm_lightjets = 1.27;//1.27 ; // used only for QCD MuEnriched, otherwise use 1.00
 
 
 bool inclTTbar = 0;
@@ -118,6 +120,90 @@ void DrawStacked(TString name, TString histotitle, bool log, bool doData, bool f
 void DrawTagRate(TString name, TString histotitle, bool log, bool doData);
 void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY, bool log, bool doData, bool doProfile);
 
+TStyle* PlotStyleCMS()
+{
+  TStyle *plotStyle = new TStyle("PLOT","Plot style CMS");
+
+  plotStyle->SetOptTitle(0);
+  plotStyle->SetOptStat(0);
+  plotStyle->SetOptFit(0);
+   
+  plotStyle->SetPaperSize(20.,26.);
+
+  plotStyle->SetEndErrorSize(2);
+  //   plotStyle->SetErrorX(0.);
+   
+  plotStyle->SetFrameBorderMode(0);
+  plotStyle->SetFrameFillColor(0);
+  plotStyle->SetFrameFillStyle(0);
+  plotStyle->SetCanvasBorderMode(0);
+  plotStyle->SetFillColor(0);
+  plotStyle->SetCanvasColor(0);
+  plotStyle->SetCanvasBorderSize(2);
+   
+  plotStyle->SetPadBorderMode(0);
+  plotStyle->SetPadColor(0);
+  plotStyle->SetPadGridX(false);
+  plotStyle->SetPadGridY(false);
+  plotStyle->SetGridColor(0);
+  plotStyle->SetGridStyle(3);
+  plotStyle->SetGridWidth(1);
+   
+  //   plotStyle->SetCanvasDefH(600);
+  //   plotStyle->SetCanvasDefW(600);
+  plotStyle->SetCanvasDefX(0);
+  plotStyle->SetCanvasDefY(0);
+     
+  plotStyle->SetHistLineColor(1);
+  plotStyle->SetHistLineStyle(0);
+  plotStyle->SetHistLineWidth(1);
+   
+  plotStyle->SetPadTickX(1);
+  plotStyle->SetPadTickY(1);
+   
+  plotStyle->SetPadLeftMargin(0.16);
+  plotStyle->SetPadRightMargin(0.02);
+  plotStyle->SetPadTopMargin(0.06);
+  plotStyle->SetPadBottomMargin(0.13);
+
+  plotStyle->SetLabelFont(42,"x");
+  plotStyle->SetTitleFont(42,"x");
+  plotStyle->SetLabelFont(42,"y");
+  plotStyle->SetTitleFont(42,"y");
+  plotStyle->SetLabelFont(42,"z");
+  plotStyle->SetTitleFont(42,"z");
+
+  plotStyle->SetLabelSize(0.05,"x");
+  plotStyle->SetTitleSize(0.06,"x");
+  plotStyle->SetLabelSize(0.05,"y");
+  plotStyle->SetTitleSize(0.06,"y");
+  plotStyle->SetLabelSize(0.035,"z");
+  plotStyle->SetTitleSize(0.035,"z");
+
+  plotStyle->SetLabelOffset(0.007,"XYZ");
+   
+  plotStyle->SetNdivisions(510,"XYZ");
+  plotStyle->SetStripDecimals(kTRUE);
+  plotStyle->SetTickLength(0.03, "XYZ");
+   
+  plotStyle->SetTitleXOffset(0.9);
+  plotStyle->SetTitleYOffset(1.25);
+
+  plotStyle->SetMarkerStyle(20);
+  plotStyle->SetMarkerSize(1.2);
+   
+  return plotStyle;
+}
+
+
+void SetPlotStyle()
+{
+  static TStyle* plotStyle = PlotStyleCMS();
+  gROOT->SetStyle("PLOT");
+  gROOT->ForceStyle();
+}
+
+
 //DrawCommPlot(true,false,true,false,true,false,false)
 
 //--------------------------
@@ -130,12 +216,14 @@ void DrawCommPlot(bool Draw_track_plots=true,
     bool Draw_2D_plots=true) {
 
   gROOT->SetBatch(kTRUE);
-  gROOT->SetStyle("Plain");
-  gStyle->SetOptTitle(0);
+  //gROOT->SetStyle("Plain");
+  /*gStyle->SetOptTitle(0);
   gStyle->SetOptStat(0);
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
-  gStyle->SetErrorX(0);
+  gStyle->SetErrorX(0);*/
+
+  SetPlotStyle();
 
   TString action = "mkdir -p " + dir4plots;
   system(action);
@@ -183,13 +271,13 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
       //DrawStacked(histoTag+"_massDrop_softdrop"    ,"Mass drop (soft drop AK8 jets) [GeV]"              ,logy ,dodata ,extNorm ,4 ,0 ,0. ,0.);
     }
     DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
-    //DrawStacked(histoTag+"_DoubleB"      ,"DoubleB"                                           ,logy ,dodata ,extNorm ,1 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB"      ,"DoubleB"                                           ,logy ,dodata ,extNorm ,5 ,0 ,-1 ,1.);
 
     //added by rizki - start
     
-    DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,5 ,0 ,0. ,0.);
     
-    int trackSip_rebin = 2;
+    int trackSip_rebin = 5;
     DrawStacked(histoTag+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
     DrawStacked(histoTag+"_trackSip3dSig_1"  ,"IP Sig 2nd track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
     DrawStacked(histoTag+"_trackSip3dSig_2"  ,"IP Sig 3rd track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
@@ -204,25 +292,25 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_trackSip2dSigAboveBottom_0"  ,"IP Sig 1st Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
     DrawStacked(histoTag+"_trackSip2dSigAboveBottom_1"  ,"IP Sig 2nd Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
 
-    DrawStacked(histoTag+"_tau1_trackEtaRel_0"  ,"EtaRel 1st track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    DrawStacked(histoTag+"_tau1_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    DrawStacked(histoTag+"_tau1_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
+    DrawStacked(histoTag+"_tau1_trackEtaRel_0"  ,"EtaRel 1st track for SV_{0}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
+    DrawStacked(histoTag+"_tau1_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{0}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
+    DrawStacked(histoTag+"_tau1_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{0}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
     
-    DrawStacked(histoTag+"_tau2_trackEtaRel_0"  ,"EtaRel 1st track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);  
-    DrawStacked(histoTag+"_tau2_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
+    DrawStacked(histoTag+"_tau2_trackEtaRel_0"  ,"EtaRel 1st track for SV_{1}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);  
+    DrawStacked(histoTag+"_tau2_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{1}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
+    DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
 
-    DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
-    DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,25.);
+    DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,4 ,1 ,0. ,4.);
+    DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,1.);
+    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,20.);
 
-    DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
-    DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,25.);
+    DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,4 ,1 ,0. ,4.);
+    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,20.);
 
-    DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,8.);
 
     DrawStacked(histoTag+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
     Draw2DPlot(histoTag+"_BDTGSV_jetProba", "BDTG SV vs JP", "BDTG SV", "Jet Probability",logy,1,0); 
@@ -514,8 +602,8 @@ void Draw(TString name, TString histotitle, bool log) {
   hist_mc->SetLineColor(2);
   hist_mc->SetFillColor(2);
 
-  gStyle->SetOptTitle(0);
-  gStyle->SetOptStat(0);
+  //  gStyle->SetOptTitle(0);
+  //gStyle->SetOptStat(0);
 
   //TCanvas *c1 = new TCanvas("c1", "c1",432,69,782,552);
   TCanvas *c1 = new TCanvas("c1", "c1",441,159,782,552);
@@ -609,8 +697,8 @@ void Draw(TString name, TString histotitle, bool log) {
   histo_ratio->GetYaxis()->SetLabelSize( labelsizey );
   histo_ratio->GetYaxis()->SetTitleSize( titlesizey );
 
-  histo_ratio->SetMinimum(0.4);
-  histo_ratio->SetMaximum(1.6);
+  histo_ratio->SetMinimum(0.2);
+  histo_ratio->SetMaximum(2.0);
   histo_ratio->Draw("E1X0");
 
   c1->cd();
@@ -982,10 +1070,11 @@ void DrawStacked(TString name,
     cout << "Data/MC ratio:       " << histo_ratio->GetBinContent(1) << endl
       << "Data/MC ratio error: " << histo_ratio->GetBinError(1) << endl;
 
-  setTDRStyle();
-  gStyle->SetErrorX(0.);
+  //  setTDRStyle();
+  //gStyle->SetErrorX(0.);
+  SetPlotStyle();
 
-  int iPeriod = 5;    // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV 
+  int iPeriod = 4;    // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV 
   int iPos = 11 ;
   int W = 800;
   int H = 600;
@@ -1019,14 +1108,14 @@ void DrawStacked(TString name,
   pad0->SetLogy(log);
 
   if (!log) {
-    if ( name.Contains("_sv_mass")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*2.1 : histo_tot->GetMaximum()*2.1) ;
-    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3.0 : histo_tot->GetMaximum()*3.0) ;
+    if ( name.Contains("_sv_mass")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*2.0 : histo_tot->GetMaximum()*2.0) ;
+    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*2.0 : histo_tot->GetMaximum()*2.0) ;
   }
   else {
-    if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*5000000 : histo_tot->GetMaximum()*5000000) ;
-    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*300000 : histo_tot->GetMaximum()*300000) ;
-    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000 : histo_tot->GetMaximum()*1000000) ; 
-    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000 : histo_tot->GetMaximum()*1000000) ;
+    if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*5000 : histo_tot->GetMaximum()*5000) ;
+    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*300 : histo_tot->GetMaximum()*300) ;
+    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000 : histo_tot->GetMaximum()*1000) ; 
+    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000 : histo_tot->GetMaximum()*1000) ;
 
   }
   if (doData) {
@@ -1037,8 +1126,8 @@ void DrawStacked(TString name,
   }
 
   //if (name=="jet_phi" || name=="sv_phi" || name=="muon_phi") {
-  if (log) histo_tot->SetMinimum(0.5);
-  else     histo_tot->SetMinimum(0.);
+  if (log) histo_tot->SetMinimum(0.2);
+  else     histo_tot->SetMinimum(0.2);
   //}
 
   histo_tot->GetXaxis()->SetTitle("");
@@ -1216,8 +1305,8 @@ void DrawStacked(TString name,
       histo_ratio->GetXaxis()->SetRangeUser(0, 25) ;
     }
 
-    histo_ratio->SetMinimum(0.4);
-    histo_ratio->SetMaximum(1.6);
+    histo_ratio->SetMinimum(0.2);
+    histo_ratio->SetMaximum(2.0);
     histo_ratio->Draw("E1X0");
     if (uncBand) histo_ratio_unc->Draw("sameE2");
 
@@ -1232,7 +1321,7 @@ void DrawStacked(TString name,
   latex->SetTextSize(0.030);
   latex->SetTextFont(42);
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.82, 0.98, title1);
+  //  latex->DrawLatex(0.82, 0.98, title1);
 
   // c1->Update();
   c1->Modified();
@@ -1392,7 +1481,7 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
   hs->Add(TagRate_MC_udsg);
 
   // SET COSMETICS
-  gStyle->SetOptTitle(0);
+  //gStyle->SetOptTitle(0);
 
   // CREATE CANVAS
   TCanvas *c1 = new TCanvas("c1", "c1",10,32,782,552);
@@ -1406,7 +1495,7 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
 
   if (doData)
     if (TagRate_Data->GetMaximum() > hs->GetMaximum() ) {
-      hs->SetMaximum(TagRate_Data->GetMaximum()*1.1 );
+      hs->SetMaximum(TagRate_Data->GetMaximum()*2.0 );
     }
   hs->Draw("hist");
 
@@ -1434,7 +1523,7 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
   latex->SetTextSize(0.055);
   latex->SetTextFont(62);
   latex->SetTextAlign(13);
-  latex->DrawLatex(0.42, 0.96, title1);
+  //  latex->DrawLatex(0.42, 0.96, title1);
 
   c1->cd();
 
@@ -1457,8 +1546,8 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
     histo_ratio->GetXaxis()->SetLabelSize( labelsizex);
     histo_ratio->GetXaxis()->SetTitleSize( titlesizex );
 
-    histo_ratio->SetMinimum(0.4);
-    histo_ratio->SetMaximum(1.6);
+    histo_ratio->SetMinimum(0.2);
+    histo_ratio->SetMaximum(2.0);
     histo_ratio->Draw("E1X0");
   }
 
@@ -1675,8 +1764,8 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   hist_data->SetMarkerColor(kBlack) ;
   histo_tot->SetMarkerColor(kBlue) ;
 
-  histo_tot->SetMinimum(0) ;
-  histo_tot->SetMaximum(10) ;
+  histo_tot->SetMinimum(0.2) ;
+  histo_tot->SetMaximum(2.0) ;
 
   TAxis* ax = histo_tot->GetXaxis() ;
   TAxis* ay = histo_tot->GetYaxis() ;
