@@ -1014,7 +1014,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         for (int iMu=0; iMu<FatJetInfo.nPFMuon; ++iMu) {
           if (FatJetInfo.PFMuon_IdxJet[iMu]==iJet ) {
             ++nmu;
-            if (passMuonSelection(iMu, FatJetInfo, iJet)) {
+            if (passMuonSelection(iMu, FatJetInfo, iJet, 0.8)) {
               if(nselmuon == 0) idxFirstMuon = iMu;
               ++nselmuon;
             }
