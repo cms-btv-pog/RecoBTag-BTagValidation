@@ -118,7 +118,7 @@ class BTagValidation : public edm::EDAnalyzer {
     double GetLumiWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) ;
     double GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) ;
     double GetLumiWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) ;
-
+    double GetLumiWeightsZratioBased (const std::string file, const std::string hist, const double ratio) ;
 
     void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
     void GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ; 
@@ -243,6 +243,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_JetNTracksWt_ ;
     const std::string               file_SV1EnergyRatioWt_ ;
     const std::string               file_IPSig1stAboveBWt_ ;
+    const std::string               file_ZratioWt_ ;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
@@ -253,6 +254,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               hist_JetNTracksWt_ ;
     const std::string               hist_SV1EnergyRatioWt_ ;
     const std::string               hist_IPSig1stAboveBWt_ ;
+    const std::string               hist_ZratioWt_ ;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
@@ -262,6 +264,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      doJetNTracksReweighting_ ;
     const bool                      doSV1EnergyRatioReweighting_ ;
     const bool                      doIPSig1stAboveBReweighting_ ;
+    const bool                      doZratioReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
 
@@ -341,6 +344,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_JetNTracksWt_(iConfig.getParameter<std::string>("File_JetNTracksWt")),
   file_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("File_SV1EnergyRatioWt")),
   file_IPSig1stAboveBWt_(iConfig.getParameter<std::string>("File_IPSig1stAboveBWt")),
+  file_ZratioWt_(iConfig.getParameter<std::string>("File_ZratioWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
   hist_PUDistMC_(iConfig.getParameter<std::string>("Hist_PUDistMC")),
   hist_PUDistData_(iConfig.getParameter<std::string>("Hist_PUDistData")),
@@ -351,6 +355,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   hist_JetNTracksWt_(iConfig.getParameter<std::string>("Hist_JetNTracksWt")),
   hist_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("Hist_SV1EnergyRatioWt")),
   hist_IPSig1stAboveBWt_(iConfig.getParameter<std::string>("Hist_IPSig1stAboveBWt")),
+  hist_ZratioWt_(iConfig.getParameter<std::string>("Hist_ZratioWt")),
   doPUReweightingOfficial_(iConfig.getParameter<bool>("DoPUReweightingOfficial")),
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
@@ -360,6 +365,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doJetNTracksReweighting_(iConfig.getParameter<bool>("DoJetNTracksReweighting")),
   doSV1EnergyRatioReweighting_(iConfig.getParameter<bool>("DoSV1EnergyRatioReweighting")),
   doIPSig1stAboveBReweighting_(iConfig.getParameter<bool>("DoIPSig1stAboveBReweighting")),
+  doZratioReweighting_(iConfig.getParameter<bool>("DoZratioReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
@@ -609,6 +615,7 @@ void BTagValidation::beginJob() {
   // Hbb tag vars - added by rizki - start
 
   AddHisto("FatJet_z_ratio"   	     ,";z ratio;;",100,0.,60.);
+  AddHisto("FatJet_z_ratio_unw"   	     ,";z ratio;;",100,0.,60.);
 
   AddHisto("FatJet_trackSip3dSig_3",";trackSip3dSig_3;;",100,-20,20);
   AddHisto("FatJet_trackSip3dSig_2",";trackSip3dSig_2;;",100,-20,20);
@@ -1181,7 +1188,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtIPSig1stAboveB_unw = wtFatJet;
         wtFatJet *= wtIPSig1stAboveB ;
       }
-      edm::LogInfo("IPSig1stAboveBReweighting") << "IPSig1stAboveB = " << FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] << ", wtIPSig1stAboveB = " << wtIPSig1stAboveB ;
+//       edm::LogInfo("IPSig1stAboveBReweighting") << "IPSig1stAboveB = " << FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] << ", wtIPSig1stAboveB = " << wtIPSig1stAboveB ;
+      //added by Rizki - zRatio reweighting factor
+      double wtZratio = 1.;
+      double wtZratio_unw = 1.;
+      if (doZratioReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtZratio *= GetLumiWeightsZratioBased(file_ZratioWt_, hist_ZratioWt_, FatJetInfo.Jet_z_ratio[iJet] ) ;
+        wtZratio_unw = wtFatJet;
+        wtFatJet *= wtZratio ;
+      }
+      edm::LogInfo("ZratioReweighting") << "Zratio = " << FatJetInfo.Jet_z_ratio[iJet] << ", wtZratio = " << wtZratio ;
 
 
       
@@ -1406,6 +1422,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // debug - end - rizki
 
       FillHisto("FatJet_z_ratio",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, z_ratio  ,   wtPU*wtFatJet);
+      FillHisto("FatJet_z_ratio_unw",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, z_ratio  ,   wtPU*wtZratio_unw);
 
       FillHisto("FatJet_trackSip3dSig_3",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_3  ,   wtPU*wtFatJet);
       FillHisto("FatJet_trackSip3dSig_2",      FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_2  ,   wtPU*wtFatJet);
@@ -2320,6 +2337,18 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     delete f ;
     delete hwt ;
     return wtIPSig ;
+  }
+
+  // ----For calculating bkg MC event weight for reweighting to the Zratio distribution in signal MC
+  double BTagValidation::GetLumiWeightsZratioBased (const std::string file, const std::string hist, const double ratio) {
+    double wtRatio(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtRatio = ratio >= 0. && ratio <= 60 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(ratio)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtRatio ;
   }
 
 
