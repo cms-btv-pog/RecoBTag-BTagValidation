@@ -1214,7 +1214,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         for (int iMu=0; iMu<FatJetInfo.nPFMuon; ++iMu) {
           if (FatJetInfo.PFMuon_IdxJet[iMu]==iJet ) {
             ++nmu;
-            if (passMuonSelection(iMu, FatJetInfo, iJet)) {
+            if (passMuonSelection(iMu, FatJetInfo, iJet, 0.8)) {
               if(nselmuon == 0) idxFirstMuon = iMu;
               ++nselmuon;
             }
@@ -2540,7 +2540,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         && JetInfo.PFMuon_nOutHit[muIdx] < (useRelaxedMuonID_ ? 99 : 3) 
         && JetInfo.PFMuon_chi2Tk[muIdx] < 10 
         && JetInfo.PFMuon_chi2[muIdx] < 10  
-        && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < 0.5 )
+        && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < 0.25 ) //0.5 for double muon selection, 0.25 for single muon selection
         //&& JetInfo.PFMuon_vz[muIdx]< 2 
         //DM&& fabs(JetInfo.PFMuon_vz[muIdx]-EvtInfo.PVz) < 2.
        )
