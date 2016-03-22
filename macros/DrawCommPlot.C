@@ -46,8 +46,8 @@ TString ptcut = "425";
 
 // TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_merged_wrongSubjetSelection/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root" ;
 //TString filename    ="../test/rizki_LXBatch_BoostedTaggerValidation_BTagMu_QCDMuEnriched_usePruned_fjpt330_eta2p4_DoubleMuTag_50m200_merged/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets_Pruned.root" ;
-//TString filename = "../test/alice_LXBatch_Templates_Single_Xtra_merged/MuonEnrichedJets_MuonTaggedFatJets_FatJet_final_hists.root" ;
-TString filename = "../test/alice_LXBatch_Templates_Double_Xtra_merged/MuonEnrichedJets_DoubleMuonTaggedFatJets_FatJet_final_hists.root" ;
+TString filename = "../test/alice_LXBatch_Templates_Single_MuonTight0p25_merged/MuonEnrichedJets_MuonTaggedFatJets_FatJet_final_hists.root" ;
+//TString filename = "../test/alice_LXBatch_Templates_Double_Xtra_merged/MuonEnrichedJets_DoubleMuonTaggedFatJets_FatJet_final_hists.root" ;
 
 // TString filename    ="../test/rizki_LXBatch_Jobs_fatJetPtMin_"+ptcut+"_tau-0p5_merged_2ndTime_fjPtReweighted/Final_histograms_btagval_InclusiveJets_ptReweighted.root" ;
 
@@ -61,7 +61,7 @@ TString filename = "../test/alice_LXBatch_Templates_Double_Xtra_merged/MuonEnric
 //TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016/Final_histograms_btagval_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016.root";
 
 TString filename_ext="" ;
-TString dir4plots = "Double" ;
+TString dir4plots = "Single" ;
 
 // TString dir4plots   ="btagvalplots_BoostedBB_DoubleMuonTagged_50m200_tau21-1p0_fj330_log" ;
 // TString dir4plots   ="btagvalplots_BoostedBB_DoubleMuonTagged_50m200_tau21-1p0_fj330_MuEnriched_log" ;
@@ -103,7 +103,7 @@ TString formatc=".root";
 bool bOverflow = 1;
 bool web       = 0;
 bool prunedjets= 0;
-bool logy      = 0;
+bool logy      = 1;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
 double norm_lightjets = 1.27;//1.27 ; // used only for QCD MuEnriched, otherwise use 1.00
@@ -1112,10 +1112,10 @@ void DrawStacked(TString name,
     else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*2.0 : histo_tot->GetMaximum()*2.0) ;
   }
   else {
-    if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*5000 : histo_tot->GetMaximum()*5000) ;
-    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*300 : histo_tot->GetMaximum()*300) ;
-    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000 : histo_tot->GetMaximum()*1000) ; 
-    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000 : histo_tot->GetMaximum()*1000) ;
+    if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*50000 : histo_tot->GetMaximum()*50000) ;
+    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3000 : histo_tot->GetMaximum()*3000) ;
+    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ;
 
   }
   if (doData) {
