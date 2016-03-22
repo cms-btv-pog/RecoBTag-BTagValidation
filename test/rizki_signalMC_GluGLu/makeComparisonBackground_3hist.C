@@ -18,7 +18,8 @@ TLegend *leg = new TLegend(0.4444465625,0.7021654,0.8365625,0.8603839,NULL,"brND
 TString massp = "M-1000";
 
 TFile * f ;
-f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
+if(option!="425_SV1EnergyRatioreweight_SingleMu"&&option!="425_Zratioreweight_SingleMu"&&option!="425_SV1EnergyRatioreweight_Zratioreweight_SingleMu")f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
+if(option=="425_SV1EnergyRatioreweight_SingleMu"||option=="425_Zratioreweight_SingleMu"||option=="425_SV1EnergyRatioreweight_Zratioreweight_SingleMu")f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_usePruned_fjpt425_50m_SingleMuTag_TightMu_signal_merged/Final_histograms_btagval.root");
 
 f->cd();
 TH1D *h = new TH1D();
@@ -60,6 +61,17 @@ if(option=="425_sjptbalancereweight")f2 = new TFile("/afs/cern.ch/work/r/rsyarif
 if(option=="425_ptreweight")f2= new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/Final_histograms_btagval_QCD76x_pt425_m50_pTreweighted_fromAlice.root");
 if(option=="425_massSoftDropreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_massSoftDrop_reweight_merged/Final_histograms_btagval.root");
 if(option=="425_jetNTracksreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_jetNTracks_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_SV1EnergyRatioreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_SV1EnergyRatio_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_IPSig1stAboveBreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_IPSig1stAboveB_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_SV1EnergyRatioreweight_jetNTracksreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_SV1EnergyRatio_jetNTracks_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_Zratioreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_Zratio_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_SV1EnergyRatioreweight_Zratioreweight")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_SV1EnergyRatio_Zratio_reweight_merged/Final_histograms_btagval.root");
+
+if(option=="425_SV1EnergyRatioreweight_SingleMu")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_usePruned_fjpt425_50m_SingleMuTag_TightMu_SV1EnergyRatio_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_Zratioreweight_SingleMu")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_usePruned_fjpt425_50m_SingleMuTag_TightMu_Zratio_reweight_merged/Final_histograms_btagval.root");
+if(option=="425_SV1EnergyRatioreweight_Zratioreweight_SingleMu")f2= new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_usePruned_fjpt425_50m_SingleMuTag_TightMu_SV1EnergyRatio_Zratio_reweight_merged/Final_histograms_btagval.root");
+
+
 
 f2->cd();
 
@@ -80,7 +92,9 @@ h2->Rebin(rebin);
 
 TFile * f3 ;
 
-f3 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
+if(option!="425_SV1EnergyRatioreweight_SingleMu"&&option!="425_Zratioreweight_SingleMu"&&option!="425_SV1EnergyRatioreweight_Zratioreweight_SingleMu")f3 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
+if(option=="425_SV1EnergyRatioreweight_SingleMu"||option=="425_Zratioreweight_SingleMu"||option=="425_SV1EnergyRatioreweight_Zratioreweight_SingleMu")f3 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_usePruned_fjpt425_50m_SingleMuTag_TightMu_merged/Final_histograms_btagval.root");
+
 
 f3->cd();
 
@@ -220,6 +234,32 @@ if(option=="425_sjptbalancereweight") tex = new TLatex(.15,.85,"Subjet p_{T} asy
 if(option=="425_ptreweight") tex = new TLatex(.15,.85,"p_{T} reweighted");
 if(option=="425_massSoftDropreweight") tex = new TLatex(.15,.85,"Mass_{SoftDrop} reweighted");
 if(option=="425_jetNTracksreweight") tex = new TLatex(.15,.85,"Num. of tracks reweighted");
+if(option=="425_SV1EnergyRatioreweight"||option=="425_SV1EnergyRatioreweight_SingleMu") tex = new TLatex(.15,.85,"SV_{1^{st}} Energy Ratio reweighted");
+if(option=="425_IPSig1stAboveBreweight") tex = new TLatex(.15,.85,"IP sig 1st above b reweighted");
+if(option=="425_Zratioreweight"||option=="425_Zratioreweight_SingleMu") tex = new TLatex(.15,.85,"z_{ratio} reweighted");
+if(option=="425_SV1EnergyRatioreweight_jetNTracksreweight"){
+	 tex = new TLatex(.15,.85,"SV_{1^{st}} Energy Ratio reweighted");
+
+	 TLatex *tex2;
+	 tex2 = new TLatex(.15,.75,"jetNTracks reweighted");
+	 tex2->SetNDC();
+	 tex2->SetTextAlign(13);
+	 tex2->SetTextFont(42);
+	 tex2->SetTextSize(0.035);
+	 tex2->Draw();
+	 }
+if(option=="425_SV1EnergyRatioreweight_Zratioreweight"||option=="425_SV1EnergyRatioreweight_Zratioreweight_SingleMu"){
+	 tex = new TLatex(.15,.85,"SV_{1^{st}} Energy Ratio reweighted");
+
+	 TLatex *tex2;
+	 tex2 = new TLatex(.15,.75,"z_{ratio} reweighted");
+	 tex2->SetNDC();
+	 tex2->SetTextAlign(13);
+	 tex2->SetTextFont(42);
+	 tex2->SetTextSize(0.035);
+	 tex2->Draw();
+	 }
+
 
 tex->SetNDC();
 tex->SetTextAlign(13);

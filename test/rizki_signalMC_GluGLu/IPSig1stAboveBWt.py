@@ -3,10 +3,14 @@
 import ROOT
 
 pt = '425'
+tag = 'Single'
+# tag = 'Double'
 
-f = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_M-1000_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root'
+if(tag=='Double') : f = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_M-1000_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root'
+if(tag=='Single') : f = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_M-1000_usePruned_fjpt425_50m_SingleMuTag_TightMu_signal_merged/Final_histograms_btagval.root'
 
-if (pt=='425') : f2 = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root'
+if (tag=='Double') : f2 = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root'
+if (tag=='Single') : f2 = '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_usePruned_fjpt425_50m_SingleMuTag_TightMu_merged/Final_histograms_btagval.root'
 
 IPSig1stAboveB_data = ROOT.TH1D("IPSig1stAboveB_signalmc", ";;IP Sig 1st Track Above Bottom ;;",100,-20,20)
 IPSig1stAboveB_mc_noweight = ROOT.TH1D("IPSig1stAboveB_mc_noweight",";;IP Sig 1st Track Above Bottom  ;;",100,-20,20)
@@ -44,7 +48,7 @@ for ibin in xrange(1, nbins+1):
   IPSig1stAboveB_mc_reweight.SetBinContent(ibin, nmc*wt)
   print "bin", ibin , " wt", wt
 
-fout = ROOT.TFile("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_weight.root", "RECREATE")
+fout = ROOT.TFile("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_"+tag+"_weight.root", "RECREATE")
 fout.cd()
 IPSig1stAboveB_data.Write()
 IPSig1stAboveB_mc_noweight.Write()
@@ -65,7 +69,7 @@ leg.AddEntry(IPSig1stAboveB_data, "Hbb MC")
 leg.AddEntry(IPSig1stAboveB_mc_noweight, "QCD MC")
 leg.Draw()
 
-c0.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_noweight.pdf")
+c0.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_"+tag+"_noweight.pdf")
   
 c1 = ROOT.TCanvas()
 c1.cd()
@@ -77,7 +81,7 @@ leg.AddEntry(IPSig1stAboveB_data, "data")
 leg.AddEntry(IPSig1stAboveB_mc_reweight, "QCD MC")
 leg.Draw()
 
-c1.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_reweight.pdf")
+c1.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_"+tag+"_reweight.pdf")
 
 c2 = ROOT.TCanvas()
 c2.cd()
@@ -87,6 +91,6 @@ leg = ROOT.TLegend(0.6,0.7,0.88,0.88)
 leg.AddEntry(IPSig1stAboveBweight_mc_data, "weight")
 leg.Draw()
 
-c1.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_weights.pdf")
-c1.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_weights.C")
+c1.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_"+tag+"_weights.pdf")
+c1.SaveAs("IPSig1stAboveB_Hbb_QCDbb_pt"+pt+"_"+tag+"_weights.C")
 
