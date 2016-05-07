@@ -21,7 +21,8 @@ TString reweight = "";
 if (Reweight) reweight = "reweight_";
 
 TFile * f ;
-f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
+if(option =="425_DoubleMu_SoftDrop")f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_useSoftDrop_fjpt425_50m_DoubleMuTag_merged/Final_histograms_btagval.root");
+if(option =="425_SingleMu_Pruned_TightMu")f = new TFile("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_BulkGravTohhTohbbhbb_narrow_"+massp+"_usePruned_fjpt425_50m_SingleMuTag_TightMu_signal_merged/Final_histograms_btagval.root");
 
 f->cd();
 TH1D *h = new TH1D();
@@ -60,7 +61,9 @@ leg->AddEntry(h,"Hbb (bfromg flavor)","l");
 
 TFile * f2 ;
 
-f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_"+reweight+"merged/Final_histograms_btagval.root");
+if(option =="425_DoubleMu_SoftDrop")f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_useSoftDrop_fjpt425_50m_DoubleMuTag_"+reweight+"merged/Final_histograms_btagval.root");
+if(option =="425_SingleMu_Pruned_TightMu")f2 = new TFile("/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_LXBatch_QCDMuEnriched_usePruned_fjpt425_50m_SingleMuTag_TightMu_"+reweight+"merged/Final_histograms_btagval.root");
+
 
 f2->cd();
 
@@ -165,6 +168,7 @@ stack->GetXaxis()->SetRangeUser(low, max);
 // cout <<"stack maximum = " << stack->GetMaximum("nostack") << endl;
 if(isLog==1)stack->SetMaximum(stack->GetMaximum("nostack")*1e4);
 if(isLog==0)stack->SetMaximum(stack->GetMaximum("nostack")*1.2);
+if(var=="tau2_vertexEnergyRatio_bfromg")stack->SetMaximum(0.1);
 // if(isLog==0)stack->SetMaximum(0.1);
 // stack->GetXaxis()->SetTitle(label);
 stack->GetXaxis()->SetLabelSize(0.0);

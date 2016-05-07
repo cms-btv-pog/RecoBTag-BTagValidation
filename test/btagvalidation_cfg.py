@@ -199,6 +199,11 @@ options.register('doIPSig1stAboveBReweighting', False,
     VarParsing.varType.bool,
     'Do IP sig 1st Track above bottom reweighting'
     )
+options.register('doZratioReweighting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do Zratio reweighting'
+    )
 options.register('applySFs', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -233,6 +238,21 @@ options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_DoubleMuonTagged_QC
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
+    )
+options.register('FileSV1EnergyRatioWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/SV1EnergyRatio_Hbb_QCDbb_pt425_weight.root",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File with data/MC weights for SV1EnergyRatio reweighting"
+    )
+options.register('FileIPSig1stAboveBWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/IPSig1stAboveB_Hbb_QCDbb_pt425_weight.root",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File with data/MC weights for IPSig1stAboveB reweighting"
+    )
+options.register('FileZratioWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/Zratio_Hbb_QCDbb_pt425_Double_weight.root",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File with data/MC weights for Zratio reweighting"
     )
 options.register('newJECPayloadNames',  
     "Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt,Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt,Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt", 
@@ -336,10 +356,12 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_MassSoftDropWt = cms.string('massSoftDropweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for mass reweighting.
     File_JetNTracksWt = cms.string('jetNTracks_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
     Hist_JetNTracksWt = cms.string('jetNTracksweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for jetNTracks reweighting.
-    File_SV1EnergyRatioWt = cms.string('SV1EnergyRatio_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for SV1 energy ratio reweighting.
+    File_SV1EnergyRatioWt = cms.string(options.FileSV1EnergyRatioWt), #added by rizki for Hbb tagger signal vs proxy studies. File for SV1 energy ratio reweighting.
     Hist_SV1EnergyRatioWt = cms.string('SV1EnergyRatioweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for SV1 energy ratio reweighting.
-    File_IPSig1stAboveBWt = cms.string('IPSig1stAboveB_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for IPSig1stAboveB reweighting.
+    File_IPSig1stAboveBWt = cms.string(options.FileIPSig1stAboveBWt), #added by rizki for Hbb tagger signal vs proxy studies. File for IPSig1stAboveB reweighting.
     Hist_IPSig1stAboveBWt = cms.string('IPSig1stAboveBweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for IPSig1stAboveB reweighting.
+    File_ZratioWt = cms.string(options.FileZratioWt), #added by rizki for Hbb tagger signal vs proxy studies. File for Zratio reweighting.
+    Hist_ZratioWt = cms.string('Zratioweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for Zratio reweighting.
     FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
@@ -355,6 +377,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     DoJetNTracksReweighting  = cms.bool(options.doJetNTracksReweighting),
     DoSV1EnergyRatioReweighting  = cms.bool(options.doSV1EnergyRatioReweighting),
     DoIPSig1stAboveBReweighting  = cms.bool(options.doIPSig1stAboveBReweighting),
+    DoZratioReweighting  = cms.bool(options.doZratioReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
       options.triggerSelection
       ),
