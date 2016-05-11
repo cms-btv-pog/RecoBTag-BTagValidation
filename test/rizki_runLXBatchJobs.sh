@@ -7,11 +7,46 @@
 
 #./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_Xtra -c btagvalidation_cfg.py -d alice_performance76X.txt -q 1nd
 
-./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_300 -c btagvalidation_cfg.py -d alice_doubleperformance76X_300.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_PU_down_300 -c btagvalidation_down_cfg.py -d alice_doubleperformance76X_300.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_PU_down_310 -c btagvalidation_down_cfg.py -d alice_doubleperformance76X_310.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_PU_down_360 -c btagvalidation_down_cfg.py -d alice_doubleperformance76X_360.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_PU_down_450 -c btagvalidation_down_cfg.py -d alice_doubleperformance76X_450.txt -q 1nd
 
-./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_310 -c btagvalidation_cfg.py -d alice_doubleperformance76X_310.txt -q 1nd
-./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_360 -c btagvalidation_cfg.py -d alice_doubleperformance76X_360.txt -q 1nd
-./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_450 -c btagvalidation_cfg.py -d alice_doubleperformance76X_450.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_bfragbd_300 -c btagvalidation_cfg.py -d alice_doubleperformance76X_300_bd.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_bfragbd_310 -c btagvalidation_cfg.py -d alice_doubleperformance76X_310_bd.txt -q 1nd
+./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_bfragbd_360 -c btagvalidation_cfg.py -d alice_doubleperformance76X_360_bd.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_bfragbd_450 -c btagvalidation_cfg.py -d alice_doubleperformance76X_450_bd.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_CD_300 -c btagvalidation_cfg.py -d alice_doubleperformance76X_CD_300.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_CD_310 -c btagvalidation_cfg.py -d alice_doubleperformance76X_CD_310.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_CD_360 -c btagvalidation_cfg.py -d alice_doubleperformance76X_CD_360.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_CD_450 -c btagvalidation_cfg.py -d alice_doubleperformance76X_CD_450.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_C_300 -c btagvalidation_cfg.py -d alice_doubleperformance76X_C_300.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_C_310 -c btagvalidation_cfg.py -d alice_doubleperformance76X_C_310.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_C_360 -c btagvalidation_cfg.py -d alice_doubleperformance76X_C_360.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_C_450 -c btagvalidation_cfg.py -d alice_doubleperformance76X_C_450.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_K0L_300 -c btagvalidation_cfg.py -d alice_doubleperformance76X_K0L_300.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_K0L_310 -c btagvalidation_cfg.py -d alice_doubleperformance76X_K0L_310.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_K0L_360 -c btagvalidation_cfg.py -d alice_doubleperformance76X_K0L_360.txt -q 1nd
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Double_K0L_450 -c btagvalidation_cfg.py -d alice_doubleperformance76X_K0L_450.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_back_300 -c btagvalidation_cfg.py -d alice_doubleperformance76X_300_SingleMu.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_back_310 -c btagvalidation_cfg.py -d alice_doubleperformance76X_310_SingleMu.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_back_360 -c btagvalidation_cfg.py -d alice_doubleperformance76X_360_SingleMu.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_back_450 -c btagvalidation_cfg.py -d alice_doubleperformance76X_450_SingleMu.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_ntracks_300 -c btagvalidation_cfg.py -d alice_performance76X_300.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_ntracks_310 -c btagvalidation_cfg.py -d alice_performance76X_310.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_ntracks_360 -c btagvalidation_cfg.py -d alice_performance76X_360.txt -q 1nd
+
+#./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_ntracks_450 -c btagvalidation_cfg.py -d alice_performance76X_450.txt -q 1nd
 
 #./createAndSubmitJobs.py -w alice_LXBatch_Templates_Single_MuonTight0p25 -c btagvalidation_cfg.py -d alice_performance76X.txt -q 1nd  
 

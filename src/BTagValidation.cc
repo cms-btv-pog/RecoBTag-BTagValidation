@@ -21,6 +21,7 @@ Implementation:
 // system include files
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -114,6 +115,9 @@ class BTagValidation : public edm::EDAnalyzer {
     double GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) ; 
     double GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
     double GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
+    double GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) ;
+    double GetLumiWeightsZratioBased (const std::string file, const std::string hist, const double ratio) ;
+
     double GetLumiWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) ;
 
     void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
@@ -216,6 +220,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      useFlavorCategories_;
     const bool                      useRelaxedMuonID_;
     const bool                      applyFatJetMuonTagging_;
+    const bool                      applyFatJetMuonTaggingV2_;
     const bool                      fatJetDoubleTagging_;
     const bool                      applyFatJetBTagging_;
     const bool                      fatJetDoubleBTagging_;
@@ -237,6 +242,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const double		                fatJetTau21Max_;
     const double                    SFbShift_;
     const double                    SFlShift_;
+    const double                    MuonJetPtRatio_;
     const std::vector<std::string>  triggerSelection_;
     const std::vector<std::string>  triggerPathNames_;
     const std::string               file_PVWt_ ; 
@@ -246,6 +252,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_NtracksWt_;
     const std::string               file_SubJetPtWt_ ;
     const std::string               file_SubJetPtBalanceWt_ ;
+    const std::string               file_SV1EnergyRatioWt_ ;
+    const std::string               file_ZratioWt_ ;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
@@ -253,15 +261,24 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               hist_NtracksWt_;
     const std::string               hist_SubJetPtWt_ ;
     const std::string               hist_SubJetPtBalanceWt_ ;
+    const std::string               hist_SV1EnergyRatioWt_ ;
+    const std::string               hist_ZratioWt_ ;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
     const bool                      doNtracksReweighting_;
+    const bool                      doBFrag_;
+    const bool                      doBFragUp_; 
+    const bool                      doBFragDown_;
+    const bool                      doCDFrag_;
+    const bool                      doCFrag_;
+    const bool                      doK0L_;
     const bool                      doSubJetPtReweighting_ ;
     const bool                      doSubJetPtBalanceReweighting_ ;
+    const bool                      doSV1EnergyRatioReweighting_ ;
+    const bool                      doZratioReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
-
     const bool                      applySFs_;
     const std::string               btagCSVFile_ ; 
     const int                       btagOperatingPoint_ ; 
@@ -312,6 +329,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   useFlavorCategories_(iConfig.getParameter<bool>("UseFlavorCategories")),
   useRelaxedMuonID_(iConfig.getParameter<bool>("UseRelaxedMuonID")),
   applyFatJetMuonTagging_(iConfig.getParameter<bool>("ApplyFatJetMuonTagging")),
+  applyFatJetMuonTaggingV2_(iConfig.getParameter<bool>("ApplyFatJetMuonTaggingV2")),
   fatJetDoubleTagging_(iConfig.getParameter<bool>("FatJetDoubleTagging")),
   applyFatJetBTagging_(iConfig.getParameter<bool>("ApplyFatJetBTagging")),
   fatJetDoubleBTagging_(iConfig.exists("FatJetDoubleBTagging") ? iConfig.getParameter<bool>("FatJetDoubleBTagging") : fatJetDoubleTagging_ ),
@@ -333,6 +351,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetTau21Max_(iConfig.getParameter<double>("FatJetTau21Max")),
   SFbShift_(iConfig.getParameter<double>("SFbShift")),
   SFlShift_(iConfig.getParameter<double>("SFlShift")),
+  MuonJetPtRatio_(iConfig.getParameter<double>("MuonJetPtRatio")),
   triggerSelection_(iConfig.getParameter<std::vector<std::string> >("TriggerSelection")),
   triggerPathNames_(iConfig.getParameter<std::vector<std::string> >("TriggerPathNames")),
   file_PVWt_(iConfig.getParameter<std::string>("File_PVWt")),
@@ -341,18 +360,30 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_FatJetPtWt_(iConfig.getParameter<std::string>("File_FatJetPtWt")),
   file_NtracksWt_(iConfig.getParameter<std::string>("File_NtracksWt")),
   file_SubJetPtWt_(iConfig.getParameter<std::string>("File_SubJetPtWt")),
+  file_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("File_SV1EnergyRatioWt")),
+  file_ZratioWt_(iConfig.getParameter<std::string>("File_ZratioWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
   hist_PUDistMC_(iConfig.getParameter<std::string>("Hist_PUDistMC")),
   hist_PUDistData_(iConfig.getParameter<std::string>("Hist_PUDistData")),
   hist_FatJetPtWt_(iConfig.getParameter<std::string>("Hist_FatJetPtWt")),
   hist_NtracksWt_(iConfig.getParameter<std::string>("Hist_NtracksWt")),
   hist_SubJetPtWt_(iConfig.getParameter<std::string>("Hist_SubJetPtWt")),
+  hist_SV1EnergyRatioWt_(iConfig.getParameter<std::string>("Hist_SV1EnergyRatioWt")),
+  hist_ZratioWt_(iConfig.getParameter<std::string>("Hist_ZratioWt")),
   doPUReweightingOfficial_(iConfig.getParameter<bool>("DoPUReweightingOfficial")),
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
   doNtracksReweighting_(iConfig.getParameter<bool>("DoNtracksReweighting")),
+  doBFrag_(iConfig.getParameter<bool>("DoBFrag")),
+  doBFragUp_(iConfig.getParameter<bool>("DoBFragUp")),
+  doBFragDown_(iConfig.getParameter<bool>("DoBFragDown")),
+  doCDFrag_(iConfig.getParameter<bool>("DoCDFrag")),
+  doCFrag_(iConfig.getParameter<bool>("DoCFrag")),
+  doK0L_(iConfig.getParameter<bool>("DoK0L")),
   doSubJetPtReweighting_(iConfig.getParameter<bool>("DoSubJetPtReweighting")),
   doSubJetPtBalanceReweighting_(iConfig.getParameter<bool>("DoSubJetPtBalanceReweighting")),
+  doSV1EnergyRatioReweighting_(iConfig.getParameter<bool>("DoSV1EnergyRatioReweighting")),
+  doZratioReweighting_(iConfig.getParameter<bool>("DoZratioReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
@@ -386,7 +417,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   if ( doJECUncert_ ) ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
-
+  
   // Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
 
@@ -799,7 +830,8 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_muon_Sip3d",      ";Muon 3D IP significance;;",100,-50,50);
   AddHisto(histoTag+"_muon_Sip2d",      ";Muon 2D IP significance;;",100,-50,50);
   AddHisto(histoTag+"_muon_DeltaR",     ";Muon1 #DeltaR;;",100,0,1.0); 
-  AddHisto(histoTag+"_muComb_ptRatio",  ";(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet);;",50,0,1);  
+  AddHisto(histoTag+"_muComb_ptRatio",  ";(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet);;",50,0,1);
+  AddHisto(histoTag+"_muon_ptRatio",  ";(p_{T}(#mu_{1}))/p_{T}(jet);;",50,0,1);   
 
   AddHisto(histoTag+"_sv_deltaR_jet",      ";#DeltaR(SV, jet);;",50,0.,0.5);
   AddHisto(histoTag+"_sv_deltaR_sumJet",   ";#DeltaR(SV,sumJet);;",50,0.,0.5);
@@ -1111,6 +1143,50 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   Long64_t nEntries = JetTree->GetEntries();
   if(maxEvents_>=0) nEntries = maxEvents_;
+  
+  float BTemplateCorrections[100][20][2];
+
+
+  if (doBFrag_)
+      {
+	int nPtRelPtBins = 15;
+
+	TString PtRelPtBin[] = {
+	  "Pt2030", "Pt3040", "Pt4050", "Pt5060", "Pt6070"
+	  , "Pt7080", "Pt80100", "Pt100120", "Pt120160", "Pt160210"
+	  , "Pt210260", "Pt260320", "Pt320400", "Pt400500", "Pt500" 
+	};
+	
+	for( int ptb=0;ptb<nPtRelPtBins;ptb++ )
+	  {      
+	    for(int ib=0;ib<100;ib++ )
+	      {
+		BTemplateCorrections[ib][ptb][0] = 1.;
+		BTemplateCorrections[ib][ptb][1] = 1.;
+	      }
+	    std::ifstream MnusCorrectionsFile;      
+	    MnusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt");
+	    while( MnusCorrectionsFile )
+	      {
+		float xBin, efcorr;
+		MnusCorrectionsFile >> xBin >> efcorr;
+		if ( efcorr > 4. ) efcorr = 1.;
+		int ib = int(xBin/0.02);
+		BTemplateCorrections[ib][ptb][0] = efcorr;
+	      }
+	         
+	    std::ifstream PlusCorrectionsFile; 
+	    PlusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt");
+	    while( PlusCorrectionsFile )
+	      {
+		float xBin, efcorr;
+		PlusCorrectionsFile >> xBin >> efcorr;
+		if ( efcorr > 4. ) efcorr = 1.;
+		int ib = int(xBin/0.02);
+		BTemplateCorrections[ib][ptb][1] = efcorr;
+	      }
+	  }
+      }
 
   //---------------------------- Start event loop ---------------------------------------//
   for(Long64_t iEntry = 0; iEntry < nEntries; ++iEntry) {
@@ -1169,7 +1245,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       double jetpt(FatJetInfo.Jet_pt[iJet]) ;
       double jeteta(FatJetInfo.Jet_eta[iJet]) ;
-
+            
       double jesup(1.0), jesdown(1.0);
       if ( doJECUncert_ ) {
         GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
@@ -1179,11 +1255,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       /*      hcheck_jetpt->Fill(jetpt);
       hcheck_jeteta->Fill(jeteta);
       */
-      edm::LogInfo("JEC") << " jetpt = " << jetpt 
-        << " jes uncert up = " << jesup 
-        << " jes uncert down = " << jesdown
-        << " jetpt_up = " << jetpt*(1 + jesup)
-        << " jetpt_down = " << jetpt*(1+jesdown) ; 
+//       edm::LogInfo("JEC") << " jetpt = " << jetpt 
+//         << " jes uncert up = " << jesup 
+//         << " jes uncert down = " << jesdown
+//         << " jetpt_up = " << jetpt*(1 + jesup)
+//         << " jetpt_down = " << jetpt*(1+jesdown) ; 
 
 
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
@@ -1258,19 +1334,25 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       int idxMuon_inFirstSubjet = -1; //1st Muon tagged (in double muon tagged fatjets) - //added by rizki
       int idxMuon_inSecondSubjet = -1; //2nd Muon tagged (in double muon tagged fatjets) - //added by rizki
+      
+      int nselmuon_sj1 = 0, nselmuon_sj2 =0;
 
-      if ( fatJetDoubleTagging_ && SubJets.nPFMuon>0) {
+      if ( (fatJetDoubleTagging_ || applyFatJetMuonTaggingV2_) && SubJets.nPFMuon>0) {
         //// Collect all muons matched to the two subjets
         std::vector<int> selectedMuonIdx1, selectedMuonIdx2;
 
         for (int iMu=0; iMu<SubJets.nPFMuon; ++iMu) {
           if ( SubJets.PFMuon_IdxJet[iMu]==iSubJet1 ) {
-            if (passMuonSelection(iMu, SubJets, iSubJet1, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 )))
+            if (passMuonSelection(iMu, SubJets, iSubJet1, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))){
               selectedMuonIdx1.push_back(iMu);
+              nselmuon_sj1++;
+              }
           }
           if ( SubJets.PFMuon_IdxJet[iMu]==iSubJet2 ) {
-            if (passMuonSelection(iMu, SubJets, iSubJet2, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 )))
+            if (passMuonSelection(iMu, SubJets, iSubJet2, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))){
               selectedMuonIdx2.push_back(iMu);
+              nselmuon_sj2++;
+              }
           }
 
         }
@@ -1290,6 +1372,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
         if(selectedMuonIdx1.size()>0)idxMuon_inFirstSubjet =  selectedMuonIdx1.at(0); //warning this might not be correct if mu not ordered in pT! // added by rizki
         if(selectedMuonIdx2.size()>0)idxMuon_inSecondSubjet = selectedMuonIdx2.at(0); //warning this might not be correct if mu not ordered in pT! // added by rizki
+        
+//         if(selectedMuonIdx1.size()>0)edm::LogInfo("Check idxMuon_in1stSubjets") << "in1stSubjet: " << selectedMuonIdx1.at(0);
+//         if(selectedMuonIdx2.size()>0)edm::LogInfo("Check idxMuon_in2ndSubjets") << "in2stSubjet: " << selectedMuonIdx2.at(0);
 
         //degug - start - rizki
         if(isDoubleMuonTagged){
@@ -1302,9 +1387,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       }
 
-      if( applyFatJetMuonTagging_ ) { //// if enabled, select muon-tagged fat jets
+      if( applyFatJetMuonTagging_ || applyFatJetMuonTaggingV2_ ) { //// if enabled, select muon-tagged fat jets
         if( fatJetDoubleTagging_ && !isDoubleMuonTagged ) continue;
         else if( !fatJetDoubleTagging_ && nselmuon==0)    continue;
+        else if( applyFatJetMuonTaggingV2_ && !fatJetDoubleTagging_ && nselmuon_sj1==0 && nselmuon_sj2==0 )    continue; //require one of the subjets has a muon
+
       }
 
       if( applyFatJetBTagging_ ) //// if enabled, select b-tagged fat jets
@@ -1336,12 +1423,14 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //added by Erich - jetPt reweighting factor
       double wtJetPt = 1.;
       //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+    edm::LogInfo("Check") << " doFatJetPtReweighting_ = " << doFatJetPtReweighting_ << ",!isData = " << !isData ;
       if (doFatJetPtReweighting_ && !isData) { //original UNCOMMENT!
         wtJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
+        edm::LogInfo("jetPtWt") << " jetPtWt = " << wtJetPt ;
         wtFatJet *= wtJetPt ;
       }
       if (doNtracksReweighting_ && !isData) {
-	wtJetPt *= GetLumiWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
+		wtJetPt *= GetLumiWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
         wtFatJet *= wtJetPt ;
       }
       //added by Rizki - subjet_ptBalance reweighting factor
@@ -1352,6 +1441,186 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       }
 
 
+      //added by Rizki - subjet_ptBalance reweighting factor
+      double wtSV1EnergyRatio = 1.;
+      if (doSV1EnergyRatioReweighting_) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtSV1EnergyRatio *= GetLumiWeightsSV1EnergyRatioBased(file_SV1EnergyRatioWt_, hist_SV1EnergyRatioWt_, FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] ) ;
+        wtFatJet *= wtSV1EnergyRatio ;
+      }
+
+      //added by Rizki - subjet_ptBalance reweighting factor
+      double wtZratio = 1.;
+      if (doZratioReweighting_) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
+        wtZratio *= GetLumiWeightsZratioBased(file_ZratioWt_, hist_ZratioWt_, FatJetInfo.Jet_z_ratio[iJet] ) ;
+        wtFatJet *= wtZratio ;
+      }
+
+      // -------For calculating b-fragmentation systematic
+      if (abs(FatJetInfo.Jet_flavour[iJet]) == 5){
+       if (doBFrag_){
+	float sfbFrag = 1.;
+	float drMin = 0.8;   
+	float jPT = FatJetInfo.Jet_pt[iJet];
+	float jeta = FatJetInfo.Jet_eta[iJet];
+	float jphi = FatJetInfo.Jet_phi[iJet];
+	float WeightBFrag = 1.;
+	float EnergyFraction = 0.; 
+	int iB = -1, iptBin = 0, efbin = -1;
+	if( jPT > 500 ) iptBin = 14;
+	else if( jPT > 400 ) iptBin = 13;
+	else if( jPT > 320 ) iptBin = 12;  
+	else if( jPT > 260 ) iptBin = 11;
+	else if( jPT > 210 ) iptBin = 10;
+	else if( jPT > 160 ) iptBin =  9;
+	else if( jPT > 120 ) iptBin =  8;  
+	else if( jPT > 100 ) iptBin =  7;  
+	else if( jPT >  80 ) iptBin =  6;  
+	else if( jPT >  70 ) iptBin =  5;  
+	else if( jPT >  60 ) iptBin =  4;  
+	else if( jPT >  50 ) iptBin =  3;  
+	else if( jPT >  40 ) iptBin =  2;  
+	else if( jPT >  30 ) iptBin =  1;  
+	else                 iptBin =  0;
+	       
+	float B_Mass = 0.;
+	for( int ib=0;ib<EvtInfo.nBHadrons;ib++ )
+	  {
+	    float drB = reco::deltaR(jeta,jphi,EvtInfo.BHadron_eta[ib],EvtInfo.BHadron_phi[ib]);
+	    if( drB < drMin )
+		{
+		  if( EvtInfo.BHadron_mass[ib] > B_Mass ) 
+		    {
+		      B_Mass = EvtInfo.BHadron_mass[ib];
+		      iB = ib;
+		    } 
+		}    
+	    }
+	       
+	  if( iB >= 0 ) 
+	    {
+	      EnergyFraction = EvtInfo.BHadron_pT[iB]/FatJetInfo.Jet_genpt[iJet];
+	      efbin = int( EnergyFraction / 0.02 );
+	      if( efbin >= 0 && efbin < 100 ) 
+		{
+		  if( doBFragDown_ ) WeightBFrag = BTemplateCorrections[efbin][iptBin][0];
+		  if( doBFragUp_ ) WeightBFrag = BTemplateCorrections[efbin][iptBin][1];
+		}    
+	    }
+	      
+	  wtFatJet *= WeightBFrag;
+       }
+      }  
+
+      //cd Frag Systematic
+      if (abs(FatJetInfo.Jet_flavour[iJet]) == 5 || abs(FatJetInfo.Jet_flavour[iJet]) == 4){
+       if (doCDFrag_)
+       {
+	float sfCD = 1.;
+	float drMin = 0.8;   
+	float jeta = FatJetInfo.Jet_eta[iJet];
+	float jphi = FatJetInfo.Jet_phi[iJet];   
+	bool isDplusMu = false, isDzeroMu = false, isDsubsMu = false;
+		     
+	int ndaughters = 0;
+	for( int k=0;k<EvtInfo.nDHadrons;k++ )
+	{
+	  double dR = reco::deltaR(EvtInfo.DHadron_eta[k], 
+					       EvtInfo.DHadron_phi[k], 
+					       jeta,
+					       jphi);
+	  if( dR > drMin ) continue;
+	  bool isSemiMu = false;
+	  int nd = EvtInfo.DHadron_nDaughters[k];
+	  for( int kk=0;kk<nd;kk++ )
+	    {
+	    if( abs(EvtInfo.DHadron_DaughtersPdgID[kk+ndaughters]) == 13 ) isSemiMu = true;
+	    }
+		      
+	  ndaughters += nd;
+		      
+	  if( !isSemiMu ) continue;
+	  if( abs(EvtInfo.DHadron_pdgID[k]) == 411 ) isDplusMu = true;
+	  if( abs(EvtInfo.DHadron_pdgID[k]) == 421 ) isDzeroMu = true;
+	  if( abs(EvtInfo.DHadron_pdgID[k]) == 431 ) isDsubsMu = true;
+        }
+		     
+	if( isDplusMu ) sfCD *= 0.176 / 0.172;
+	if( isDzeroMu ) sfCD *= 0.067 / 0.077;
+	if( isDsubsMu ) sfCD *= 0.067 / 0.080;
+	    
+	wtFatJet *= sfCD;
+       }
+      }
+    
+      //c fragmentation
+      if (abs(FatJetInfo.Jet_flavour[iJet]) == 4){
+	if (doCFrag_){
+	  float sfC = 1.;
+	  float drMin = 0.8;   
+	  float jeta = FatJetInfo.Jet_eta[iJet];
+	  float jphi = FatJetInfo.Jet_phi[iJet];
+	  
+          bool hasCquark = 0;
+	  for( int c=0;c<EvtInfo.ncQuarks;c++ )
+	    {
+	      double dRc = reco::deltaR(EvtInfo.cQuark_eta[c], 
+						  EvtInfo.cQuark_phi[c], 
+						  jeta,
+						  jphi);
+	       if( dRc < drMin ) hasCquark = 1;
+	    }
+		       
+	  if( hasCquark )
+	    { 
+	       bool isDplus = false, isDzero = false, isDsubs = false, isDbary = false;
+	       for( int k=0;k<EvtInfo.nDHadrons;k++ )
+		 {
+		   double dR = reco::deltaR(EvtInfo.DHadron_eta[k], 
+						     EvtInfo.DHadron_phi[k], 
+						     jeta, 
+						     jphi);
+		   if( dR > drMin ) continue;
+			         
+		   if( abs(EvtInfo.DHadron_pdgID[k]) == 411 ) isDplus = true;
+		   if( abs(EvtInfo.DHadron_pdgID[k]) == 421 ) isDzero = true;
+		   if( abs(EvtInfo.DHadron_pdgID[k]) == 431 ) isDsubs = true;
+		   if((abs(EvtInfo.DHadron_pdgID[k])/1000)%10 == 4 ) isDbary = true;
+		 }       
+
+		 if( isDplus ) sfC *= 1.37; // PDG2008(0.246+-0.020)
+		 if( isDzero ) sfC *= 0.91; // PDG2008(0.565+-0.032)
+		 if( isDsubs ) sfC *= 0.67; // PDG2008(0.080+-0.017)
+			  // 0.185072, 0.58923, 0.115961
+	    }
+	  wtFatJet *= sfC;
+	}    
+      }
+   
+	// K0s Lambda sys
+      if (abs(FatJetInfo.Jet_flavour[iJet]) < 4 || abs(FatJetInfo.Jet_flavour[iJet])==21)
+	{
+	  if (doK0L_)
+	    {
+	      float sfK0L = 1.;
+	      float jeta = FatJetInfo.Jet_eta[iJet];
+	      float jphi = FatJetInfo.Jet_phi[iJet];
+	      int nK0s = 0, nLambda = 0;
+	      for( int k=0;k<EvtInfo.nGenV0;k++ )
+		    {
+		      double dR = reco::deltaR(EvtInfo.GenV0_eta[k], 
+						 EvtInfo.GenV0_phi[k], 
+						 jeta,
+						 jphi);
+		      if( dR > 0.3 ) continue;
+		      int pdgid = abs(EvtInfo.GenV0_pdgID[k]);
+		      if( pdgid == 310 )  nK0s++;
+		      if( pdgid == 3122 ) nLambda++;
+		    }
+	      if( nK0s > 0 )    sfK0L *= 1.3;
+	      if( nLambda > 0 ) sfK0L *= 1.5;
+	      wtFatJet *= sfK0L;
+	    }
+	}
 
       //// fat jet multiplicity
       ++nFatJet;
@@ -1451,24 +1720,24 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     if ( jetpt*(1 + jesup) > ptbinsLow[0] && jetpt*(1 + jesup) <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_all_JESup_pt4", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc , FatJetInfo.Jet_Proba[iJet],wtPU*wtFatJet);
 
     if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBL_  ) {
-      std::cout << "got to doubleb > 0.3" << std::endl;
+//       std::cout << "got to doubleb > 0.3" << std::endl;
       if ( jetpt*(1 + jesup) > ptbinsLow[0] && jetpt*(1 + jesup) <= ptbinsHigh[0] ){
-	std::cout << "got to doubleb in ptbin1" << std::endl;
+// 	std::cout << "got to doubleb in ptbin1" << std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt0_JESup", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc , FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
       else if ( jetpt*(1 + jesup) > ptbinsLow[1] && jetpt*(1 + jesup) <= ptbinsHigh[1] ){
-	std::cout << "got to doubleb in ptbin2"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin2"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt1_JESup", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
       else if ( jetpt*(1 + jesup) > ptbinsLow[2] && jetpt*(1 + jesup) <= ptbinsHigh[2] ){
-	std::cout << "got to doubleb in ptbin3"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin3"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt2_JESup", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
       else if ( jetpt*(1 + jesup) > ptbinsLow[3] && jetpt*(1 + jesup) <= ptbinsHigh[3] ){
-	std::cout << "got to doubleb in ptbin4"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin4"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt3_JESup", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet); }
       else if ( jetpt*(1 + jesup) > ptbinsLow[4] && jetpt*(1 + jesup) <= ptbinsHigh[4] ){
-	std::cout << "got to doubleb in ptbin4"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin4"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt5_JESup", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet); }
      if ( jetpt*(1 + jesup) > ptbinsLow[0] && jetpt*(1 + jesup) <= ptbinsHigh[1] ){
-	std::cout << "got to doubleb in ptbin1" << std::endl;
+// 	std::cout << "got to doubleb in ptbin1" << std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt4_JESup", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc , FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);} 
     }
       else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBL_  ) {
@@ -1522,24 +1791,24 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
     if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBL_  ) {
-      std::cout << "got to doubleb > 0.3" << std::endl;
+//       std::cout << "got to doubleb > 0.3" << std::endl;
       if ( jetpt*(1 + jesdown) > ptbinsLow[0] && jetpt*(1 + jesdown) <= ptbinsHigh[0] ){
-	std::cout << "got to doubleb in ptbin1" << std::endl;
+// 	std::cout << "got to doubleb in ptbin1" << std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt0_JESdown", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc , FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
       else if ( jetpt*(1 + jesdown) > ptbinsLow[1] && jetpt*(1 + jesdown) <= ptbinsHigh[1] ){
-	std::cout << "got to doubleb in ptbin2"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin2"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt1_JESdown", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
       else if ( jetpt*(1 + jesdown) > ptbinsLow[2] && jetpt*(1 + jesdown) <= ptbinsHigh[2] ){
-	std::cout << "got to doubleb in ptbin3"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin3"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt2_JESdown", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
       else if ( jetpt*(1 + jesdown) > ptbinsLow[3] && jetpt*(1 + jesdown) <= ptbinsHigh[3] ){
-	std::cout << "got to doubleb in ptbin4"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin4"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt3_JESdown", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet); }
       else if ( jetpt*(1 + jesdown) > ptbinsLow[4] && jetpt*(1 + jesdown) <= ptbinsHigh[4] ){
-	std::cout << "got to doubleb in ptbin4"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin4"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt5_JESdown", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc ,FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet); }
       if ( jetpt*(1 + jesdown) > ptbinsLow[0] && jetpt*(1 + jesdown) <= ptbinsHigh[1] ){
-	std::cout << "got to doubleb in ptbin1" << std::endl;
+// 	std::cout << "got to doubleb in ptbin1" << std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt4_JESdown", FatJetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc , FatJetInfo.Jet_Proba[iJet]  ,wtPU*wtFatJet);}
     }
     else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBL_  ) {
@@ -1705,20 +1974,20 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       TString hTag = "FatJet";
 
       if(idxMuon_inFirstSubjet > -1){
-        FillHisto(hTag+"_mu1_ptrel",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_ptrel[idxMuon_inFirstSubjet] ,wtPU*wtFatJet);
-        FillHisto(hTag+"_mu1_chi2",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_chi2[idxMuon_inFirstSubjet]  ,wtPU*wtFatJet);
-        FillHisto(hTag+"_muon1_Pt",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_pt[idxMuon_inFirstSubjet] ,     wtPU*wtFatJet);
-        FillHisto(hTag+"_muon1_eta",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_eta[idxMuon_inFirstSubjet] ,    wtPU*wtFatJet);
-        FillHisto(hTag+"_muon1_phi",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_phi[idxMuon_inFirstSubjet] ,    wtPU*wtFatJet);      
+//         FillHisto(hTag+"_mu1_ptrel",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_ptrel[idxMuon_inFirstSubjet] ,wtPU*wtFatJet);
+//         FillHisto(hTag+"_mu1_chi2",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_chi2[idxMuon_inFirstSubjet]  ,wtPU*wtFatJet);
+        FillHisto(hTag+"_muon1_Pt",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_pt ,     wtPU*wtFatJet);
+        FillHisto(hTag+"_muon1_eta",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_eta ,    wtPU*wtFatJet);
+        FillHisto(hTag+"_muon1_phi",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_phi ,    wtPU*wtFatJet);      
         FillHisto(hTag+"_muon1_dR",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.DeltaR(jet_p4) ,    wtPU*wtFatJet);		
         FillHisto(hTag+"_muon1_sj1_dR",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.DeltaR(subjet1_p4) ,    wtPU*wtFatJet);		
       }
       if(idxMuon_inSecondSubjet > -1){
-        FillHisto(hTag+"_mu2_ptrel",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_ptrel[idxMuon_inSecondSubjet] ,wtPU*wtFatJet);
-        FillHisto(hTag+"_mu2_chi2",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_chi2[idxMuon_inSecondSubjet]  ,wtPU*wtFatJet);
-        FillHisto(hTag+"_muon2_Pt",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_pt[idxMuon_inSecondSubjet] ,     wtPU*wtFatJet);
-        FillHisto(hTag+"_muon2_eta",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_eta[idxMuon_inSecondSubjet] ,    wtPU*wtFatJet);
-        FillHisto(hTag+"_muon2_phi",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_phi[idxMuon_inSecondSubjet] ,    wtPU*wtFatJet);      
+//         FillHisto(hTag+"_mu2_ptrel",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_ptrel[idxMuon_inSecondSubjet] ,wtPU*wtFatJet);
+//         FillHisto(hTag+"_mu2_chi2",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,FatJetInfo.PFMuon_chi2[idxMuon_inSecondSubjet]  ,wtPU*wtFatJet);
+        FillHisto(hTag+"_muon2_Pt",     FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_pt ,     wtPU*wtFatJet);
+        FillHisto(hTag+"_muon2_eta",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_eta ,    wtPU*wtFatJet);
+        FillHisto(hTag+"_muon2_phi",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_phi ,    wtPU*wtFatJet);      
         FillHisto(hTag+"_muon2_dR",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.DeltaR(jet_p4) ,    wtPU*wtFatJet);		
         FillHisto(hTag+"_muon2_sj2_dR",    FatJetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.DeltaR(subjet2_p4) ,    wtPU*wtFatJet);		
       }
@@ -2231,24 +2500,24 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     //nominal
     if ( doubleb >= DoubleBL_  ) {
-      std::cout << "got to doubleb > 0.3" << std::endl;
+//       std::cout << "got to doubleb > 0.3" << std::endl;
       if ( ptjet > ptbinsLow[0] && ptjet <= ptbinsHigh[0] ){
-	std::cout << "got to doubleb in ptbin1" << std::endl;
+// 	std::cout << "got to doubleb in ptbin1" << std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt0", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
       else if ( ptjet > ptbinsLow[1] && ptjet <= ptbinsHigh[1] ){
-	std::cout << "got to doubleb in ptbin2"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin2"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt1", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
       else if ( ptjet > ptbinsLow[2] && ptjet <= ptbinsHigh[2] ){
-	std::cout << "got to doubleb in ptbin3"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin3"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt2", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
       else if ( ptjet > ptbinsLow[3] && ptjet <= ptbinsHigh[3] ){
-	std::cout << "got to doubleb in ptbin4"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin4"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt3", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
       else if ( ptjet > ptbinsLow[4] && ptjet <= ptbinsHigh[4] ){
-	std::cout << "got to doubleb in ptbin4"<< std::endl;
+// 	std::cout << "got to doubleb in ptbin4"<< std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt5", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
       if ( ptjet > ptbinsLow[0] && ptjet <= ptbinsHigh[1] ){
-	std::cout << "got to doubleb in ptbin1" << std::endl;
+// 	std::cout << "got to doubleb in ptbin1" << std::endl;
 	FillHisto(histoTag+"_JP_DoubleBLpass_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
       FillHisto(histoTag+"_JP_DoubleBLpass_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
@@ -2335,6 +2604,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       thejet.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
       themuon.SetPtEtaPhiM(JetInfo.PFMuon_pt[idxFirstMuon], JetInfo.PFMuon_eta[idxFirstMuon], JetInfo.PFMuon_phi[idxFirstMuon], 0);
 
+      FillHisto(histoTag+"_muon_ptRatio",     flav, isGSPbb ,isGSPcc ,JetInfo.PFMuon_pt[idxFirstMuon]/ptjet ,     wt);
       FillHisto(histoTag+"_muon_DeltaR",         flav, isGSPbb, isGSPcc ,themuon.DeltaR(thejet) , wt);
       FillHisto2D(histoTag+"_muon_ptrel_vs_jetpt", flav, isGSPbb, isGSPcc ,ptjet,JetInfo.PFMuon_ptrel[idxFirstMuon],wt);
       FillHisto2D(histoTag+"_muon_DeltaR_vs_jetpt",flav, isGSPbb, isGSPcc ,ptjet,themuon.DeltaR(thejet),wt);
@@ -2540,7 +2810,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         && JetInfo.PFMuon_nOutHit[muIdx] < (useRelaxedMuonID_ ? 99 : 3) 
         && JetInfo.PFMuon_chi2Tk[muIdx] < 10 
         && JetInfo.PFMuon_chi2[muIdx] < 10  
-        && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < 0.25 ) //0.5 for double muon selection, 0.25 for single muon selection
+        && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < MuonJetPtRatio_ )
         //&& JetInfo.PFMuon_vz[muIdx]< 2 
         //DM&& fabs(JetInfo.PFMuon_vz[muIdx]-EvtInfo.PVz) < 2.
        )
@@ -2709,6 +2979,31 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     delete hwt ;
     return wtPtbalance ;
   }
+
+  // ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
+  double BTagValidation::GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) {
+    double wtRatio(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtRatio = ratio >= -1 && ratio <= 4 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(ratio)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtRatio ;
+  }
+
+  // ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
+  double BTagValidation::GetLumiWeightsZratioBased (const std::string file, const std::string hist, const double ratio) {
+    double wtRatio(1) ;
+    TFile* f = new TFile(file.c_str()) ;
+    TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+    wtRatio = ratio >= 0 && ratio <= 60 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(ratio)) : 1.;
+    f->Close() ;
+    delete f ;
+    delete hwt ;
+    return wtRatio ;
+  }
+
 
   void BTagValidation::ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) {
     newjec = 1.0; 
