@@ -20,3 +20,11 @@ cd RecoBTag/BTagValidation/test/
 
 cmsRun btagvalidation_cfg.py
   
+  
+  To run systematics:
+  src/BTagValidation.cc has b fragmentation, c fragmentation, ntracks, c->D fragmentation, K0/Lambda, and pileup up and down systematics implemented. For b fragmentation, in test/btagvalidation_cfg.py, doBFrag=True and you need to run once with doBFragUp=True and once with doBFragDown=True. For c fragmentation, doCFrag=True. For c->D fragmentation, doCDFrag=True. For K0/Lambda, doK0L=True.
+  
+  For ntracks reweighting, you have to run test/rizki_signalMC_GluGLu/dataMCntracks/jetwt.py over a file that already contains the QCD and data distributions, in order to get a root file that will reweight the QCD ntracks distribution to look like the data ntracks distribution. That file is fed to test/btagvalidation_cfg.py as FileNtracksWt and you must set doNtracksReweighting=True.
+  
+  For pileup up and down, you reset File_PUDistData in test/btagvalidation_cfg.py to be test/RunII2015_25ns_PUXsec65550nb.root or test/RunII2015_25ns_PUXsec72450nb.root.
+
