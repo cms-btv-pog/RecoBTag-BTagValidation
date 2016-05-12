@@ -36,9 +36,9 @@ def main():
   (options, args) = parser.parse_args()
 
   # make sure all necessary input parameters are provided
-  if not (options.main_workdir and options.dataset_list_for_merging):
-    print usage
-    sys.exit()
+#  if not (options.main_workdir and options.dataset_list_for_merging):
+#    print usage
+#    sys.exit()
 
   main_workdir = options.main_workdir
   # redefine main_workdir as an absolute path (if not defined in such form already)
@@ -54,9 +54,9 @@ def main():
 
   group = ''
   group_datasets = {}
-  group_xs = {}
-  group_L = {}
-  dataset_xs = {}
+#  group_xs = {}
+#  group_L = {}
+#  dataset_xs = {}
 
   # open and read the dataset_list_for_merging
   dataset_list_for_merging = open(options.dataset_list_for_merging,'r')
@@ -70,25 +70,25 @@ def main():
     if re.search(':', line):
       group = line_elements[0].rstrip(':')
       group_datasets[group] = []
-      group_xs[group] = 0.
-      group_L[group] = -1.
-      if re.search('L=', line):
-        group_L[group] = float(line.split('L=')[-1].strip('\n'))
+#      group_xs[group] = 0.
+#      group_L[group] = -1.
+#      if re.search('L=', line):
+#        group_L[group] = float(line.split('L=')[-1].strip('\n'))
     else:
       dataset = line_elements[0]
-      xs = float(line_elements[1])
+#      xs = float(line_elements[1])
       group_datasets[group].append(dataset)
-      if xs > 0.:
-        group_xs[group] = group_xs[group] + xs
-      else:
-        group_xs[group] = -1.
-      dataset_xs[dataset] = xs
-    print "groupL " + str(group_L[group])
+#      if xs > 0.:
+#        group_xs[group] = group_xs[group] + xs
+#      else:
+#        group_xs[group] = -1.
+#      dataset_xs[dataset] = xs
+#    print "groupL " + str(group_L[group])
 
   # final output file
   filename='Final_histograms'
-  if (len(options.analyzer_module)>0):
-    filename+=str('_'+options.analyzer_module)
+#  if (len(options.analyzer_module)>0):
+#    filename+=str('_'+options.analyzer_module)
   filename+=str('.root')
   output_root_file = TFile( os.path.join(output_dir,filename), 'RECREATE' )
 
@@ -122,9 +122,10 @@ def main():
 
       # open input ROOT file
       root_file = TFile(input_root_file)
-      htemp = root_file.Get(os.path.join(options.analyzer_module,'h1_CutFlow_unw'))
-      nEventsAll = htemp.GetBinContent(1)
-      nEventsStored = htemp.GetBinContent(2)
+ #     htemp = root_file.Get(os.path.join(options.analyzer_module,'h1_CutFlow_unw'))
+ #     print htemp
+ #     nEventsAll = htemp.GetBinContent(1)
+ #     nEventsStored = htemp.GetBinContent(2)
       scale = 1.
 
       #htemp2 = root_file.Get(os.path.join(options.analyzer_module,'h1_fatjet_pt'))
@@ -138,14 +139,14 @@ def main():
       #nFatjet_c = htemp2_c.GetEntries()
       #nFatjet_l = htemp2_l.GetEntries()
 
-      if group_xs[group] > 0.:
-        if group_L[group] > 0.:
-          print "group_xs and group_L > 0"
-          scale = (dataset_xs[dataset]*group_L[group])/nEventsAll
-        else:
-          print "group_L <= 0"
-          scale = dataset_xs[dataset]/(group_xs[group]*nEventsAll)
-      print "scale " + str(scale)
+ #     if group_xs[group] > 0.:
+ #       if group_L[group] > 0.:
+ #         print "group_xs and group_L > 0"
+ #         scale = (dataset_xs[dataset]*group_L[group])/nEventsAll
+ #       else:
+ #         print "group_L <= 0"
+ #         scale = dataset_xs[dataset]/(group_xs[group]*nEventsAll)
+ #     print "scale " + str(scale)
        # print dataset + ' -- Events: %.0f (all), %.0f (stored); relative xs: %.8E; scale: %.8E; Fatjets: %.0f (b: %.0f,bgsp: %.0f,c: %.0f,l: %.0f); Fatjets (after scale): %0.f (b: %.0f,bgsp: %.0f,c: %.0f,l: %.0f)'%(nEventsAll,nEventsStored,(dataset_xs[dataset]/group_xs[group]),scale,nFatjet,nFatjet_b,nFatjet_bfromg,nFatjet_c,nFatjet_l,scale*nFatjet,scale*nFatjet_b,scale*nFatjet_bfromg,scale*nFatjet_c,scale*nFatjet_l)
       #else:
         #print dataset + ' -- Events: %.0f (all), %.0f (stored); scale: %.8E; Fatjets: %.0f; Fatjets (after scale): %0.f'%(nEventsAll,nEventsStored,scale,nFatjet, scale*nFatjet)
@@ -163,13 +164,13 @@ def main():
       #totalFatjets_l = totalFatjets_l + scale*nFatjet_l
 
       # get the number of histograms
-      nHistos = root_file.Get(options.analyzer_module).GetListOfKeys().GetEntries()
+      nHistos = root_file.GetListOfKeys().GetEntries()
 
       # loop over histograms in the input ROOT file
       for h in range(0, nHistos):
-        histoName = root_file.Get(options.analyzer_module).GetListOfKeys()[h].GetName()
+        histoName = root_file.GetListOfKeys()[h].GetName()
         #print histoName
-        htemp = root_file.Get(os.path.join(options.analyzer_module,histoName))
+        htemp = root_file.Get(histoName)
 
         if histoName not in final_histos.keys():
           final_histos[histoName] = copy.deepcopy(htemp)
@@ -177,7 +178,7 @@ def main():
           final_histos[histoName].Scale(scale)
         else:
           final_histos[histoName].Add(htemp, scale)
-        print "final scale " + str(scale)
+       # print "final scale " + str(scale)
 
     print ''
     print 'TOTAL Fatjets (before scale) = %.0f (b: %.0f,bgsp: %.0f,c: %.0f,l: %.0f)'%(_totalFatjets,_totalFatjets_b,_totalFatjets_bfromg,_totalFatjets_c,_totalFatjets_l)

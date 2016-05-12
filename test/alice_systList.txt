@@ -1,0 +1,53 @@
+# Dataset_name  Number_of_jobs  EOS_location  PyCfg_parameters (optional)
+
+#DATA:
+#/JetHT/Run2015C_25ns-16Dec2015-v1/doubleTaggingTrue_DoubleSVBFalse -1 -1
+#/JetHT/Run2015D-16Dec2015-v1/doubleTaggingTrue_DoubleSVBFalse -1 -1
+
+#QCD: L=2630
+#/QCD_Pt-170to300_MuEnrichedPt5 8654.49315
+#/QCD_Pt-470to600_MuEnrichedPt5 79.02553776
+#/QCD_Pt-600to800_MuEnrichedPt5 25.09505908
+#/QCD_Pt-800to1000_MuEnrichedPt5 4.707368272
+#/QCD_Pt-1000toInf_MuEnrichedPt5 1.621316920
+#/QCD_Pt-300to470_MuEnrichedPt5 797.3526900
+#/QCD_Pt-120to170_MuEnrichedPt5 25190.51514
+
+#ZJets: L=2200
+#/ZJetstoQQ 5.67
+
+#WJets: L=2200
+#/WJetstoQQ 95.14
+
+#TTJets: L=2200
+#/TTJets 730
+
+#ZJets:
+#/ZJetsToQQ_HT600toInf_13TeV-madgraph 5.67
+
+UNWEIGHTED:
+/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval -1 -1
+
+#NTRACKS:
+#/Final_ntracks -1 -1
+
+#CD:
+#/Final_histograms_CD -1 -1
+
+#CFRAG:
+#/Final_histograms_C -1 -1
+
+#K0L:
+#/Final_histograms_K0L -1 -1
+
+#BFRAGUP:
+#/Final_histograms_bfrag_up -1 -1
+
+#BFRAGDOWN:
+#/Final_bfrag_down -1 -1
+
+PUUP:
+/Final_PU_up -1 -1
+
+PUDOWN:
+/Final_PU_down -1 -1
