@@ -327,9 +327,9 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   //// Dummy: no .csv exists for 80X
   reader.load(&calib,            // calibration instance
       BTagEntry::FLAV_B,    // btag flavour
-      "comb")               // measurement type
+      "comb") ;             // measurement type
 
-    if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
+  if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
 
   // Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
