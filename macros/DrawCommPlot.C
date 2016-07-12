@@ -26,24 +26,18 @@
 
 using namespace std;
 
-TString ptcut = "425";
+TString ptcut = "450";
 
-//TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_08Feb2016/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets.root"; 
-//TString filename    = "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsDoubleMuTagged_PUWt_07Feb2016/Final_histograms_btagval_DoubleMuonTaggedFatJets_MuonEnrichedJets.root";
-//TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/FatJets_76X_FatJetsSingleMuTagged_PUWt_FatJetPtWt_07Feb2016/Final_histograms_btagval_JetHT_MuonTaggedFatJets_MuonEnrichedJets.root";
-TString filename    ="/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016/Final_histograms_btagval_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016.root";
+TString filename    ="../test/BATCH_06June2016/Final_histograms_btagval.root";
 
 TString filename_ext="" ;
 
-//TString dir4plots   = "FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_NoNormLight_08Feb2016";
-//TString dir4plots   = "FatJets_76X_FatJetsDoubleMuTagged_PUWt_FatJetsSubJetsPtWt_NoNormLight_08Feb2016";
-//TString dir4plots   = "FatJets_76X_JetHT_FatJetsSingleMuTagged_PUWt_YesNormLight_07Feb2016";
-TString dir4plots   = "FatJets_76X_JetHT_QCDMuEnriched_76X_SubjetMuTagged_PUWt_08Feb2016";
+TString dir4plots   = "Comm_InclQCD_06June2016";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
-TString title1 = "#sqrt{s} = 13 TeV, 25 ns";
+TString title1 = "#sqrt{s} = 13 TeV (2016)";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
@@ -79,7 +73,7 @@ void DrawCommPlot(bool Draw_track_plots=true,
     bool Draw_muons_plots=true,
     bool Draw_discriminator_plots=false,
     bool Draw_tagRate_plots=false,
-    bool Draw_2D_plots=true) {
+    bool Draw_2D_plots=false) {
 
   gROOT->SetBatch(kTRUE);
   gROOT->SetStyle("Plain");
@@ -137,150 +131,150 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
     //DrawStacked(histoTag+"_DoubleB"      ,"DoubleB"                                           ,logy ,dodata ,extNorm ,1 ,0 ,-1 ,1.);
 
-    //added by rizki - start
+    //////added by rizki - start
 
-    DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
 
-	int trackSip_rebin = 2;
-    DrawStacked(histoTag+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip3dSig_1"  ,"IP Sig 2nd track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip3dSig_2"  ,"IP Sig 3rd track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip3dSig_3"  ,"IP Sig 4th track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////int trackSip_rebin = 2;
+    ////DrawStacked(histoTag+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_trackSip3dSig_1"  ,"IP Sig 2nd track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_trackSip3dSig_2"  ,"IP Sig 3rd track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_trackSip3dSig_3"  ,"IP Sig 4th track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
 
-    DrawStacked(histoTag+"_tau1_trackSip3dSig_1"  ,"IP Sig 2nd track of SV_{0}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_trackSip3dSig_0"  ,"IP Sig 1st track of SV_{0}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau2_trackSip3dSig_1"  ,"IP Sig 2nd track of SV_{1}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau2_trackSip3dSig_0"  ,"IP Sig 1st track of SV_{1}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau1_trackSip3dSig_1"  ,"IP Sig 2nd track of SV_{0}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau1_trackSip3dSig_0"  ,"IP Sig 1st track of SV_{0}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau2_trackSip3dSig_1"  ,"IP Sig 2nd track of SV_{1}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau2_trackSip3dSig_0"  ,"IP Sig 1st track of SV_{1}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
 
-    DrawStacked(histoTag+"_trackSip2dSigAboveCharm_0"  ,"IP Sig 1st Track Above Charm"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip2dSigAboveBottom_0"  ,"IP Sig 1st Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip2dSigAboveBottom_1"  ,"IP Sig 2nd Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_trackSip2dSigAboveCharm_0"  ,"IP Sig 1st Track Above Charm"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_trackSip2dSigAboveBottom_0"  ,"IP Sig 1st Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_trackSip2dSigAboveBottom_1"  ,"IP Sig 2nd Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
 
-    DrawStacked(histoTag+"_tau1_trackEtaRel_0"  ,"EtaRel 1st track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    DrawStacked(histoTag+"_tau1_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    DrawStacked(histoTag+"_tau1_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    
-    DrawStacked(histoTag+"_tau2_trackEtaRel_0"  ,"EtaRel 1st track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);  
-    DrawStacked(histoTag+"_tau2_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
-    DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
+    ////DrawStacked(histoTag+"_tau1_trackEtaRel_0"  ,"EtaRel 1st track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
+    ////DrawStacked(histoTag+"_tau1_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
+    ////DrawStacked(histoTag+"_tau1_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{0}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
 
-    DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
-    DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    ////DrawStacked(histoTag+"_tau2_trackEtaRel_0"  ,"EtaRel 1st track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);  
+    ////DrawStacked(histoTag+"_tau2_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
+    ////DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
 
-    DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
-    DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    ////DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
+    ////DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
 
-    DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
+    ////DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
 
-    DrawStacked(histoTag+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
 
-	//debug - start - rizki
-	
-	//selectedRegion
-	TString hTag1 = histoTag+"_selectedRegion";
-    DrawStacked(hTag1+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
-    DrawStacked(hTag1+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(hTag1+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-	Draw2DPlot(hTag1+"_BDTGSV_trackSip3dSig_0", "BDTG SV vs IP Sig 1st Track", "BDTG SV", "IP Sig 1st Track",logy,1,0);
-    Draw2DPlot(hTag1+"_BDTGSV_jetNTracks", "BDTG SV vs Number of tracks", "BDTG SV", "Number of tracks",logy,1,0); 
-    Draw2DPlot(hTag1+"_jetNTracks_trackSip3dSig_0", "Number of tracks vs IP Sig 1st Track", "Number of tracks", "IP Sig 1st Track" ,logy,1,0);
+    ////DrawStacked(histoTag+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
 
-  	DrawStacked(hTag1+"_pt_all"      ,"p_{T} [GeV/c]"                ,logy ,dodata ,extNorm ,6  ,1 ,0. ,2000.);
-  	DrawStacked(hTag1+"_eta"         ,"#eta"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
-  	//DrawStacked(hTag1+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,40 ,0 ,0. ,0.   );
-  	DrawStacked(hTag1+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
+    //////debug - start - rizki
 
-    DrawStacked(hTag1+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag1+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag1+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    //////selectedRegion
+    ////TString hTag1 = histoTag+"_selectedRegion";
+    ////DrawStacked(hTag1+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    ////DrawStacked(hTag1+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(hTag1+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////Draw2DPlot(hTag1+"_BDTGSV_trackSip3dSig_0", "BDTG SV vs IP Sig 1st Track", "BDTG SV", "IP Sig 1st Track",logy,1,0);
+    ////Draw2DPlot(hTag1+"_BDTGSV_jetNTracks", "BDTG SV vs Number of tracks", "BDTG SV", "Number of tracks",logy,1,0); 
+    ////Draw2DPlot(hTag1+"_jetNTracks_trackSip3dSig_0", "Number of tracks vs IP Sig 1st Track", "Number of tracks", "IP Sig 1st Track" ,logy,1,0);
 
-    DrawStacked(hTag1+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag1+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag1+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_pt_all"      ,"p_{T} [GeV/c]"                ,logy ,dodata ,extNorm ,6  ,1 ,0. ,2000.);
+    ////DrawStacked(hTag1+"_eta"         ,"#eta"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
+    //////DrawStacked(hTag1+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,40 ,0 ,0. ,0.   );
+    ////DrawStacked(hTag1+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
 
-    DrawStacked(hTag1+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag1+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag1+"_muComb_ptRatio",    "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag1+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-	//other selected Region
-	TString hTag2 = histoTag+"_otherSelectedRegion";
-    DrawStacked(hTag2+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
-    DrawStacked(hTag2+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(hTag2+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-  	Draw2DPlot(hTag2+"_BDTGSV_trackSip3dSig_0", "BDTG SV vs IP Sig 1st Track", "BDTG SV", "IP Sig 1st Track",logy,1,0);
-    Draw2DPlot(hTag2+"_BDTGSV_jetNTracks", "BDTG SV vs Number of tracks", "BDTG SV", "Number of tracks",logy,1,0); 
-    Draw2DPlot(hTag2+"_jetNTracks_trackSip3dSig_0", "Number of tracks vs IP Sig 1st Track", "Number of tracks", "IP Sig 1st Track" ,logy,1,0);
+    ////DrawStacked(hTag1+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-  	DrawStacked(hTag2+"_pt_all"      ,"p_{T} [GeV/c]"                ,logy ,dodata ,extNorm ,6  ,1 ,0. ,2000.);
-  	DrawStacked(hTag2+"_eta"         ,"#eta"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
-  	DrawStacked(hTag2+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
-  	DrawStacked(hTag2+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,40 ,0 ,0. ,0.   );
+    ////DrawStacked(hTag1+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_muComb_ptRatio",    "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
 
-    DrawStacked(hTag2+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag2+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag2+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    //////other selected Region
+    ////TString hTag2 = histoTag+"_otherSelectedRegion";
+    ////DrawStacked(hTag2+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    ////DrawStacked(hTag2+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
+    ////DrawStacked(hTag2+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    ////Draw2DPlot(hTag2+"_BDTGSV_trackSip3dSig_0", "BDTG SV vs IP Sig 1st Track", "BDTG SV", "IP Sig 1st Track",logy,1,0);
+    ////Draw2DPlot(hTag2+"_BDTGSV_jetNTracks", "BDTG SV vs Number of tracks", "BDTG SV", "Number of tracks",logy,1,0); 
+    ////Draw2DPlot(hTag2+"_jetNTracks_trackSip3dSig_0", "Number of tracks vs IP Sig 1st Track", "Number of tracks", "IP Sig 1st Track" ,logy,1,0);
 
-    DrawStacked(hTag2+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag2+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag2+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_pt_all"      ,"p_{T} [GeV/c]"                ,logy ,dodata ,extNorm ,6  ,1 ,0. ,2000.);
+    ////DrawStacked(hTag2+"_eta"         ,"#eta"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
+    ////DrawStacked(hTag2+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
+    ////DrawStacked(hTag2+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,40 ,0 ,0. ,0.   );
 
-    DrawStacked(hTag2+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag2+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(hTag2+"_muComb_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(hTag2+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-	//all region
-    DrawStacked(histoTag+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(histoTag+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(histoTag+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-    DrawStacked(histoTag+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(histoTag+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(histoTag+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_muComb_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
 
-    DrawStacked(histoTag+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(histoTag+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muComb_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked(histoTag+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    //////all region
+    ////DrawStacked(histoTag+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(histoTag+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(histoTag+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-    DrawStacked("Subjet1_dR",       "#DeltaR (Subjet_{1}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,0.);
-    DrawStacked("Subjet2_dR",       "#DeltaR (Subjet_{2}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,0.);
-	
-	//debug - end - rizki
-	
-    //added by rizki - end
+    ////DrawStacked(histoTag+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(histoTag+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(histoTag+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
+
+    ////DrawStacked(histoTag+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(histoTag+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(histoTag+"_muComb_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(histoTag+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+
+    ////DrawStacked("Subjet1_dR",       "#DeltaR (Subjet_{1}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked("Subjet2_dR",       "#DeltaR (Subjet_{2}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,0.);
+
+    //////debug - end - rizki
+
+    //////added by rizki - end
 
   }
 
@@ -402,14 +396,14 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     if( histoTag=="FatJet" ){
       if( !prunedjets) Draw2DPlot(histoTag+"_softdropMass_nsubjettiness", "FatJet softdrop mass vs. Nsubjettiness", "FatJet softdrop mass", "Nsubjettiness", 0, 1, 0);
       if( prunedjets) Draw2DPlot(histoTag+"_prunedMass_nsubjettiness", "FatJet pruned mass vs. Nsubjettiness", "FatJet pruned mass", "Nsubjettiness", 0, 1, 0);
-      
+
       Draw2DPlot(histoTag+"_BDTGSV_trackSip3dSig_0", "BDTG SV vs IP Sig 1st Track", "BDTG SV", "IP Sig 1st Track",logy,1,0);
       Draw2DPlot(histoTag+"_BDTGSV_trackSip3dSig_1", "BDTG SV vs IP Sig 2nd Track", "BDTG SV", "IP Sig 2nd Track",logy,1,0);
       Draw2DPlot(histoTag+"_BDTGSV_trackSip3dSig_2", "BDTG SV vs IP Sig 3rd Track", "BDTG SV", "IP Sig 3rd Track",logy,1,0);
       Draw2DPlot(histoTag+"_BDTGSV_trackSip3dSig_3", "BDTG SV vs IP Sig 4th Track", "BDTG SV", "IP Sig 4th Track",logy,1,0);
-      
+
       Draw2DPlot(histoTag+"_BDTGSV_jetNTracks", "BDTG SV vs Number of tracks", "BDTG SV", "Number of tracks",logy,1,0);
-      
+
       Draw2DPlot(histoTag+"_jetNTracks_trackSip3dSig_0", "Number of tracks vs IP Sig 1st Track", "Number of tracks", "IP Sig 1st Track" ,logy,1,0);
       Draw2DPlot(histoTag+"_seltrack_vs_jetpt", "nr. of selected tracks as a function of the jet p_{T}", "jet p_{T}","nr. of selected tracks",logy,0,1);
       Draw2DPlot(histoTag+"_muon_ptrel_vs_jetpt", "PFMuon_p{T}^{rel} vs jet pt", "jet p_{T}","#mu ptrel",logy,0,1);
@@ -438,9 +432,9 @@ void Draw(TString name, TString histotitle, bool log) {
     hist_data     = (TH1D*)myFile->Get("DATA__"+name+"_data");
   }
   else if (name=="h1_nPV_unw"){    
-  	hist_mc       = (TH1D*)myFile->Get("QCD__h1_nPV_mc_unw");
+    hist_mc       = (TH1D*)myFile->Get("QCD__h1_nPV_mc_unw");
     hist_data     = (TH1D*)myFile->Get("DATA__h1_nPV_data");
-    } 	
+  } 	
   else {
     hist_mc       = (TH1D*)myFile->Get("QCD__"+name);
     hist_data     = (TH1D*)myFile->Get("DATA__"+name);
@@ -498,7 +492,7 @@ void Draw(TString name, TString histotitle, bool log) {
   hist_data->Draw("E1"); //quick fix to set y-axis according to data.
   hist_mc->Draw("SAMEhist");
   hist_data->Draw("SAMEE1"); //quick fix to have data in front of mc
- 
+
   TLegend* leg = new TLegend(0.56,0.60,0.86,0.85,NULL,"brNDC");
   leg->SetBorderSize(1);
   leg->SetTextFont(62);
@@ -741,7 +735,7 @@ void DrawStacked(TString name,
     }
   }
 
-//   if (filename.Contains("MuonTagged") ) norm_lightjets = 1.27 ;
+  //   if (filename.Contains("MuonTagged") ) norm_lightjets = 1.27 ;
 
   int xlow = hist_data->GetXaxis()->FindBin(rangeXLow);
   int xhigh = hist_data->GetXaxis()->FindBin(rangeXHigh);
@@ -860,37 +854,37 @@ void DrawStacked(TString name,
     yaxistitle="Jets / 0.02" ; 
   }
   if (name.Contains("z_ratio") ){
-  	yaxistitle="Jets / 1.2";
+    yaxistitle="Jets / 1.2";
   }
   if (name.Contains("trackSip") && !name.Contains("BDTG")){
-  	yaxistitle="Tracks / 8";
+    yaxistitle="Tracks / 8";
   }
   if (name.Contains("trackEtaRel") || name.Contains("vertexMass")){
-  	yaxistitle="SVs / 1";
+    yaxistitle="SVs / 1";
   }
   if (name.Contains("vertexEnergyRatio")){
-  	yaxistitle="SVs / 0.05";
+    yaxistitle="SVs / 0.05";
   }
   if (name.Contains("flightDistance2dSig")){
-  	yaxistitle="SVs / 4";
+    yaxistitle="SVs / 4";
   }
   if (name.Contains("vertexDeltaR")){
-  	yaxistitle="SVs / 0.02";
+    yaxistitle="SVs / 0.02";
   }
   if (name.Contains("jetNTracks")){
-  	yaxistitle="Tracks / 1";
+    yaxistitle="Tracks / 1";
   }
   if (name.Contains("_nSV")){
-  	yaxistitle="SVs / 1";
+    yaxistitle="SVs / 1";
   }
   if (name.Contains("vertexDeltaR")){
-  	yaxistitle="Jets / 0.02";
+    yaxistitle="Jets / 0.02";
   }
   if (name.Contains("BDTG_SV")){
-  	yaxistitle="Jets / 0.04";
+    yaxistitle="Jets / 0.04";
   }
 
-   
+
 
   THStack *stack = new THStack("stack","");
   if (inclTTbar) stack->Add(hist_ttbar);
@@ -1462,7 +1456,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   histo_tot ->Add(hist_gsplit);
   histo_tot ->Add(hist_gsplit_c);
   histo_tot ->Add(hist_l);
-  
+
   float scale_f = (hist_data->Integral())/(hist_b->Integral() + hist_c ->Integral()+ hist_gsplit->Integral() + hist_gsplit_c->Integral() + hist_l->Integral());
 
   if (doData) {
@@ -1473,11 +1467,11 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
     hist_l       ->Scale(scale_f);
     histo_tot    ->Scale(scale_f);
   }
-  
-//   histo_tot->RebinX(10) ;
-//   histo_tot->RebinY(50) ;
-//   hist_data->RebinX(10) ;
-//   hist_data->RebinY(50) ;
+
+  //   histo_tot->RebinX(10) ;
+  //   histo_tot->RebinY(50) ;
+  //   hist_data->RebinX(10) ;
+  //   hist_data->RebinY(50) ;
 
   histo_tot->RebinX(2) ;
   histo_tot->RebinY(2) ;
@@ -1664,11 +1658,11 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   TString name_plot=name+"_Linear"+formata;
   if(log) name_plot=name+"_Log"+formata;
   canvas->SaveAs(dir4plots+"/"+name_plot);
-//   name_plot=name+"_Linear"+formatb;
-//   if(log) name_plot=name+"_Log"+formatb;
-//   canvas->SaveAs(dir4plots+"/"+name_plot);
-//   name_plot=name+"_Linear"+formatc;
-//   if(log) name_plot=name+"_Log"+formatc;
-//   canvas->SaveAs(dir4plots+"/"+name_plot);
+  //   name_plot=name+"_Linear"+formatb;
+  //   if(log) name_plot=name+"_Log"+formatb;
+  //   canvas->SaveAs(dir4plots+"/"+name_plot);
+  //   name_plot=name+"_Linear"+formatc;
+  //   if(log) name_plot=name+"_Log"+formatc;
+  //   canvas->SaveAs(dir4plots+"/"+name_plot);
 
 }
