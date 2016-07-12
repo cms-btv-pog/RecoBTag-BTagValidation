@@ -35,7 +35,7 @@ Implementation:
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/deltaR.h"
@@ -315,7 +315,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   btagMeasurementType_(iConfig.getParameter<std::string>("btagMeasurementType")), 
   btagSFType_(iConfig.getParameter<std::string>("btagSFType")),
   calib("csvv2", btagCSVFile_),  
-  reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
+  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
+  //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
   //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
 {
   //now do what ever initialization is needed
