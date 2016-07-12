@@ -325,9 +325,9 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   nEventsStored = 0;
 
   //// Dummy: no .csv exists for 80X
-  reader.load(&calib,            // calibration instance
-      BTagEntry::FLAV_B,    // btag flavour
-      "comb") ;             // measurement type
+  //reader.load(&calib,            // calibration instance
+  //    BTagEntry::FLAV_B,    // btag flavour
+  //    "comb") ;             // measurement type
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
 
