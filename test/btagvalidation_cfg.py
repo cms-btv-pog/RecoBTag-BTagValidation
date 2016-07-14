@@ -27,7 +27,12 @@ options.register('useJetProbaTree', False,
 options.register('applyFatJetMuonTagging', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    "Apply muon tagging to fat jets"
+    "Apply muon tagging to fat jets (require 1 muon in fatjet)"
+    )
+options.register('applyFatJetMuonTaggingV2', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Apply muon tagging to fat jets (require at least 1 muon in a subjet)"
     )
 options.register('applyFatJetBTagging', False,
     VarParsing.multiplicity.singleton,
@@ -154,6 +159,11 @@ options.register('SFlShift', 0.,
     VarParsing.varType.float,
     "Shift in SFl in units of sigmas"
     )
+options.register('MuonJetPtRatio', 0.5,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "pT(muon)/pT(Jet) for Muon Tagging"
+    )
 options.register('doPUReweightingOfficial', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -256,6 +266,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     UseFlavorCategories    = cms.bool(options.useFlavorCategories),
     UseRelaxedMuonID       = cms.bool(options.useRelaxedMuonID),
     ApplyFatJetMuonTagging = cms.bool(options.applyFatJetMuonTagging),
+    ApplyFatJetMuonTaggingV2 = cms.bool(options.applyFatJetMuonTaggingV2),
     ApplyFatJetBTagging    = cms.bool(options.applyFatJetBTagging),
     FatJetDoubleTagging    = cms.bool(options.fatJetDoubleTagging),
     FatJetDoubleBTagging   = cms.bool(options.fatJetDoubleBTagging),
@@ -289,6 +300,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki
     SFbShift               = cms.double(options.SFbShift),
     SFlShift               = cms.double(options.SFlShift),
+    MuonJetPtRatio               = cms.double(options.MuonJetPtRatio),
     DoPUReweightingOfficial= cms.bool(options.doPUReweightingOfficial),
     DoPUReweightingNPV     = cms.bool(options.doPUReweightingNPV),
     DoFatJetPtReweighting  = cms.bool(options.doFatJetPtReweighting),
