@@ -46,15 +46,10 @@ FileNames_QCD_Pt_800to1000 = [
 
 ### Do not remove the following lines
 FileNames = [
-    #'JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
-    #'JetTree_data_FatJets_Subjets_BoostedCommissioning_2.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_3.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_4.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_5.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_6.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_7.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_8.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_9.root',
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_10.root',
+	'root://xrootd-cms.infn.it//store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v1.04/JetHT/JetHT_Run2016B-PromptReco-v2_MINIAOD_usePrivateJEC/160708_082118/0000/JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
+	'root://xrootd-cms.infn.it//store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v1.04/JetHT/JetHT_Run2016B-PromptReco-v2_MINIAOD_usePrivateJEC/160708_082118/0000/JetTree_data_FatJets_Subjets_BoostedCommissioning_2.root',
+	'root://xrootd-cms.infn.it//store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v1.04/JetHT/JetHT_Run2016B-PromptReco-v2_MINIAOD_usePrivateJEC/160708_082118/0000/JetTree_data_FatJets_Subjets_BoostedCommissioning_3.root',
+	'root://xrootd-cms.infn.it//store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v1.04/JetHT/JetHT_Run2016B-PromptReco-v2_MINIAOD_usePrivateJEC/160708_082118/0000/JetTree_data_FatJets_Subjets_BoostedCommissioning_4.root',
+	'root://xrootd-cms.infn.it//store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v1.04/JetHT/JetHT_Run2016B-PromptReco-v2_MINIAOD_usePrivateJEC/160708_082118/0000/JetTree_data_FatJets_Subjets_BoostedCommissioning_5.root',	
     ]
 

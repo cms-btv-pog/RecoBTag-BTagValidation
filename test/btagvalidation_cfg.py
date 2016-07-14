@@ -179,7 +179,7 @@ options.register('applySFs', False,
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('btagCSVFile', 'CSVv2.csv',
+options.register('btagCSVFile', 'CSVv2_4invfb.csv',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "CSV file containing b-tagging SFs"

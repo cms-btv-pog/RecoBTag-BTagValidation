@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#QCD MuEnriched
+
+mkdir rizki_commissioning_80x_DoubleMuonTag_combined
+./combineOutput.py -w rizki_commissioning_80x_DoubleMuonTag -o rizki_commissioning_80x_DoubleMuonTag_combined
+
+mkdir rizki_commissioning_80x_SingleMuonTag_combined
+./combineOutput.py -w rizki_commissioning_80x_SingleMuonTag -o rizki_commissioning_80x_SingleMuonTag_combined
+
+mkdir rizki_commissioning_80x_DoubleMuonTag_merged
+./mergeDatasets.py -w rizki_commissioning_80x_DoubleMuonTag_combined -o rizki_commissioning_80x_DoubleMuonTag_merged -d rizki_datasetListForMerging_80x.txt
+
+mkdir rizki_commissioning_80x_SingleMuonTag_merged
+./mergeDatasets.py -w rizki_commissioning_80x_SingleMuonTag_combined -o rizki_commissioning_80x_SingleMuonTag_merged -d rizki_datasetListForMerging_80x.txt
+
+##QCDincl
+
+mkdir rizki_commissioning_80x_DoubleMuonTag_QCDincl_combined
+./combineOutput.py -w rizki_commissioning_80x_DoubleMuonTag_QCDincl -o rizki_commissioning_80x_DoubleMuonTag_QCDincl_combined
+
+mkdir rizki_commissioning_80x_SingleMuonTag_QCDincl_combined
+./combineOutput.py -w rizki_commissioning_80x_SingleMuonTag_QCDincl -o rizki_commissioning_80x_SingleMuonTag_QCDincl_combined
+
+mkdir rizki_commissioning_80x_DoubleMuonTag_QCDincl_merged
+./mergeDatasets.py -w rizki_commissioning_80x_DoubleMuonTag_QCDincl_combined -o rizki_commissioning_80x_DoubleMuonTag_QCDincl_merged -d rizki_datasetListForMerging_80x.txt
+
+mkdir rizki_commissioning_80x_SingleMuonTag_QCDincl_merged
+./mergeDatasets.py -w rizki_commissioning_80x_SingleMuonTag_QCDincl_combined -o rizki_commissioning_80x_SingleMuonTag_QCDincl_merged -d rizki_datasetListForMerging_80x.txt
