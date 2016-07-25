@@ -89,7 +89,7 @@ options.register('fatJetAbsEtaMax', 2.4,
     VarParsing.varType.float,
     "Maximum abs(eta)"
     )
-options.register('fatJetPtMin', 425.,
+options.register('fatJetPtMin', 350.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet Pt"
@@ -114,7 +114,7 @@ options.register('fatJetTau21Min', 0.0, #added by rizki
     VarParsing.varType.float,
     "tau2/tau1 jet substructure min cut for fat jets"
     )
-options.register('fatJetTau21Max', 0.5, #added by rizki
+options.register('fatJetTau21Max', 0.6, #added by rizki
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "tau2/tau1 jet substructure max cut for fat jets"
@@ -179,7 +179,7 @@ options.register('applySFs', False,
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('btagCSVFile', 'CSVv2.csv',
+options.register('btagCSVFile', 'CSVv2_4invfb.csv',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "CSV file containing b-tagging SFs"
@@ -199,12 +199,12 @@ options.register('btagSFType', "central",
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('FileFatJetPtWt', "FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root",
+options.register('FileFatJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/JetPtWts/FatJet_pt_all_wt.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
-options.register('FileSubJetPtWt', "SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root",
+options.register('FileSubJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/JetPtWts/SoftDropSubJet_pt_all_wt.root", 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
@@ -252,7 +252,6 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     InputTTreeEvtInfo      = cms.string('btaganaFatJets/ttree'),
     InputTTree             = cms.string('btaganaFatJets/ttree'),
     InputFiles             = cms.vstring(FileNames),
-    #InputFiles             = cms.vstring(FileNames_QCD_Pt_800to1000),
     UseFlavorCategories    = cms.bool(options.useFlavorCategories),
     UseRelaxedMuonID       = cms.bool(options.useRelaxedMuonID),
     ApplyFatJetMuonTagging = cms.bool(options.applyFatJetMuonTagging),
@@ -275,14 +274,14 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetSoftDropMassMin  = cms.double(options.fatJetSoftDropMassMin),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string('PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'),
+    File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('RunII2016_25ns_PUSpring16V1_Xsec69000nb.root'),
+    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec72450nb.root'), 
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt), 
-    Hist_FatJetPtWt        = cms.string(''),
+    Hist_FatJetPtWt        = cms.string('FatJet_pt_all_wt'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
-    Hist_SubJetPtWt        = cms.string(''),
+    Hist_SubJetPtWt        = cms.string('SoftDropSubJet_pt_all_wt'),
     FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
@@ -297,6 +296,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
       options.triggerSelection
       ),
     TriggerPathNames       = cms.vstring(
+      "HLT_BTagMu_AK8Jet300_Mu5_v", 
       "HLT_BTagMu_Jet300_Mu5_v",
       "HLT_PFJet200_v",
       "HLT_PFJet260_v",
