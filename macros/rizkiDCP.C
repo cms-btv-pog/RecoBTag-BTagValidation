@@ -54,8 +54,8 @@ TString ptcut = "300";
 //TString filename = "../test/alice_LXBatch_Templates_Double_600_merged/MuonEnrichedJets_DoubleMuonTaggedFatJets_FatJet_final_hists.root";
 
 
-TString filename = "/afs/cern.ch/user/r/rsyarif/public/alice_LXBatch_Templates_SingleMu_ALLpt_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
-//TString filename = "/afs/cern.ch/user/r/rsyarif/public/alice_LXBatch_Templates_Double_ALLpt_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
+//TString filename = "/afs/cern.ch/user/r/rsyarif/public/alice_LXBatch_Templates_SingleMu_ALLpt_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
+TString filename = "/afs/cern.ch/user/r/rsyarif/public/alice_LXBatch_Templates_Double_ALLpt_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
 //TString filename = "../test/alice_LXBatch_Templates_Single_ptbinned_merged/MuonEnrichedJets_MuonTaggedFatJets_FatJet_final_hists.root";
 //TString filename = "../test/alice_LXBatch_Templates_Double_600_merged/MuonEnrichedJets_DoubleMuonTaggedFatJets_FatJet_final_hists.root";
 
@@ -74,7 +74,7 @@ TString filename_ext="" ;
 // TString dir4plots = "Double_log" ;
 // TString dir4plots = "Double_linear" ;
 
-TString dir4plots = "Single_test" ;
+TString dir4plots = "Double_test" ;
 //TString dir4plots = "Single_merge" ;
 //TString dir4plots = "Double_mupt_lin";
 //TString dir4plots = "highpt";
@@ -292,7 +292,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
 
     //added by rizki - start
     
-    DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,5 ,1 ,0. ,40.);
+    DrawStacked(histoTag+"_z_ratio"           ,"#it{z} variable"                                   ,logy ,dodata ,extNorm ,5 ,1 ,0. ,40.);
     
     int trackSip_rebin = 5;
     DrawStacked(histoTag+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
@@ -305,9 +305,9 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_tau2_trackSip3dSig_1"  ,"IP Sig 2nd track of SV_{1}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
     DrawStacked(histoTag+"_tau2_trackSip3dSig_0"  ,"IP Sig 1st track of SV_{1}"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
 
-    DrawStacked(histoTag+"_trackSip2dSigAboveCharm_0"  ,"IP Sig 1st Track Above Charm"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip2dSigAboveBottom_0"  ,"IP Sig 1st Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_trackSip2dSigAboveBottom_1"  ,"IP Sig 2nd Track Above Bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_trackSip2dSigAboveCharm_0"  ,"2D SIP for first track above charm"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_trackSip2dSigAboveBottom_0"  ,"2D SIP for first track above bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_trackSip2dSigAboveBottom_1"  ,"2D SIP for second track above bottom"                          ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
 
     DrawStacked(histoTag+"_tau1_trackEtaRel_0"  ,"EtaRel 1st track for SV_{0}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
     DrawStacked(histoTag+"_tau1_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{0}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
@@ -318,16 +318,16 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,5 ,1 ,0. ,10.);
 
     DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,25.);
-    DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,4 ,1 ,0. ,4.);
+    DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} p_{T} ratio"                          ,logy ,dodata ,extNorm ,4 ,1 ,0. ,4.);
     DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,1.);
     DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,20.);
 
     DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,25.);
-    DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,4 ,1 ,0. ,4.);
+    DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} p_{T} ratio"                          ,logy ,dodata ,extNorm ,4 ,1 ,0. ,4.);
     DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,3 ,1 ,0. ,20.);
 
     DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,8.);
+    DrawStacked(histoTag+"_nSV"  ,"number of SV"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,8.);
 
     DrawStacked(histoTag+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
 //     Draw2DPlot(histoTag+"_BDTGSV_jetProba", "BDTG SV vs JP", "BDTG SV", "Jet Probability",logy,1,0); 
@@ -1014,25 +1014,31 @@ void DrawStacked(TString name,
     yaxistitle="Jets / 0.02" ; 
   }
   if (name.Contains("z_ratio") ){
-  	yaxistitle="Jets / 1.2";
+  	yaxistitle="Jets / 2";
   }
   if (name.Contains("trackSip") && !name.Contains("BDTG")){
-  	yaxistitle="Tracks / 8";
+  	yaxistitle="Tracks / 2";
   }
-  if (name.Contains("trackEtaRel") || name.Contains("vertexMass")){
-  	yaxistitle="SVs / 1";
+  if (name.Contains("trackEtaRel")){
+  	yaxistitle="SVs / 0.5";
+  }
+  if (name.Contains("vertexMass")){
+        yaxistitle="SVs / 4";
+  }
+  if (name.Contains("DoubleB")){
+        yaxistitle="AK8 jets / 0.1";
   }
   if (name.Contains("vertexEnergyRatio")){
-  	yaxistitle="SVs / 0.05";
+  	yaxistitle="SVs / 0.2";
   }
   if (name.Contains("flightDistance2dSig")){
-  	yaxistitle="SVs / 4";
+  	yaxistitle="SVs / 1";
   }
   if (name.Contains("vertexDeltaR")){
-  	yaxistitle="SVs / 0.02";
+  	yaxistitle="SVs / 0.05";
   }
   if (name.Contains("jetNTracks")){
-  	yaxistitle="Tracks / 1";
+  	yaxistitle="Tracks / 2";
   }
   if (name.Contains("_nSV")){
   	yaxistitle="SVs / 1";
@@ -1173,7 +1179,7 @@ void DrawStacked(TString name,
   histo_tot->Draw("hist");
 
   stack->Draw("histSAME");
-
+  if (log){
     if (name.Contains("DoubleB")) {
       TArrow *ar2 = new TArrow(0.3,0.6,0.3,10,0.03,"<|");
       ar2->SetAngle(20);
@@ -1187,12 +1193,21 @@ void DrawStacked(TString name,
       ar4->SetAngle(20);
       ar4->SetLineWidth(2);
       ar4->Draw();
-      l1 = new TPaveLabel(0.17,11,1.0,50,"L                     M                     T");
+      //      l1 = new TPaveLabel(0.17,5,1.0,50,"L                     M                     T");
+      TPaveLabel *l1 = new TPaveLabel(0.25,10,0.35,50,"L");
       l1->SetBorderSize(0);
       l1->SetFillColor(65);
       l1->Draw();
+      TPaveLabel *l2 = new TPaveLabel(0.55,10,0.65,50,"M");
+      l2->SetBorderSize(0);
+      l2->SetFillColor(65);
+      l2->Draw();
+      TPaveLabel *l3 = new TPaveLabel(0.85,10,0.95,50,"T");
+      l3->SetBorderSize(0);
+      l3->SetFillColor(65);
+      l3->Draw();
       }
-
+  }
   if (uncBand) histo_unc->Draw("SAMEE2");
 
   if (doData) hist_data->Draw("SAMEE1X0");
