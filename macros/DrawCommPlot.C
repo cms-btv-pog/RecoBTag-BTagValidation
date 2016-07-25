@@ -26,13 +26,13 @@
 
 using namespace std;
 
-TString ptcut = "450";
+TString ptcut = "350";
 
-TString filename    ="../test/BATCH_06June2016/Final_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/BATCH_Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedFatJet/Final_histograms_btagval.root";
 
 TString filename_ext="" ;
 
-TString dir4plots   = "Comm_InclQCD_06June2016";
+TString dir4plots   = "Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedFatJet";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -50,7 +50,7 @@ bool prunedjets= 0;
 bool logy      = 1;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
-double norm_lightjets = 1.00; //1.27 ; // used only for QCD MuEnriched.
+double norm_lightjets = 1.27 ; // used only for QCD MuEnriched.
 
 
 bool inclTTbar = 0;
@@ -429,15 +429,15 @@ void Draw(TString name, TString histotitle, bool log) {
 
   if (name=="h1_nPV") {
     hist_mc       = (TH1D*)myFile->Get("QCD__"+name+"_mc");
-    hist_data     = (TH1D*)myFile->Get("DATA__"+name+"_data");
+    hist_data     = (TH1D*)myFile->Get("Data__"+name+"_data");
   }
   else if (name=="h1_nPV_unw"){    
     hist_mc       = (TH1D*)myFile->Get("QCD__h1_nPV_mc_unw");
-    hist_data     = (TH1D*)myFile->Get("DATA__h1_nPV_data");
+    hist_data     = (TH1D*)myFile->Get("Data__h1_nPV_data");
   } 	
   else {
     hist_mc       = (TH1D*)myFile->Get("QCD__"+name);
-    hist_data     = (TH1D*)myFile->Get("DATA__"+name);
+    hist_data     = (TH1D*)myFile->Get("Data__"+name);
   }
   float scale_f = (hist_data->Integral())/(hist_mc->Integral());
   if (name=="h1_pt_hat" || "h1_pt_hat_sel") ;
@@ -603,7 +603,7 @@ void DrawStacked(TString name,
   hist_l        = (TH1D*)myFile->Get(fdir+name+"_l");
   if (inclTTbar) hist_ttbar = (TH1D*)myFile->Get("TTJets__"+name+"_mc");
   if (inclZjj)   hist_zjj   = (TH1D*)myFile->Get("ZJetsFullyHadronic__"+name+"_mc");
-  if (doData)    hist_data  = (TH1D*)myFile->Get("DATA__"+name+"_data");
+  if (doData)    hist_data  = (TH1D*)myFile->Get("Data__"+name+"_data");
 
   std::cout << " hist_b name = " << hist_b->GetName() << endl ;
 
@@ -968,10 +968,10 @@ void DrawStacked(TString name,
     else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3.0 : histo_tot->GetMaximum()*3.0) ;
   }
   else {
-    if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*5000000 : histo_tot->GetMaximum()*5000000) ;
-    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*300000 : histo_tot->GetMaximum()*300000) ;
-    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000 : histo_tot->GetMaximum()*1000000) ; 
-    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000 : histo_tot->GetMaximum()*1000000) ;
+    if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*50000000 : histo_tot->GetMaximum()*50000000) ;
+    else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3000000 : histo_tot->GetMaximum()*3000000) ;
+    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ; 
+    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ;
 
   }
   if (doData) {
@@ -1058,27 +1058,27 @@ void DrawStacked(TString name,
     else if (filename.Contains("InclusiveJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of AK8 jets}" ;
     else if (filename.Contains("InclusiveJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of AK8 jets}" ;
 
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
+    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuTaggedFatJet") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
+    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuTaggedFatJet") && filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
+    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuTaggedFatJet") && filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
 
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("FatJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Double-muon-tagged AK8 jets}" ;  
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
+    else if (filename.Contains("DoubleMuTaggedFatJet")&& filename.Contains("MuonEnrichedJets") && name.Contains("FatJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Double-muon-tagged AK8 jets}" ;  
+    else if (filename.Contains("DoubleMuTaggedFatJet")&& filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
+    else if (filename.Contains("DoubleMuTaggedFatJet")&& filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
 
     else if (filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{AK8 jets}" ;
     else if (filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Soft drop subjets of AK8 jets}" ;
     else if (filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Pruned subjets of AK8 jets}" ;
 
-    else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{Double-muon-tagged AK8 jets}" ;  
-    else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of Double-muon-tagged AK8 jets}" ;
-    else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of Double-muon-tagged AK8 jets}" ;
+    else if (filename.Contains("DoubleMuTaggedFatJet") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{Double-muon-tagged AK8 jets}" ;  
+    else if (filename.Contains("DoubleMuTaggedFatJet") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of Double-muon-tagged AK8 jets}" ;
+    else if (filename.Contains("DoubleMuTaggedFatJet") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of Double-muon-tagged AK8 jets}" ;
 
-    else if (filename.Contains("MuonTaggedFatJets") && !filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 jets}" ;  
-    else if (filename.Contains("MuonTaggedFatJets") && !filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("MuonTaggedFatJets") && !filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("SubjetMuTagged") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 soft drop subjets}" ; 
-    else if (filename.Contains("SubjetMuTagged") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 pruned subjets}" ; 
+    else if (filename.Contains("MuTaggedFatJet") && !filename.Contains("DoubleMuTaggedFatJet") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 jets}" ;  
+    else if (filename.Contains("MuTaggedFatJet") && !filename.Contains("DoubleMuTaggedFatJet") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{#splitline{Soft drop subjets of}{Muon-tagged AK8 jets}}" ;
+    else if (filename.Contains("MuTaggedFatJet") && !filename.Contains("DoubleMuTaggedFatJet") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of Muon-tagged AK8 jets}" ;
+    else if (filename.Contains("MuTaggedSJ") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 soft drop subjets}" ; 
+    else if (filename.Contains("MuTaggedSJ") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 pruned subjets}" ; 
     else {
       std::cout << " >>>> Error:Check filename = " << filename << " or name = " << name << "\n" ;
     }
@@ -1106,7 +1106,7 @@ void DrawStacked(TString name,
 
     TString jetpt="p_{T} (AK8 jets) > "+ptcut+" GeV" ; 
 
-    TLatex *tex3 = new TLatex(0.20,0.62-adjustheight,jetpt);
+    TLatex *tex3 = new TLatex(0.20,0.52-adjustheight,jetpt);
     tex3->SetNDC();
     tex3->SetTextAlign(13);
     tex3->SetTextFont(42);
@@ -1445,7 +1445,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   hist_gsplit    = (TH2D*)myFile->Get("QCD__"+name+"_bfromg");
   hist_gsplit_c    = (TH2D*)myFile->Get("QCD__"+name+"_cfromg");
   hist_l         = (TH2D*)myFile->Get("QCD__"+name+"_l");
-  hist_data      = (TH2D*)myFile->Get("DATA__"+name+"_data");
+  hist_data      = (TH2D*)myFile->Get("Data__"+name+"_data");
 
   //return ;
 
