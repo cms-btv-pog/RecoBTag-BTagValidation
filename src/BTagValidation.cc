@@ -194,6 +194,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      useFlavorCategories_;
     const bool                      useRelaxedMuonID_;
     const bool                      applyFatJetMuonTagging_;
+    const bool                      applyFatJetMuonTaggingV2_;
     const bool                      fatJetDoubleTagging_;
     const bool                      applyFatJetBTagging_;
     const bool                      fatJetDoubleBTagging_;
@@ -215,6 +216,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const double		                fatJetTau21Max_;
     const double                    SFbShift_;
     const double                    SFlShift_;
+    const double                    MuonJetPtRatio_;
     const std::vector<std::string>  triggerSelection_;
     const std::vector<std::string>  triggerPathNames_;
     const std::string               file_PVWt_ ; 
@@ -270,6 +272,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   useFlavorCategories_(iConfig.getParameter<bool>("UseFlavorCategories")),
   useRelaxedMuonID_(iConfig.getParameter<bool>("UseRelaxedMuonID")),
   applyFatJetMuonTagging_(iConfig.getParameter<bool>("ApplyFatJetMuonTagging")),
+  applyFatJetMuonTaggingV2_(iConfig.getParameter<bool>("ApplyFatJetMuonTaggingV2")),
   fatJetDoubleTagging_(iConfig.getParameter<bool>("FatJetDoubleTagging")),
   applyFatJetBTagging_(iConfig.getParameter<bool>("ApplyFatJetBTagging")),
   fatJetDoubleBTagging_(iConfig.exists("FatJetDoubleBTagging") ? iConfig.getParameter<bool>("FatJetDoubleBTagging") : fatJetDoubleTagging_ ),
@@ -291,6 +294,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetTau21Max_(iConfig.getParameter<double>("FatJetTau21Max")),
   SFbShift_(iConfig.getParameter<double>("SFbShift")),
   SFlShift_(iConfig.getParameter<double>("SFlShift")),
+  MuonJetPtRatio_(iConfig.getParameter<double>("MuonJetPtRatio")),
   triggerSelection_(iConfig.getParameter<std::vector<std::string> >("TriggerSelection")),
   triggerPathNames_(iConfig.getParameter<std::vector<std::string> >("TriggerPathNames")),
   file_PVWt_(iConfig.getParameter<std::string>("File_PVWt")),
@@ -728,7 +732,8 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_muon_Sip3d",      ";Muon 3D IP significance;;",100,-50,50);
   AddHisto(histoTag+"_muon_Sip2d",      ";Muon 2D IP significance;;",100,-50,50);
   AddHisto(histoTag+"_muon_DeltaR",     ";Muon1 #DeltaR;;",100,0,1.0); 
-  AddHisto(histoTag+"_muComb_ptRatio",  ";(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet);;",50,0,1);  
+  AddHisto(histoTag+"_muComb_ptRatio",  ";(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet);;",50,0,1);
+  AddHisto(histoTag+"_muon_ptRatio",  ";(p_{T}(#mu_{1}))/p_{T}(jet);;",50,0,1);   
 
   AddHisto(histoTag+"_sv_deltaR_jet",      ";#DeltaR(SV, jet);;",50,0.,0.5);
   AddHisto(histoTag+"_sv_deltaR_sumJet",   ";#DeltaR(SV,sumJet);;",50,0.,0.5);
@@ -898,7 +903,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //---------------------------- Start fat jet loop ---------------------------------------//
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
-          FatJetInfo.Jet_pt[iJet] > fatJetPtMax_ )                  continue; //// apply jet pT cut
+          FatJetInfo.Jet_pt[iJet] >= fatJetPtMax_ )                  continue; //// apply jet pT cut
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
       if ( FatJetInfo.Jet_looseID[iJet]==0 )                         continue; //// apply loose jet ID
       if (usePrunedSubjets_) {
@@ -925,7 +930,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         for (int iMu=0; iMu<FatJetInfo.nPFMuon; ++iMu) {
           if (FatJetInfo.PFMuon_IdxJet[iMu]==iJet ) {
             ++nmu;
-            if (passMuonSelection(iMu, FatJetInfo, iJet)) {
+            if (passMuonSelection(iMu, FatJetInfo, iJet, 0.8)) {
               if(nselmuon == 0) idxFirstMuon = iMu;
               ++nselmuon;
             }
@@ -969,19 +974,25 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       int idxMuon_inFirstSubjet = -1; //1st Muon tagged (in double muon tagged fatjets) - //added by rizki
       int idxMuon_inSecondSubjet = -1; //2nd Muon tagged (in double muon tagged fatjets) - //added by rizki
+      
+      int nselmuon_sj1 = 0, nselmuon_sj2 =0;
 
-      if ( fatJetDoubleTagging_ && SubJets.nPFMuon>0) {
+      if ( (fatJetDoubleTagging_ || applyFatJetMuonTaggingV2_) && SubJets.nPFMuon>0) {
         //// Collect all muons matched to the two subjets
         std::vector<int> selectedMuonIdx1, selectedMuonIdx2;
 
         for (int iMu=0; iMu<SubJets.nPFMuon; ++iMu) {
           if ( SubJets.PFMuon_IdxJet[iMu]==iSubJet1 ) {
-            if (passMuonSelection(iMu, SubJets, iSubJet1, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 )))
+            if (passMuonSelection(iMu, SubJets, iSubJet1, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))){
               selectedMuonIdx1.push_back(iMu);
+              nselmuon_sj1++;
+              }
           }
           if ( SubJets.PFMuon_IdxJet[iMu]==iSubJet2 ) {
-            if (passMuonSelection(iMu, SubJets, iSubJet2, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 )))
+            if (passMuonSelection(iMu, SubJets, iSubJet2, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))){
               selectedMuonIdx2.push_back(iMu);
+              nselmuon_sj2++;
+              }
           }
 
         }
@@ -1013,9 +1024,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       }
 
-      if( applyFatJetMuonTagging_ ) { //// if enabled, select muon-tagged fat jets
+      if( applyFatJetMuonTagging_ || applyFatJetMuonTaggingV2_ ) { //// if enabled, select muon-tagged fat jets
         if( fatJetDoubleTagging_ && !isDoubleMuonTagged ) continue;
         else if( !fatJetDoubleTagging_ && nselmuon==0)    continue;
+        else if( applyFatJetMuonTaggingV2_ && !fatJetDoubleTagging_ && nselmuon_sj1==0 && nselmuon_sj2==0 )    continue; //require one of the subjets has a muon
+
       }
 
       if( applyFatJetBTagging_ ) //// if enabled, select b-tagged fat jets
@@ -1961,7 +1974,7 @@ bool BTagValidation::passMuonSelection(const int muIdx, const JetInfoBranches& J
       && JetInfo.PFMuon_nOutHit[muIdx] < (useRelaxedMuonID_ ? 99 : 3) 
       && JetInfo.PFMuon_chi2Tk[muIdx] < 10 
       && JetInfo.PFMuon_chi2[muIdx] < 10  
-      && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < 0.5 )
+      && (jet.DeltaR(muon) < deltaR && muon.Pt()/jet.Pt() < MuonJetPtRatio_ )
       //&& JetInfo.PFMuon_vz[muIdx]< 2 
       //DM&& fabs(JetInfo.PFMuon_vz[muIdx]-EvtInfo.PVz) < 2.
      )
