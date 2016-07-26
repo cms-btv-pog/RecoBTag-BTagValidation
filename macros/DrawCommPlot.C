@@ -28,22 +28,22 @@ using namespace std;
 
 TString ptcut = "350";
 
-TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/BATCH_Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedFatJet/Final_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/BATCH_Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedSJ/Final_histograms_btagval.root";
 
 TString filename_ext="" ;
 
-TString dir4plots   = "Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedFatJet";
+TString dir4plots   = "Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedSJ";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
 //TString title1 = "#sqrt{s} = 13 TeV (2016)";
-TString title1 = "#sqrt{s} = 13 TeV (2016) 7.7 fb^{-1}";
+TString title1 = "7.7 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
 TString formatb=".png";
-TString formatc=".root";
+TString formatc=".C";
 
 bool bOverflow = 1;
 bool web       = 0;
