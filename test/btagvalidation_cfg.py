@@ -104,15 +104,25 @@ options.register('fatJetPtMax', 1.E6,
     VarParsing.varType.float,
     "Maximum fat jet Pt"
     )
-options.register('fatJetPrunedMassMin', 0.,
+options.register('usePrunedMass', False,
     VarParsing.multiplicity.singleton,
-    VarParsing.varType.float,
-    "Minimum fat jet softdrop mass"
+    VarParsing.varType.bool,
+    "Use pruned mass cut"
     )
-options.register('fatJetPrunedMassMax', 1.E6,
+options.register('useSoftDropMass', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use softdrop mass cut"
+    )
+options.register('fatJetGroomedMassMin', 0.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Maximum fat jet softdrop mass"
+    "Minimum fat jet softdrop/pruned mass"
+    )
+options.register('fatJetGroomedMassMax', 1.E6,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Maximum fat jet softdrop/pruned mass"
     )
 options.register('fatJetTau21Min', 0.0, #added by rizki
     VarParsing.multiplicity.singleton,
@@ -254,7 +264,7 @@ options.register('applySFs', False,
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('btagCSVFile', 'CSVv2.csv',
+options.register('btagCSVFile', 'CSVv2_4invfb.csv',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "CSV file containing b-tagging SFs"
@@ -390,12 +400,15 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
-    FatJetPrunedMassMin  = cms.double(options.fatJetPrunedMassMin),
-    File_PVWt              = cms.string('/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/hnpv_data_Run2015D_mc_RunIISpring15DR74-Asympt25ns_pvwt.root'),
-    Hist_PVWt              = cms.string('hpvwt_data_mc'),
-    File_PUDistMC          = cms.string('/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PUDistMC_2015_25ns_FallMC_matchData_PoissonOOTPU.root'),
+    UsePrunedMass       = cms.bool(options.usePrunedMass),
+    UseSoftDropMass     = cms.bool(options.useSoftDropMass),
+    FatJetGroomedMassMin  = cms.double(options.fatJetGroomedMassMin),
+    FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
+    File_PVWt              = cms.string(''),
+    Hist_PVWt              = cms.string(''),
+    File_PUDistMC          = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/RunII2015_25ns_PUXsec69000nb.root'),
+    File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec72450nb.root'), 
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
     Hist_FatJetPtWt        = cms.string('jetptweight_mc_data'),
@@ -443,6 +456,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
       options.triggerSelection
       ),
     TriggerPathNames       = cms.vstring(
+      "HLT_BTagMu_AK8Jet300_Mu5_v", 
       "HLT_BTagMu_Jet300_Mu5_v",
       "HLT_PFJet200_v",
       "HLT_PFJet260_v",

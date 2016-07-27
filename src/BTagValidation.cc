@@ -36,7 +36,7 @@ Implementation:
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -239,8 +239,10 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    fatJetPtMin_;
     const double                    fatJetPtMax_;
     const double                    fatJetAbsEtaMax_;
-    const double                    fatJetPrunedMassMin_;
-    const double                    fatJetPrunedMassMax_;
+    const bool                      usePrunedMass_ ;
+    const bool                      useSoftDropMass_ ;
+    const double                    fatJetGroomedMassMin_;
+    const double                    fatJetGroomedMassMax_;
     const double		                fatJetTau21Min_;
     const double		                fatJetTau21Max_;
     const double                    SFbShift_;
@@ -357,8 +359,10 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetPtMin_(iConfig.getParameter<double>("FatJetPtMin")),
   fatJetPtMax_(iConfig.getParameter<double>("FatJetPtMax")),
   fatJetAbsEtaMax_(iConfig.getParameter<double>("FatJetAbsEtaMax")),
-  fatJetPrunedMassMin_(iConfig.getParameter<double>("FatJetPrunedMassMin")),
-  fatJetPrunedMassMax_(iConfig.getParameter<double>("FatJetPrunedMassMax")),
+  usePrunedMass_(iConfig.getParameter<bool>("UsePrunedMass")),
+  useSoftDropMass_(iConfig.getParameter<bool>("UseSoftDropMass")), 
+  fatJetGroomedMassMin_(iConfig.getParameter<double>("FatJetGroomedMassMin")),
+  fatJetGroomedMassMax_(iConfig.getParameter<double>("FatJetGroomedMassMax")),
   fatJetTau21Min_(iConfig.getParameter<double>("FatJetTau21Min")),
   fatJetTau21Max_(iConfig.getParameter<double>("FatJetTau21Max")),
   SFbShift_(iConfig.getParameter<double>("SFbShift")),
@@ -419,8 +423,9 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doNewJEC_(iConfig.getParameter<bool>("doNewJEC")), 
   doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), 
   calib("csvv2", btagCSVFile_),  
-  reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
-//reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
+  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
+  //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
+  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
 {
   //now do what ever initialization is needed
   isData = true;
@@ -1293,15 +1298,15 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
           FatJetInfo.Jet_pt[iJet] >= fatJetPtMax_ )                  continue; //// apply jet pT cut
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
-      if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply tight jet ID
-      //  if (usePrunedSubjets_) {
-      if ( FatJetInfo.Jet_massPruned[iJet] < fatJetPrunedMassMin_ ||
-          FatJetInfo.Jet_massPruned[iJet] > fatJetPrunedMassMax_ )  continue; //// apply pruned jet mass cut
-      //}
-      // else if (useSoftDropSubjets_) {
-      // if ( FatJetInfo.Jet_massSoftDrop[iJet] < fatJetSoftDropMassMin_ ||
-      //   FatJetInfo.Jet_massSoftDrop[iJet] > fatJetSoftDropMassMax_ )  continue; //// apply softdrop jet mass cut
-      // }
+      if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply loose jet ID
+      if (usePrunedMass_) {
+        if ( FatJetInfo.Jet_massPruned[iJet] < fatJetGroomedMassMin_ ||
+            FatJetInfo.Jet_massPruned[iJet] > fatJetGroomedMassMax_ )  continue; //// apply pruned jet mass cut
+      }
+      else if (useSoftDropMass_) {
+        if ( FatJetInfo.Jet_massSoftDrop[iJet] < fatJetGroomedMassMin_ ||
+            FatJetInfo.Jet_massSoftDrop[iJet] > fatJetGroomedMassMax_ )  continue; //// apply softdrop jet mass cut
+      }
 
       //added by rizki - start
       float tau1 = FatJetInfo.Jet_tau1[iJet];
@@ -1517,7 +1522,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // -------For calculating b-fragmentation systematic
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 5){
         if (doBFrag_){
-          float sfbFrag = 1.;
+          //float sfbFrag = 1.;
           float drMin = 0.8;   
           float jPT = FatJetInfo.Jet_pt[iJet];
           float jeta = FatJetInfo.Jet_eta[iJet];
@@ -1631,7 +1636,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
           if( hasCquark )
           { 
-            bool isDplus = false, isDzero = false, isDsubs = false, isDbary = false;
+            bool isDplus = false, isDzero = false, isDsubs = false;// isDbary = false;
             for( int k=0;k<EvtInfo.nDHadrons;k++ )
             {
               double dR = reco::deltaR(EvtInfo.DHadron_eta[k], 
@@ -1643,7 +1648,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               if( abs(EvtInfo.DHadron_pdgID[k]) == 411 ) isDplus = true;
               if( abs(EvtInfo.DHadron_pdgID[k]) == 421 ) isDzero = true;
               if( abs(EvtInfo.DHadron_pdgID[k]) == 431 ) isDsubs = true;
-              if((abs(EvtInfo.DHadron_pdgID[k])/1000)%10 == 4 ) isDbary = true;
+              //if((abs(EvtInfo.DHadron_pdgID[k])/1000)%10 == 4 ) isDbary = true;  //ATTENTION! what is this? ASK ALICE/Kirill!
             }       
 
             if( isDplus ) sfC *= 1.37; // PDG2008(0.246+-0.020)
@@ -2162,83 +2167,83 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
     //// ------- start process subjets --------------
-    if( usePrunedSubjets_ || useSoftDropSubjets_ ) {
-      int nTotalFat = 0, nSharedFat = 0; // for track sharing
-
-      for(int sj=0; sj<2; ++sj) {
-        int iSubJet = SubJetInfo.Jet_nFirstSJ[iJet];
-        if( sj==1 ) iSubJet = SubJetInfo.Jet_nLastSJ[iJet];
-
-        int idxFirstMuonSubJet = -1;
-        int nselmuonSubJet = 0;
-        int nmuSubJet = 0;
-
-        if (SubJets.nPFMuon>0) {
-          for (int iMu=0; iMu<SubJets.nPFMuon; ++iMu) {
-            if (SubJets.PFMuon_IdxJet[iMu]==iSubJet ) {
-              ++nmuSubJet;
-              if (passMuonSelection(iMu, SubJets, iSubJet, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))) {
-                if(nselmuonSubJet == 0) idxFirstMuonSubJet = iMu;
-                ++nselmuonSubJet;
-              }
-            }
-          }
-        }
-
-        if(applySubJetMuonTagging_ && nselmuonSubJet==0) continue;  //// if enabled, select muon-tagged subjets
-        if(applySubJetBTagging_ && 
-            (SubJets.Jet_CombIVF[iSubJet]<=subJetBDiscrMin_ || SubJets.Jet_CombIVF[iSubJet]>subJetBDiscrMax_) 
-          ) continue;  //// if enabled, select b-tagged subjets
-
-        //// apply b-tagging scale factors
-        double wtSubJet = 1.;
-        if( applySFs_ && !isData ) {
-          if( applyFatJetBTagging_ && fatJetDoubleBTagging_ ) wtSubJet *= wtFatJet;
-          else wtSubJet *= scaleFactor(SubJets.Jet_flavour[iSubJet], SubJets.Jet_pt[iSubJet], SubJets.Jet_eta[iSubJet], (subJetBDiscrMin_>0.25));
-        }
-
-        double wtSubJetPt = 1.;
-        if (doSubJetPtReweighting_ && !isData) {
-          wtSubJetPt *= GetLumiWeightsJetPtBased(file_SubJetPtWt_, hist_SubJetPtWt_, SubJets.Jet_pt[iSubJet]) ;
-          wtSubJet *= wtSubJetPt ;
-        }
-
-        //// subjet multiplicity
-        ++nSubJet;
-
-        //// fill subjet histograms
-        h1_subjet_pt->Fill(SubJets.Jet_pt[iSubJet],wtPU*wtSubJet);
-
-        std::string sjlabel ;
-        if (usePrunedSubjets_) sjlabel = "PrunedSubJet" ;
-        else if (useSoftDropSubjets_) sjlabel = "SoftDropSubJet" ;
-        //fillJetHistos(SubJets, iSubJet, false, false ,sjlabel, nmuSubJet, nselmuonSubJet, idxFirstMuonSubJet, wtPU*wtSubJet);
-
-        //// track sharing
-        int iSubJetComp = (sj==0 ? SubJetInfo.Jet_nLastSJ[iJet] : SubJetInfo.Jet_nLastSJ[iJet]); // companion subjet index
-        int nTotal = 0, nShared = 0;
-
-        for (int iTrk=SubJets.Jet_nFirstTrack[iSubJet]; iTrk<SubJets.Jet_nLastTrack[iSubJet]; ++iTrk) {
-          if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJet], SubJets.Jet_phi[iSubJet] ) < 0.3 ) {
-            ++nTotal;
-            ++nTotalFat;
-            if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJetComp], SubJets.Jet_phi[iSubJetComp] ) < 0.3 ) {
-              ++nShared;
-              if(sj==0) ++nSharedFat;
-            }
-          }
-        }
-
-        p1_SubJetPt_TotalTracks->Fill(SubJets.Jet_pt[iSubJet], nTotal, wtPU*wtSubJet);
-        p1_SubJetPt_SharedTracks->Fill(SubJets.Jet_pt[iSubJet], nShared, wtPU*wtSubJet);
-        if( nTotal>0 ) p1_SubJetPt_SharedTracksRatio->Fill(SubJets.Jet_pt[iSubJet], double(nShared)/double(nTotal), wtPU*wtSubJet);
-      }
-
-      p1_FatJetPt_TotalTracks->Fill(FatJetInfo.Jet_pt[iJet], nTotalFat-nSharedFat, wtPU*wtFatJet);
-      p1_FatJetPt_SharedTracks->Fill(FatJetInfo.Jet_pt[iJet], nSharedFat, wtPU*wtFatJet);
-      if( nTotalFat>0 ) p1_FatJetPt_SharedTracksRatio->Fill(FatJetInfo.Jet_pt[iJet], double(nSharedFat)/double(nTotalFat-nSharedFat), wtPU*wtFatJet);
-
-    } //// ------- end process subjets --------------
+//     if( usePrunedSubjets_ || useSoftDropSubjets_ ) {
+//       int nTotalFat = 0, nSharedFat = 0; // for track sharing
+// 
+//       for(int sj=0; sj<2; ++sj) {
+//         int iSubJet = SubJetInfo.Jet_nFirstSJ[iJet];
+//         if( sj==1 ) iSubJet = SubJetInfo.Jet_nLastSJ[iJet];
+// 
+//         int idxFirstMuonSubJet = -1;
+//         int nselmuonSubJet = 0;
+//         int nmuSubJet = 0;
+// 
+//         if (SubJets.nPFMuon>0) {
+//           for (int iMu=0; iMu<SubJets.nPFMuon; ++iMu) {
+//             if (SubJets.PFMuon_IdxJet[iMu]==iSubJet ) {
+//               ++nmuSubJet;
+//               if (passMuonSelection(iMu, SubJets, iSubJet, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))) {
+//                 if(nselmuonSubJet == 0) idxFirstMuonSubJet = iMu;
+//                 ++nselmuonSubJet;
+//               }
+//             }
+//           }
+//         }
+// 
+//         if(applySubJetMuonTagging_ && nselmuonSubJet==0) continue;  //// if enabled, select muon-tagged subjets
+//         if(applySubJetBTagging_ && 
+//             (SubJets.Jet_CombIVF[iSubJet]<=subJetBDiscrMin_ || SubJets.Jet_CombIVF[iSubJet]>subJetBDiscrMax_) 
+//           ) continue;  //// if enabled, select b-tagged subjets
+// 
+//         //// apply b-tagging scale factors
+//         double wtSubJet = 1.;
+//         if( applySFs_ && !isData ) {
+//           if( applyFatJetBTagging_ && fatJetDoubleBTagging_ ) wtSubJet *= wtFatJet;
+//           else wtSubJet *= scaleFactor(SubJets.Jet_flavour[iSubJet], SubJets.Jet_pt[iSubJet], SubJets.Jet_eta[iSubJet], (subJetBDiscrMin_>0.25));
+//         }
+// 
+//         double wtSubJetPt = 1.;
+//         if (doSubJetPtReweighting_ && !isData) {
+//           wtSubJetPt *= GetLumiWeightsJetPtBased(file_SubJetPtWt_, hist_SubJetPtWt_, SubJets.Jet_pt[iSubJet]) ;
+//           wtSubJet *= wtSubJetPt ;
+//         }
+// 
+//         //// subjet multiplicity
+//         ++nSubJet;
+// 
+//         //// fill subjet histograms
+//         h1_subjet_pt->Fill(SubJets.Jet_pt[iSubJet],wtPU*wtSubJet);
+// 
+//         std::string sjlabel ;
+//         if (usePrunedSubjets_) sjlabel = "PrunedSubJet" ;
+//         else if (useSoftDropSubjets_) sjlabel = "SoftDropSubJet" ;
+//         //fillJetHistos(SubJets, iSubJet, false, false ,sjlabel, nmuSubJet, nselmuonSubJet, idxFirstMuonSubJet, wtPU*wtSubJet);
+// 
+//         //// track sharing
+//         int iSubJetComp = (sj==0 ? SubJetInfo.Jet_nLastSJ[iJet] : SubJetInfo.Jet_nLastSJ[iJet]); // companion subjet index
+//         int nTotal = 0, nShared = 0;
+// 
+//         for (int iTrk=SubJets.Jet_nFirstTrack[iSubJet]; iTrk<SubJets.Jet_nLastTrack[iSubJet]; ++iTrk) {
+//           if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJet], SubJets.Jet_phi[iSubJet] ) < 0.3 ) {
+//             ++nTotal;
+//             ++nTotalFat;
+//             if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJetComp], SubJets.Jet_phi[iSubJetComp] ) < 0.3 ) {
+//               ++nShared;
+//               if(sj==0) ++nSharedFat;
+//             }
+//           }
+//         }
+// 
+//         p1_SubJetPt_TotalTracks->Fill(SubJets.Jet_pt[iSubJet], nTotal, wtPU*wtSubJet);
+//         p1_SubJetPt_SharedTracks->Fill(SubJets.Jet_pt[iSubJet], nShared, wtPU*wtSubJet);
+//         if( nTotal>0 ) p1_SubJetPt_SharedTracksRatio->Fill(SubJets.Jet_pt[iSubJet], double(nShared)/double(nTotal), wtPU*wtSubJet);
+//       }
+// 
+//       p1_FatJetPt_TotalTracks->Fill(FatJetInfo.Jet_pt[iJet], nTotalFat-nSharedFat, wtPU*wtFatJet);
+//       p1_FatJetPt_SharedTracks->Fill(FatJetInfo.Jet_pt[iJet], nSharedFat, wtPU*wtFatJet);
+//       if( nTotalFat>0 ) p1_FatJetPt_SharedTracksRatio->Fill(FatJetInfo.Jet_pt[iJet], double(nSharedFat)/double(nTotalFat-nSharedFat), wtPU*wtFatJet);
+// 
+//     } //// ------- end process subjets --------------
     }    
 
     //----------------------------- End fat jet loop ----------------------------------------//

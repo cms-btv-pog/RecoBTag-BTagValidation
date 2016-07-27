@@ -4,6 +4,7 @@
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/ServiceRegistry"/>
 <use name="CondFormats/BTauObjects"/>
+<use name="CondTools/BTau"/>
 <use name="CondFormats/JetMETObjects"/>
 <use name="PhysicsTools/UtilAlgos"/>
 <use name="PhysicsTools/Utilities"/>
