@@ -28,13 +28,13 @@ using namespace std;
 
 TString ptcut = "450";
 
-TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_DoubleMuonTag_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_SingleMuonTag_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_DoubleMuonTag_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_SingleMuonTag_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
 
 TString filename_ext="" ;
 
-TString dir4plots   = "Comm_DoubleMuTag_MuEnrQCD_13July2016";
-// TString dir4plots   = "Comm_SingleMuTag_MuEnrQCD_13July2016";
+// TString dir4plots   = "Comm_DoubleMuTag_MuEnrQCD_13July2016";
+TString dir4plots   = "Comm_SingleMuTag_MuEnrQCD_18July2016";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -48,7 +48,7 @@ TString formatc=".root";
 
 bool bOverflow = 1;
 bool web       = 0;
-bool prunedjets= 1;
+bool prunedjets= 0;
 bool logy      = 1;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
@@ -813,7 +813,7 @@ void DrawStacked(TString name,
   }
 
   beautify(hist_c        , 8   ,1 , 1001    , 1) ;
-  beautify(hist_gsplit_c , 8   ,8 , 1001    , 1) ;
+  beautify(hist_gsplit_c , 5   ,8 , 1001    , 1) ;
   beautify(hist_b        , 2   ,1 , 1001    , 1) ;
   beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
   beautify(hist_l        , 4   ,1 , 1001    , 1) ;
@@ -891,8 +891,8 @@ void DrawStacked(TString name,
 
   THStack *stack = new THStack("stack","");
   if (inclTTbar) stack->Add(hist_ttbar);
-  stack->Add(hist_gsplit);
   stack->Add(hist_b);
+  stack->Add(hist_gsplit);
   stack->Add(hist_gsplit_c);
   stack->Add(hist_c);
   stack->Add(hist_l);
@@ -1045,7 +1045,7 @@ void DrawStacked(TString name,
   leg->AddEntry(hist_c,        "c quark"           ,         "f");
   leg->AddEntry(hist_l,        "uds quark or gluon"     ,    "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
-  //   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
+  if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
   if (inclTTbar) leg->AddEntry(hist_ttbar,    "t#bar{t}"               ,    "f");
   if (inclZjj) leg->AddEntry(hist_zjj,    "Z#rightarrowq#bar{q}"       ,    "f");
 
