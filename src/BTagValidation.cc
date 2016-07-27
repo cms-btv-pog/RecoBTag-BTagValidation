@@ -210,8 +210,10 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    fatJetPtMin_;
     const double                    fatJetPtMax_;
     const double                    fatJetAbsEtaMax_;
-    const double                    fatJetSoftDropMassMin_;
-    const double                    fatJetSoftDropMassMax_;
+    const bool                      usePrunedMass_ ;
+    const bool                      useSoftDropMass_ ;
+    const double                    fatJetGroomedMassMin_;
+    const double                    fatJetGroomedMassMax_;
     const double		                fatJetTau21Min_;
     const double		                fatJetTau21Max_;
     const double                    SFbShift_;
@@ -288,8 +290,10 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetPtMin_(iConfig.getParameter<double>("FatJetPtMin")),
   fatJetPtMax_(iConfig.getParameter<double>("FatJetPtMax")),
   fatJetAbsEtaMax_(iConfig.getParameter<double>("FatJetAbsEtaMax")),
-  fatJetSoftDropMassMin_(iConfig.getParameter<double>("FatJetSoftDropMassMin")),
-  fatJetSoftDropMassMax_(iConfig.getParameter<double>("FatJetSoftDropMassMax")),
+  usePrunedMass_(iConfig.getParameter<bool>("UsePrunedMass")),
+  useSoftDropMass_(iConfig.getParameter<bool>("UseSoftDropMass")), 
+  fatJetGroomedMassMin_(iConfig.getParameter<double>("FatJetGroomedMassMin")),
+  fatJetGroomedMassMax_(iConfig.getParameter<double>("FatJetGroomedMassMax")),
   fatJetTau21Min_(iConfig.getParameter<double>("FatJetTau21Min")),
   fatJetTau21Max_(iConfig.getParameter<double>("FatJetTau21Max")),
   SFbShift_(iConfig.getParameter<double>("SFbShift")),
@@ -881,7 +885,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
     if( !passTrigger() ) continue; //// apply trigger selection
-
+    
     h1_CutFlow->Fill(3.,wtPU); //// count events passing trigger selection
     h1_CutFlow_unw->Fill(3.);
 
@@ -906,13 +910,13 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           FatJetInfo.Jet_pt[iJet] >= fatJetPtMax_ )                  continue; //// apply jet pT cut
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
       if ( FatJetInfo.Jet_looseID[iJet]==0 )                         continue; //// apply loose jet ID
-      if (usePrunedSubjets_) {
-        if ( FatJetInfo.Jet_massPruned[iJet] < fatJetSoftDropMassMin_ ||
-            FatJetInfo.Jet_massPruned[iJet] > fatJetSoftDropMassMax_ )  continue; //// apply pruned jet mass cut
+      if (usePrunedMass_) {
+        if ( FatJetInfo.Jet_massPruned[iJet] < fatJetGroomedMassMin_ ||
+            FatJetInfo.Jet_massPruned[iJet] > fatJetGroomedMassMax_ )  continue; //// apply pruned jet mass cut
       }
-      else if (useSoftDropSubjets_) {
-        if ( FatJetInfo.Jet_massSoftDrop[iJet] < fatJetSoftDropMassMin_ ||
-            FatJetInfo.Jet_massSoftDrop[iJet] > fatJetSoftDropMassMax_ )  continue; //// apply softdrop jet mass cut
+      else if (useSoftDropMass_) {
+        if ( FatJetInfo.Jet_massSoftDrop[iJet] < fatJetGroomedMassMin_ ||
+            FatJetInfo.Jet_massSoftDrop[iJet] > fatJetGroomedMassMax_ )  continue; //// apply softdrop jet mass cut
       }
 
       //added by rizki - start

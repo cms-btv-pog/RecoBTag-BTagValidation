@@ -104,15 +104,25 @@ options.register('fatJetPtMax', 1.E6,
     VarParsing.varType.float,
     "Maximum fat jet Pt"
     )
-options.register('fatJetSoftDropMassMin', 0.,
+options.register('usePrunedMass', False,
     VarParsing.multiplicity.singleton,
-    VarParsing.varType.float,
-    "Minimum fat jet softdrop mass"
+    VarParsing.varType.bool,
+    "Use pruned mass cut"
     )
-options.register('fatJetSoftDropMassMax', 1.E6,
+options.register('useSoftDropMass', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use softdrop mass cut"
+    )
+options.register('fatJetGroomedMassMin', 0.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
-    "Maximum fat jet softdrop mass"
+    "Minimum fat jet softdrop/pruned mass"
+    )
+options.register('fatJetGroomedMassMax', 1.E6,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Maximum fat jet softdrop/pruned mass"
     )
 options.register('fatJetTau21Min', 0.0, #added by rizki
     VarParsing.multiplicity.singleton,
@@ -283,7 +293,10 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
-    FatJetSoftDropMassMin  = cms.double(options.fatJetSoftDropMassMin),
+    UsePrunedMass       = cms.bool(options.usePrunedMass),
+    UseSoftDropMass     = cms.bool(options.useSoftDropMass),
+    FatJetGroomedMassMin  = cms.double(options.fatJetGroomedMassMin),
+    FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
     File_PUDistMC          = cms.string('PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'),
@@ -294,7 +307,6 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_FatJetPtWt        = cms.string(''),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string(''),
-    FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
     FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki
@@ -310,6 +322,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
       ),
     TriggerPathNames       = cms.vstring(
       "HLT_BTagMu_Jet300_Mu5_v",
+      "HLT_BTagMu_AK8Jet300_Mu5_v",
       "HLT_PFJet200_v",
       "HLT_PFJet260_v",
       "HLT_PFJet320_v",
