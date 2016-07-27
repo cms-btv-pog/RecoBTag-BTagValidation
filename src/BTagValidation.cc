@@ -909,7 +909,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
           FatJetInfo.Jet_pt[iJet] >= fatJetPtMax_ )                  continue; //// apply jet pT cut
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
-      if ( FatJetInfo.Jet_looseID[iJet]==0 )                         continue; //// apply loose jet ID
+      if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply loose jet ID
       if (usePrunedMass_) {
         if ( FatJetInfo.Jet_massPruned[iJet] < fatJetGroomedMassMin_ ||
             FatJetInfo.Jet_massPruned[iJet] > fatJetGroomedMassMax_ )  continue; //// apply pruned jet mass cut
