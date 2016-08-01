@@ -331,7 +331,7 @@ options.register('doNewJEC', False,
     VarParsing.varType.bool,
     "Apply new JECs"
     )
-options.register('doJECUncert', True,
+options.register('doJECUncert', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Do JEC uncertainty"
@@ -428,7 +428,6 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_IPSig1stAboveBWt = cms.string('IPSig1stAboveBweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for IPSig1stAboveB reweighting.
     File_ZratioWt = cms.string(options.FileZratioWt), #added by rizki for Hbb tagger signal vs proxy studies. File for Zratio reweighting.
     Hist_ZratioWt = cms.string('Zratioweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for Zratio reweighting.
-    FatJetPrunedMassMax  = cms.double(options.fatJetPrunedMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
     FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki

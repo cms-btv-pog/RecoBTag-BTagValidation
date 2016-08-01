@@ -1245,12 +1245,12 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     h1_CutFlow->Fill(2.,wtPU); //// count all events
     h1_CutFlow_unw->Fill(2.);
 
-
     //edm::LogInfo("PUWeight") << " EvtInfo.nPUtrue: " << EvtInfo.nPUtrue << " wtPU: " << wtPU ;
 
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
     if( !passTrigger() ) continue; //// apply trigger selection
+    std::cout << "Event selection: pass Trigger "<< std::endl;
 
     h1_CutFlow->Fill(3.,wtPU); //// count events passing trigger selection
     h1_CutFlow_unw->Fill(3.);
@@ -1269,12 +1269,13 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     }
 
     if(FatJetInfo.nJet <= 0) continue; //// require at least 1 fat jet in the event
-
+    std::cout << "Event selection: pass Fatjet>0 "<< std::endl;
     int nFatJet = 0;
     int nSubJet = 0;
 
     //---------------------------- Start fat jet loop ---------------------------------------//
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
+      std::cout << "Fatjet selection: in fatjet loop, FatJetInfo.Jet_pt["<<iJet<<"] = "<< FatJetInfo.Jet_pt[iJet] << std::endl;
 
       double jetpt(FatJetInfo.Jet_pt[iJet]) ;
       double jeteta(FatJetInfo.Jet_eta[iJet]) ;
@@ -1297,8 +1298,14 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       if ( FatJetInfo.Jet_pt[iJet] < fatJetPtMin_ ||
           FatJetInfo.Jet_pt[iJet] >= fatJetPtMax_ )                  continue; //// apply jet pT cut
+      std::cout << "Fatjet selection: pass pT cut "<< std::endl;
+
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
+      std::cout << "Fatjet selection: pass eta cut "<< std::endl;
+
       if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply loose jet ID
+      std::cout << "Fatjet selection: pass jet tight ID "<< std::endl;
+
       if (usePrunedMass_) {
         if ( FatJetInfo.Jet_massPruned[iJet] < fatJetGroomedMassMin_ ||
             FatJetInfo.Jet_massPruned[iJet] > fatJetGroomedMassMax_ )  continue; //// apply pruned jet mass cut
@@ -1307,12 +1314,14 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if ( FatJetInfo.Jet_massSoftDrop[iJet] < fatJetGroomedMassMin_ ||
             FatJetInfo.Jet_massSoftDrop[iJet] > fatJetGroomedMassMax_ )  continue; //// apply softdrop jet mass cut
       }
+      std::cout << "Fatjet selection: pass groomed mass cut "<< std::endl;
 
       //added by rizki - start
       float tau1 = FatJetInfo.Jet_tau1[iJet];
       float tau2 = FatJetInfo.Jet_tau2[iJet];
       float tau21 = (tau1!=0 ? tau2/tau1 : 0.);
       if ( tau21 > fatJetTau21Max_ ||tau21 < fatJetTau21Min_ ) continue ; ////apply jet substructure tau21 cut.
+      std::cout << "Fatjet selection: pass tau2/tau1 cut "<< std::endl;
       //added by rizki - end
 
       int idxFirstMuon = -1;
@@ -1343,6 +1352,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //// If  processing subjets, discard fat jet with any one subjet having pt = 0
       if( (usePrunedSubjets_ || useSoftDropSubjets_)
           && (SubJets.Jet_pt[iSubJet1]==0. || SubJets.Jet_pt[iSubJet2]==0.) ) continue;
+      std::cout << "Fatjet selection: pass eta cut "<< std::endl;
 
       TLorentzVector subjet1_p4, subjet2_p4;
       subjet1_p4.SetPtEtaPhiM(SubJets.Jet_pt[iSubJet1], SubJets.Jet_eta[iSubJet1], SubJets.Jet_phi[iSubJet1], SubJets.Jet_mass[iSubJet1]);
@@ -1362,6 +1372,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //// If processing subjets, skip infrared unsafe configurations
       if( (usePrunedSubjets_ || useSoftDropSubjets_)
           && subjet_dR < (FatJetInfo.Jet_mass[iJet]/FatJetInfo.Jet_pt[iJet]) ) continue;
+      std::cout << "Fatjet selection: pass infrared unsafe config "<< std::endl;
 
       bool isDoubleMuonTagged = false;
 
@@ -1426,6 +1437,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         else if( applyFatJetMuonTaggingV2_ && !fatJetDoubleTagging_ && nselmuon_sj1==0 && nselmuon_sj2==0 )    continue; //require one of the subjets has a muon
 
       }
+      std::cout << "Fatjet selection: pass muon tagging "<< std::endl;
 
       if( applyFatJetBTagging_ ) //// if enabled, select b-tagged fat jets
       {
