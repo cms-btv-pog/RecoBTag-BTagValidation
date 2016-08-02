@@ -1,0 +1,1 @@
+python systematicsMerge.py -w rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_merged/ -d alice_systList.txt -o TEMP/
