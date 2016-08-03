@@ -1303,7 +1303,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
       std::cout << "Fatjet selection: pass eta cut "<< std::endl;
 
-      if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply loose jet ID
+      if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply tight/loose jet ID
       std::cout << "Fatjet selection: pass jet tight ID "<< std::endl;
 
       if (usePrunedMass_) {
