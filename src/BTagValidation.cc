@@ -113,15 +113,15 @@ class BTagValidation : public edm::EDAnalyzer {
     double scaleFactorUDSG_CSVM(const double jetPt, const double jetEta);
 
     double GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) ; 
-    double GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
-    double GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
-    double GetLumiWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) ;
-    double GetLumiWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) ;
-    double GetLumiWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) ;
-    double GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) ;
-    double GetLumiWeightsZratioBased (const std::string file, const std::string hist, const double ratio) ;
+    double GetWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
+    double GetWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) ;
+    double GetWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) ;
+    double GetWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) ;
+    double GetWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) ;
+    double GetWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) ;
+    double GetWeightsZratioBased (const std::string file, const std::string hist, const double ratio) ;
 
-    double GetLumiWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) ;
+    double GetWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) ;
 
     void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ; 
     void GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ; 
@@ -1470,25 +1470,25 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
       edm::LogInfo("Check") << " doFatJetPtReweighting_ = " << doFatJetPtReweighting_ << ",!isData = " << !isData ;
       if (doFatJetPtReweighting_ && !isData) { //original UNCOMMENT!
-        wtJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
+        wtJetPt *= GetWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
         edm::LogInfo("jetPtWt") << " jetPtWt = " << wtJetPt ;
         wtFatJet *= wtJetPt ;
       }
       if (doNtracksReweighting_ && !isData) {
-        wtJetPt *= GetLumiWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
+        wtJetPt *= GetWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
         wtFatJet *= wtJetPt ;
       }
       //added by Rizki - subjet_ptBalance reweighting factor
       double wtSubJetPtBalance = 1.;
       if (doSubJetPtBalanceReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-        wtSubJetPtBalance *= GetLumiWeightsSubJetPtBalanceBased(file_SubJetPtBalanceWt_, hist_SubJetPtBalanceWt_, SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]) ) ;
+        wtSubJetPtBalance *= GetWeightsSubJetPtBalanceBased(file_SubJetPtBalanceWt_, hist_SubJetPtBalanceWt_, SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]) ) ;
         wtFatJet *= wtSubJetPtBalance ;
       }
       //added by Rizki - mass reweighting factor
       double wtMassSoftDrop = 1.;
       double wtMassSoftDrop_unw = 1.;
       if (doMassSoftDropReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-        wtMassSoftDrop *= GetLumiWeightsMassSoftDropBased(file_MassSoftDropWt_, hist_MassSoftDropWt_, FatJetInfo.Jet_massSoftDrop[iJet] ) ;
+        wtMassSoftDrop *= GetWeightsMassSoftDropBased(file_MassSoftDropWt_, hist_MassSoftDropWt_, FatJetInfo.Jet_massSoftDrop[iJet] ) ;
         wtMassSoftDrop_unw = wtFatJet;
         wtFatJet *= wtMassSoftDrop ;
       }
@@ -1497,7 +1497,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double wtJetNTracks = 1.;
       double wtJetNTracks_unw = 1.;
       if (doJetNTracksReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-        wtJetNTracks *= GetLumiWeightsJetNTracksBased(file_JetNTracksWt_, hist_JetNTracksWt_, FatJetInfo.TagVarCSV_jetNTracks[iJet] ) ;
+        wtJetNTracks *= GetWeightsJetNTracksBased(file_JetNTracksWt_, hist_JetNTracksWt_, FatJetInfo.TagVarCSV_jetNTracks[iJet] ) ;
         wtJetNTracks_unw = wtFatJet;
         wtFatJet *= wtJetNTracks ;
       }
@@ -1506,7 +1506,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double wtSV1EnergyRatio = 1.;
       double wtSV1EnergyRatio_unw = 1.;
       if (doSV1EnergyRatioReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-        wtSV1EnergyRatio *= GetLumiWeightsSV1EnergyRatioBased(file_SV1EnergyRatioWt_, hist_SV1EnergyRatioWt_, FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] ) ;
+        wtSV1EnergyRatio *= GetWeightsSV1EnergyRatioBased(file_SV1EnergyRatioWt_, hist_SV1EnergyRatioWt_, FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] ) ;
         wtSV1EnergyRatio_unw = wtFatJet;
         wtFatJet *= wtSV1EnergyRatio ;
       }
@@ -1515,7 +1515,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double wtIPSig1stAboveB = 1.;
       double wtIPSig1stAboveB_unw = 1.;
       if (doIPSig1stAboveBReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-        wtIPSig1stAboveB *= GetLumiWeightsIPSig1stAboveBBased(file_IPSig1stAboveBWt_, hist_IPSig1stAboveBWt_, FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] ) ;
+        wtIPSig1stAboveB *= GetWeightsIPSig1stAboveBBased(file_IPSig1stAboveBWt_, hist_IPSig1stAboveBWt_, FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] ) ;
         wtIPSig1stAboveB_unw = wtFatJet;
         wtFatJet *= wtIPSig1stAboveB ;
       }
@@ -1524,7 +1524,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double wtZratio = 1.;
       double wtZratio_unw = 1.;
       if (doZratioReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-        wtZratio *= GetLumiWeightsZratioBased(file_ZratioWt_, hist_ZratioWt_, FatJetInfo.Jet_z_ratio[iJet] ) ;
+        wtZratio *= GetWeightsZratioBased(file_ZratioWt_, hist_ZratioWt_, FatJetInfo.Jet_z_ratio[iJet] ) ;
         wtZratio_unw = wtFatJet;
         wtFatJet *= wtZratio ;
       }
@@ -2216,7 +2216,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 // 
 //         double wtSubJetPt = 1.;
 //         if (doSubJetPtReweighting_ && !isData) {
-//           wtSubJetPt *= GetLumiWeightsJetPtBased(file_SubJetPtWt_, hist_SubJetPtWt_, SubJets.Jet_pt[iSubJet]) ;
+//           wtSubJetPt *= GetWeightsJetPtBased(file_SubJetPtWt_, hist_SubJetPtWt_, SubJets.Jet_pt[iSubJet]) ;
 //           wtSubJet *= wtSubJetPt ;
 //         }
 // 
@@ -3026,7 +3026,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   // ----For calculating MC event weight for reweighting to the jetPt distribution in the data (or signal, depending)
-  double BTagValidation::GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) {
+  double BTagValidation::GetWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) {
     double wtPt(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3038,7 +3038,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   // ----For calculating MC event weight for reweighting to the ntracks distribution in data
-  double BTagValidation::GetLumiWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) {
+  double BTagValidation::GetWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) {
     double wtPt(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3050,7 +3050,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   // ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
-  double BTagValidation::GetLumiWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) {
+  double BTagValidation::GetWeightsSubJetPtBalanceBased (const std::string file, const std::string hist, const double jetptbalance) {
     double wtPtbalance(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3062,7 +3062,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   // ----For calculating bkg MC event weight for reweighting to the mass distribution in signal MC
-  double BTagValidation::GetLumiWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) {
+  double BTagValidation::GetWeightsMassSoftDropBased (const std::string file, const std::string hist, const double jetmass) {
     double wtMass(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3075,7 +3075,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
   // ----For calculating bkg MC event weight for reweighting to the jetNTracks distribution in signal MC
-  double BTagValidation::GetLumiWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) {
+  double BTagValidation::GetWeightsJetNTracksBased (const std::string file, const std::string hist, const double jetNTracks) {
     double wtNTracks(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3087,7 +3087,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   // ----For calculating bkg MC event weight for reweighting to the IPSig1stAboveB distribution in signal MC
-  double BTagValidation::GetLumiWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) {
+  double BTagValidation::GetWeightsIPSig1stAboveBBased (const std::string file, const std::string hist, const double IPSig) {
     double wtIPSig(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3099,7 +3099,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   // ----For calculating bkg MC event weight for reweighting to the Zratio distribution in signal MC
-  double BTagValidation::GetLumiWeightsZratioBased (const std::string file, const std::string hist, const double ratio) {
+  double BTagValidation::GetWeightsZratioBased (const std::string file, const std::string hist, const double ratio) {
     double wtRatio(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
@@ -3112,7 +3112,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
   // ----For calculating MC event weight for reweighting to the subjetPtBalance distribution in the data
-  double BTagValidation::GetLumiWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) {
+  double BTagValidation::GetWeightsSV1EnergyRatioBased (const std::string file, const std::string hist, const double ratio) {
     double wtRatio(1) ;
     TFile* f = new TFile(file.c_str()) ;
     TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
