@@ -28,11 +28,13 @@ using namespace std;
 
 TString ptcut = "350";
 
-TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/BATCH_Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedSJ/Final_histograms_btagval.root";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_DoubleMuonTag_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_SingleMuonTag_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
 
 TString filename_ext="" ;
 
-TString dir4plots   = "Run2016JPcalibMC_7p7fbinv_MuEnrichedJetPtWted_AK8Pt350_CommissioningMuTaggedSJ";
+// TString dir4plots   = "Comm_DoubleMuTag_MuEnrQCD_13July2016";
+TString dir4plots   = "Comm_SingleMuTag_MuEnrQCD_18July2016";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -811,7 +813,7 @@ void DrawStacked(TString name,
   }
 
   beautify(hist_c        , 8   ,1 , 1001    , 1) ;
-  beautify(hist_gsplit_c , 8   ,8 , 1001    , 1) ;
+  beautify(hist_gsplit_c , 5   ,8 , 1001    , 1) ;
   beautify(hist_b        , 2   ,1 , 1001    , 1) ;
   beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
   beautify(hist_l        , 4   ,1 , 1001    , 1) ;
@@ -1043,7 +1045,7 @@ void DrawStacked(TString name,
   leg->AddEntry(hist_c,        "c"           ,         "f");
   leg->AddEntry(hist_l,        "udsg"     ,    "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
-  //   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
+  if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
   if (inclTTbar) leg->AddEntry(hist_ttbar,    "t#bar{t}"               ,    "f");
   if (inclZjj) leg->AddEntry(hist_zjj,    "Z#rightarrowq#bar{q}"       ,    "f");
 
