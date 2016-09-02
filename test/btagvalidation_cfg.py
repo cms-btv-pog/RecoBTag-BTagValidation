@@ -94,7 +94,7 @@ options.register('fatJetAbsEtaMax', 2.4,
     VarParsing.varType.float,
     "Maximum abs(eta)"
     )
-options.register('fatJetPtMin', 350.,
+options.register('fatJetPtMin', 450.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet Pt"
@@ -287,7 +287,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_PVWt              = cms.string(''),
     File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec72450nb.root'), 
+    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDist/RunII2016_25ns_PUSpring16V1_Xsec69200nb.root'), 
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt), 
     Hist_FatJetPtWt        = cms.string('FatJet_pt_all_wt'),
