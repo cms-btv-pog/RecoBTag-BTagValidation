@@ -179,6 +179,11 @@ options.register('doPUReweightingOfficial', False,
     VarParsing.varType.bool,
     "Do pileup reweighting"
     )
+options.register('FilePUDistData', '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V3_Xsec69200nb.root',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File for data/MC weights for PU reweight (official)"
+    )
 options.register('doPUReweightingNPV', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -406,9 +411,13 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
+    File_PUDistMC          = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec72450nb.root'), 
+#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V2_Xsec69200nb.root'), #some lumi sections were missing?
+#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec69200nb.root'), #devdatta's file
+#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V3_Xsec69200nb.root'), #reproduce again, the missing lumis are not missing anymore?
+#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec62000nb.root'), #use different minbias xsec.
+    File_PUDistData        = cms.string(options.FilePUDistData),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
     Hist_FatJetPtWt        = cms.string('jetptweight_mc_data'),
