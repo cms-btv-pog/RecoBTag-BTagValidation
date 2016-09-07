@@ -1568,6 +1568,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           //wtFatJet *= scaleFactor(FatJetInfo.Jet_flavour[iJet], FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], (fatJetBDiscrCut_>0.25));
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]); 
       }
+
       //added by Erich - jetPt reweighting factor
       double wtJetPt = 1.;
       //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
@@ -1577,16 +1578,19 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         edm::LogInfo("jetPtWt") << " jetPtWt = " << wtJetPt ;
         wtFatJet *= wtJetPt ;
       }
+
       if (doNtracksReweighting_ && !isData) {
         wtJetPt *= GetWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
         wtFatJet *= wtJetPt ;
       }
+
       //added by Rizki - subjet_ptBalance reweighting factor
       double wtSubJetPtBalance = 1.;
       if (doSubJetPtBalanceReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
         wtSubJetPtBalance *= GetWeightsSubJetPtBalanceBased(file_SubJetPtBalanceWt_, hist_SubJetPtBalanceWt_, SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]) ) ;
         wtFatJet *= wtSubJetPtBalance ;
       }
+
       //added by Rizki - mass reweighting factor
       double wtMassSoftDrop = 1.;
       double wtMassSoftDrop_unw = 1.;
@@ -1595,7 +1599,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtMassSoftDrop_unw = wtFatJet;
         wtFatJet *= wtMassSoftDrop ;
       }
-      //       edm::LogInfo("MassSoftDropReweighting") << "massSoftDrop = " << FatJetInfo.Jet_massSoftDrop[iJet] << ", wtMassSoftDrop = " << wtMassSoftDrop ;
+      // edm::LogInfo("MassSoftDropReweighting") << "massSoftDrop = " << FatJetInfo.Jet_massSoftDrop[iJet] << ", wtMassSoftDrop = " << wtMassSoftDrop ;
+
       //added by Rizki - jetNTracks reweighting factor
       double wtJetNTracks = 1.;
       double wtJetNTracks_unw = 1.;
@@ -1604,7 +1609,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtJetNTracks_unw = wtFatJet;
         wtFatJet *= wtJetNTracks ;
       }
-      //       edm::LogInfo("JetNTracksReweighting") << "JetNTracks = " << FatJetInfo.TagVarCSV_jetNTracks[iJet] << ", wtJetNTracks = " << wtJetNTracks ;
+      // edm::LogInfo("JetNTracksReweighting") << "JetNTracks = " << FatJetInfo.TagVarCSV_jetNTracks[iJet] << ", wtJetNTracks = " << wtJetNTracks ;
+
       //added by Rizki - SV1EnergyRatio reweighting factor
       double wtSV1EnergyRatio = 1.;
       double wtSV1EnergyRatio_unw = 1.;
@@ -1613,7 +1619,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtSV1EnergyRatio_unw = wtFatJet;
         wtFatJet *= wtSV1EnergyRatio ;
       }
-      //       edm::LogInfo("SV1EnergyRatioReweighting") << "SV1 Energy ratio = " << FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] << ", wtSV1EnergyRatio = " << wtSV1EnergyRatio ;
+      // edm::LogInfo("SV1EnergyRatioReweighting") << "SV1 Energy ratio = " << FatJetInfo.Jet_tau1_vertexEnergyRatio[iJet] << ", wtSV1EnergyRatio = " << wtSV1EnergyRatio ;
+
       //added by Rizki - IPSig1stAboveB reweighting factor
       double wtIPSig1stAboveB = 1.;
       double wtIPSig1stAboveB_unw = 1.;
@@ -1622,7 +1629,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtIPSig1stAboveB_unw = wtFatJet;
         wtFatJet *= wtIPSig1stAboveB ;
       }
-      //       edm::LogInfo("IPSig1stAboveBReweighting") << "IPSig1stAboveB = " << FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] << ", wtIPSig1stAboveB = " << wtIPSig1stAboveB ;
+      // edm::LogInfo("IPSig1stAboveBReweighting") << "IPSig1stAboveB = " << FatJetInfo.Jet_trackSip2dSigAboveBottom_0[iJet] << ", wtIPSig1stAboveB = " << wtIPSig1stAboveB ;
+
       //added by Rizki - zRatio reweighting factor
       double wtZratio = 1.;
       double wtZratio_unw = 1.;
@@ -1631,7 +1639,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtZratio_unw = wtFatJet;
         wtFatJet *= wtZratio ;
       }
-      edm::LogInfo("ZratioReweighting") << "Zratio = " << FatJetInfo.Jet_z_ratio[iJet] << ", wtZratio = " << wtZratio ;
+      // edm::LogInfo("ZratioReweighting") << "Zratio = " << FatJetInfo.Jet_z_ratio[iJet] << ", wtZratio = " << wtZratio ;
 
 
       // -------For calculating b-fragmentation systematic

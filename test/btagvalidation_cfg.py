@@ -242,17 +242,17 @@ options.register('doSubJetPtBalanceReweighting', False,
 options.register('doMassSoftDropReweighting', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'Do mass soft drop reweighting'
+    'Do soft drop reweighting'
     )
 options.register('doJetNTracksReweighting', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'Do mass jetNTracks reweighting'
+    'Do jetNTracks reweighting'
     )
 options.register('doSV1EnergyRatioReweighting', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    'Do mass SV1 energy ratio reweighting'
+    'Do SV1 energy ratio reweighting'
     )
 options.register('doIPSig1stAboveBReweighting', False,
     VarParsing.multiplicity.singleton,
