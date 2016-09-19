@@ -265,6 +265,10 @@ process.TFileService = cms.Service("TFileService",
     )
 
 from inputFiles_cfi import *
+from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
+
+print bTagAnalyzerCommon.TriggerPathNames 
+
 process.btagval = cms.EDAnalyzer('BTagValidation',
     MaxEvents              = cms.int32(options.maxEvents),
     ReportEvery            = cms.int32(options.reportEvery),
@@ -319,17 +323,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
       options.triggerSelection
       ),
-    TriggerPathNames       = cms.vstring(
-      "HLT_BTagMu_AK8Jet300_Mu5_v", 
-      "HLT_BTagMu_Jet300_Mu5_v",
-      "HLT_BTagMu_AK8Jet300_Mu5_v",
-      "HLT_PFJet200_v",
-      "HLT_PFJet260_v",
-      "HLT_PFJet320_v",
-      "HLT_PFJet400_v",
-      "HLT_PFJet450_v",
-      "HLT_PFJet500_v",
-      ),
+    TriggerPathNames       = bTagAnalyzerCommon.TriggerPathNames,
     ApplySFs               = cms.bool(options.applySFs),
     btagCSVFile            = cms.string(options.btagCSVFile),
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),

@@ -1949,10 +1949,13 @@ bool BTagValidation::passTrigger() {
       std::vector<std::string>::const_iterator it ;
       for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
         if ( it->find(trigpath) < std::string::npos ) {
-          //int triggerIdx = ( it - triggerPathNames_.begin() );
-          //int bitIdx = int(triggerIdx/32);
-          ret = true;
-          break;
+          int triggerIdx = ( it - triggerPathNames_.begin() );
+          int bitIdx = int(triggerIdx/32);
+          if ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) {
+            //std::cout << " fired trigger " << *it << std::endl;
+            ret = true;
+            break;
+          }
         }
       }
     }
