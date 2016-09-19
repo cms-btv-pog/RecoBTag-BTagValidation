@@ -3039,26 +3039,29 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   // ------------------------------------------------------------------------------
   bool BTagValidation::passTrigger() {
-    bool ret = false;
+  bool ret = false;
 
-    if(triggerSelection_.size()==0) ret = true;
-    else {
-      for(unsigned i=0; i<triggerSelection_.size(); ++i) {
-        std::string trigpath = triggerSelection_.at(i) ; 
-        std::vector<std::string>::const_iterator it ;
-        for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
-          if ( it->find(trigpath) < std::string::npos ) {
-            //int triggerIdx = ( it - triggerPathNames_.begin() );
-            //int bitIdx = int(triggerIdx/32);
+  if(triggerSelection_.size()==0) ret = true;
+  else {
+    for(unsigned i=0; i<triggerSelection_.size(); ++i) {
+      std::string trigpath = triggerSelection_.at(i) ; 
+      std::vector<std::string>::const_iterator it ;
+      for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
+        if ( it->find(trigpath) < std::string::npos ) {
+          int triggerIdx = ( it - triggerPathNames_.begin() );
+          int bitIdx = int(triggerIdx/32);
+          if ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) {
+            //std::cout << " fired trigger " << *it << std::endl;
             ret = true;
             break;
           }
         }
       }
     }
-
-    return ret;
   }
+
+  return ret;
+}
 
   // ------------------------------------------------------------------------------
   bool BTagValidation::passMuonSelection(const int muIdx, const JetInfoBranches& JetInfo, const int iJet, const double deltaR) {
