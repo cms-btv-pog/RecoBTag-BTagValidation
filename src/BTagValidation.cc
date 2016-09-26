@@ -2645,7 +2645,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     ptbinsHigh[3] = 2000.;
     ptbinsHigh[4] = 400.;
 
-    //nominal
+	//Double B
+    if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_DoubleB_pt0", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
+    else if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_DoubleB_pt1", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-500
+    else if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[2] ) FillHisto(histoTag+"_DoubleB_pt2", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //500-600
+    else if ( jetpt > ptbinsLow[3] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_DoubleB_pt3", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //600-2000
+    else if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_DoubleB_pt5", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-400
+    if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_DoubleB_pt4", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-500
+    if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_DoubleB_pt6", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //500-2000
+	
+    //JP nominal
 
     if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_all_pt0", flav, isGSPbb, isGSPcc ,jetproba  ,wt); //400-450
     else if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_all_pt1", flav, isGSPbb, isGSPcc ,jetproba  ,wt); //450-500
