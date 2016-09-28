@@ -326,7 +326,7 @@ options.register('newJECPayloadNames',
     "New JEC payload names"
     ),
 options.register('jecUncPayloadName', 
-    "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_Uncertainty_AK8PFchs.txt",
+    "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/Spring16_25nsV6_MC_Uncertainty_AK8PFchs.txt",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string, 
     "JEC uncertainty payload name"
