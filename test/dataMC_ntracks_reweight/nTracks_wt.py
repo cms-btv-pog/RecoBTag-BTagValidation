@@ -3,8 +3,22 @@
 import ROOT
 
 dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/";
-fname = 'rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP'
+
+# fname = 'rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP'
+
+# fname = 'rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3'
+# f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+
+# fname = 'rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3'
+# f = dir+fname+'_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+
+# fname = 'rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300'
+# f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+
+fname = 'rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170'
 f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+
+print 'Processing file: ', f
 
 h7 = ROOT.TH1D("h7",";ntracks total QCD;;",80,-0.5,79.5)
 nTracks_data = ROOT.TH1D("nTracks_data", ";ntracks;;",80,-0.5,79.5)
