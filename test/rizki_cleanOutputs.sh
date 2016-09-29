@@ -1,59 +1,59 @@
 #!/bin/bash
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - JEC unc turned on
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - bfragdown
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - bfragup
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - CD
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - cfrag
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - K0L
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 62000 PU DataDist - nTracks
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 58900 PU DataDist - PU down
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 #nominal (BTagMu_Jet300) - #using minbias xsec 65100 PU DataDist - PU up
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300 
 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - JEC unc turned on
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - bfragdown
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - bfragup
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - CD
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - cfrag
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - K0L
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 62000 PU DataDist - nTracks
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 58900 PU DataDist - PU down
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 #nominal (BTagMu_DiJet170) - #using minbias xsec 65100 PU DataDist - PU up
-# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8DiJet170 
+# ./cleanUpOutput.py -w rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170 
 
 
 ############################################################
