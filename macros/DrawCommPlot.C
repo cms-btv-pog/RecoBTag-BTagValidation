@@ -26,21 +26,21 @@
 
 using namespace std;
 
-TString ptcut = "350";
+TString ptcut = "450";
 
 // TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_DoubleMuonTag_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
-TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_SingleMuonTag_merged/Final_MuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/BATCH_JetHT_12p9fbinv_QCTPtHatBinnedWthTrig_AK8Pt450/Final_histograms_btagval.root";
 
 TString filename_ext="" ;
 
 // TString dir4plots   = "Comm_DoubleMuTag_MuEnrQCD_13July2016";
-TString dir4plots   = "Comm_SingleMuTag_MuEnrQCD_18July2016";
+TString dir4plots   = "Comm_JetHT_12p9fbinv_QCTPtHatBinnedWthTrig_AK8Pt450_10Oct2016";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
 //TString title1 = "#sqrt{s} = 13 TeV (2016)";
-TString title1 = "7.7 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
+TString title1 = "12.9 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
@@ -1057,9 +1057,9 @@ void DrawStacked(TString name,
 
   if (setSampleName) {
     TString sample = "";
-    if (filename.Contains("InclusiveJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{AK8 jets}" ;  
-    else if (filename.Contains("InclusiveJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of AK8 jets}" ;
-    else if (filename.Contains("InclusiveJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of AK8 jets}" ;
+    if (filename.Contains("JetHT") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{AK8 jets}" ;  
+    else if (filename.Contains("JetHT") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of AK8 jets}" ;
+    else if (filename.Contains("JetHT") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of AK8 jets}" ;
 
     else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
     else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuEnrichedJet") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
