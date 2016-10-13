@@ -89,6 +89,11 @@ options.register('useRelaxedMuonID', True,
     VarParsing.varType.bool,
     "Use relaxed muon ID"
     )
+options.register('muonPtMin', 7.,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "Minimum Muon Pt"
+    )
 options.register('fatJetAbsEtaMax', 2.4,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
@@ -406,6 +411,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetDoubleSVBDiscrMax= cms.double(options.fatJetDoubleSVBDiscrMax), 
     SubJetBDiscrMin        = cms.double(options.subJetBDiscrMin),
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
+    MuonPtMin            = cms.double(options.muonPtMin),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
     UsePrunedMass       = cms.bool(options.usePrunedMass),

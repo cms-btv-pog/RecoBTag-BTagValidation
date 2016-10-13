@@ -240,6 +240,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    fatJetDoubleSVBDiscrMax_;
     const double                    subJetBDiscrMin_;
     const double                    subJetBDiscrMax_;
+    const double                    muonPtMin_;
     const double                    fatJetPtMin_;
     const double                    fatJetPtMax_;
     const double                    fatJetAbsEtaMax_;
@@ -362,6 +363,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetDoubleSVBDiscrMax_(iConfig.getParameter<double>("FatJetDoubleSVBDiscrMax")),
   subJetBDiscrMin_(iConfig.getParameter<double>("SubJetBDiscrMin")),
   subJetBDiscrMax_(iConfig.getParameter<double>("SubJetBDiscrMax")),
+  muonPtMin_(iConfig.getParameter<double>("MuonPtMin")),
   fatJetPtMin_(iConfig.getParameter<double>("FatJetPtMin")),
   fatJetPtMax_(iConfig.getParameter<double>("FatJetPtMax")),
   fatJetAbsEtaMax_(iConfig.getParameter<double>("FatJetAbsEtaMax")),
@@ -3211,7 +3213,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     muon.SetPtEtaPhiM(JetInfo.PFMuon_pt[muIdx], JetInfo.PFMuon_eta[muIdx], JetInfo.PFMuon_phi[muIdx], 0);
 
     bool cut_mu_pass = false;
-    if (JetInfo.PFMuon_pt[muIdx] > 7 && fabs(JetInfo.PFMuon_eta[muIdx]) < 2.4 
+    if (JetInfo.PFMuon_pt[muIdx] > muonPtMin_ && fabs(JetInfo.PFMuon_eta[muIdx]) < 2.4 
         && JetInfo.PFMuon_isGlobal[muIdx] == 1 
         && JetInfo.PFMuon_nMuHit[muIdx] > 0 
         && JetInfo.PFMuon_nMatched[muIdx] > 1 
