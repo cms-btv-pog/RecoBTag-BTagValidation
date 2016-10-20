@@ -19,6 +19,11 @@ options.register('triggerSelection', '',
     VarParsing.varType.string,
     "Trigger selection"
     )
+options.register('triggerLogicIsOR', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Trigger logic: True = OR, False = AND'
+    )
 options.register('useJetProbaTree', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -473,6 +478,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
       options.triggerSelection
       ),
     TriggerPathNames       = bTagAnalyzerCommon.TriggerPathNames,
+    triggerLogicIsOR      = cms.bool(options.triggerLogicIsOR),
     ApplySFs               = cms.bool(options.applySFs),
     btagCSVFile            = cms.string(options.btagCSVFile),
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),

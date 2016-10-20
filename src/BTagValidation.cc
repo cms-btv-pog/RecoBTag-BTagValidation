@@ -167,6 +167,7 @@ class BTagValidation : public edm::EDAnalyzer {
 
     TH1D *h1_nFatJet;
     TH1D *h1_fatjet_pt;
+    TH1D *h1_leading_fatjet_pt;
 
     TH1D *h1_nSubJet;
     TH1D *h1_subjet_pt;
@@ -255,6 +256,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    MuonJetPtRatio_;
     const std::vector<std::string>  triggerSelection_;
     const std::vector<std::string>  triggerPathNames_;
+    const bool                    	triggerLogicIsOR_;
     const std::string               file_PVWt_ ; 
     const std::string               file_PUDistMC_ ;
     const std::string               file_PUDistData_ ;
@@ -378,6 +380,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   MuonJetPtRatio_(iConfig.getParameter<double>("MuonJetPtRatio")),
   triggerSelection_(iConfig.getParameter<std::vector<std::string> >("TriggerSelection")),
   triggerPathNames_(iConfig.getParameter<std::vector<std::string> >("TriggerPathNames")),
+  triggerLogicIsOR_(iConfig.getParameter<bool>("triggerLogicIsOR")),
   file_PVWt_(iConfig.getParameter<std::string>("File_PVWt")),
   file_PUDistMC_(iConfig.getParameter<std::string>("File_PUDistMC")),
   file_PUDistData_(iConfig.getParameter<std::string>("File_PUDistData")),
@@ -621,6 +624,7 @@ void BTagValidation::beginJob() {
 
   h1_nFatJet        = fs->make<TH1D>("h1_nFatJet",       ";N(AK8 jets);;",     100,0,100);
   h1_fatjet_pt      = fs->make<TH1D>("h1_fatjet_pt",     ";p_{T} (AK8 jets) [GeV];;",   PtMax/10,0,PtMax);
+  h1_leading_fatjet_pt      = fs->make<TH1D>("h1_leading_fatjet_pt",     ";p_{T} (leading AK8 jet) [GeV];;",   PtMax/10,0,PtMax);
 
   /*  hcheck_run        = fs->make<TH1D>("hcheck_run",     ";run number;;",   );
       hcheck_id         = fs->make<TH1D>("hcheck_id",     ";event number;;",   nEntries,0,nEntries);
@@ -1452,6 +1456,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
+    //std::cout << "In event loop" << std::endl;
     if( !passTrigger() ) continue; //// apply trigger selection
     std::cout << "Event selection: pass Trigger "<< std::endl;
 
@@ -1477,6 +1482,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     int nSubJet = 0;
 
     //---------------------------- Start fat jet loop ---------------------------------------//
+	bool firstJet=true;
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
       std::cout << "Fatjet selection: in fatjet loop, FatJetInfo.Jet_pt["<<iJet<<"] = "<< FatJetInfo.Jet_pt[iJet] << std::endl;
 
@@ -2210,6 +2216,13 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		}
 
 		h1_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
+		
+		if(firstJet){
+			h1_leading_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
+			std::cout<<"leading jet pT = " <<  FatJetInfo.Jet_pt[iJet] << std::endl;
+			firstJet=false;
+		}
+
 		FillHisto("FatJet_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
 		fillJetHistos(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, wtPU*wtFatJet);
 
@@ -2304,6 +2317,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //----------------------------- End fat jet loop ----------------------------------------//
 
     // fill jet multiplicity
+    std::cout << "nFatJet = " << nFatJet << std::endl;
     h1_nFatJet->Fill(nFatJet, wtPU);
     if( usePrunedSubjets_ || useSoftDropSubjets_ ) h1_nSubJet->Fill(nSubJet, wtPU);
 
@@ -3185,7 +3199,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   if(triggerSelection_.size()==0) ret = true;
   else {
+  	std::vector<bool> triggerBits;
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
+      triggerBits.push_back(false);
       std::string trigpath = triggerSelection_.at(i) ; 
       std::vector<std::string>::const_iterator it ;
       for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
@@ -3194,12 +3210,34 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           int bitIdx = int(triggerIdx/32);
           if ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) {
             //std::cout << " fired trigger " << *it << std::endl;
-            ret = true;
-            break;
+            triggerBits.at(i) = true;
+            break; 
           }
         }
       }
     }
+    
+    bool isOR = triggerLogicIsOR_; 
+    
+    for(unsigned i=0; i<triggerSelection_.size(); ++i) {
+
+    	// makes trigger logic: AND
+    	if(!triggerBits.at(i) && !isOR){
+    		ret=false;
+    		break;
+    	}
+    	else if(!isOR){
+    		ret=true;
+    	}
+
+		// makes trigger logic: OR
+    	if(triggerBits.at(i) && isOR){
+    		ret=true;
+    		break;
+    	} 
+    }
+    
+    
   }
 
   return ret;
