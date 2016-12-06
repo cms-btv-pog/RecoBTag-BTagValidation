@@ -4,6 +4,11 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 
 options = VarParsing('python')
 
+options.register('FileNames', 'FileNames',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "Name of list of input files"
+    )
 options.register('outFilename', 'bTagValPlots.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -275,7 +280,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     UseJetProbaTree        = cms.bool(options.useJetProbaTree),
     InputTTreeEvtInfo      = cms.string('btaganaFatJets/ttree'),
     InputTTree             = cms.string('btaganaFatJets/ttree'),
-    InputFiles             = cms.vstring(FileNames),
+    InputFiles             = cms.vstring(FileNames[options.FileNames]),
     UseFlavorCategories    = cms.bool(options.useFlavorCategories),
     UseRelaxedMuonID       = cms.bool(options.useRelaxedMuonID),
     ApplyFatJetMuonTagging = cms.bool(options.applyFatJetMuonTagging),
