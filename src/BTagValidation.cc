@@ -45,6 +45,7 @@ Implementation:
 
 #include <TString.h>
 #include <TChain.h>
+#include <TTree.h>
 #include <TFile.h>
 #include <TH1D.h>
 #include <TH2D.h>
@@ -121,6 +122,8 @@ class BTagValidation : public edm::EDAnalyzer {
     std::map<TString, TH2D*> HistoBtag2D_map;
 
     edm::Service<TFileService> fs;
+
+    TTree* outtree_;
 
     TH1D *h1_CutFlow;
     TH1D *h1_CutFlow_unw;
@@ -1791,6 +1794,21 @@ void BTagValidation::endJob() {
   h1_CutFlow->SetBinError(2, TMath::Sqrt(nEventsStored)); //// strictly speaking not correct since event weights not applied
   h1_CutFlow_unw->SetBinError(1, TMath::Sqrt(nEventsAll));
   h1_CutFlow_unw->SetBinError(2, TMath::Sqrt(nEventsStored));
+
+  JetTree->SetBranchStatus("*"                   ,0);
+  JetTree->SetBranchStatus("*.nJet"              ,1);
+  JetTree->SetBranchStatus("*.Jet_CombIVF"       ,1);
+  JetTree->SetBranchStatus("*.Jet_DoubleSV"      ,1);
+  JetTree->SetBranchStatus("*.Jet_pt"            ,1);
+  JetTree->SetBranchStatus("*.Jet_eta"           ,1);
+  JetTree->SetBranchStatus("*.Jet_Proba"         ,1);
+  JetTree->SetBranchStatus("*.Jet_flavour"       ,1);
+  JetTree->SetBranchStatus("*.Jet_hadronFlavour" ,1);
+  outtree_ = JetTree->CloneTree();
+  outtree_->SetName("SlimmedTree"); 
+
+  outtree_->Write();
+
 }
 
 // ------------ method called when starting to processes a run  ------------
