@@ -493,6 +493,20 @@ void BTagValidation::beginJob() {
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
 
+  JetTree->SetBranchStatus("*"                   ,0);
+  JetTree->SetBranchStatus("*.nJet"              ,1);
+  JetTree->SetBranchStatus("*.Jet_CombIVF"       ,1);
+  JetTree->SetBranchStatus("*.Jet_DoubleSV"      ,1);
+  JetTree->SetBranchStatus("*.Jet_pt"            ,1);
+  JetTree->SetBranchStatus("*.Jet_eta"           ,1);
+  JetTree->SetBranchStatus("*.Jet_Proba"         ,1);
+  JetTree->SetBranchStatus("*.Jet_flavour"       ,1);
+  JetTree->SetBranchStatus("*.Jet_hadronFlavour" ,1);
+  JetTree->SetBranchStatus("*.Jet_nbHadrons"     ,1);
+  JetTree->SetBranchStatus("*.Jet_ncHadrons"     ,1);
+  outtree_ = JetTree->CloneTree(0);
+  outtree_->SetName("SlimmedTree"); 
+
   double PtMax = 5000.;
 
   h1_CutFlow        = fs->make<TH1D>("h1_CutFlow",       "h1_CutFlow",        4,-0.5,3.5);
@@ -854,6 +868,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   using namespace edm;
 
+  JetTree->SetBranchStatus("*", 1);
+
   if(JetTree == 0 && JetTreeEvtInfo == 0) return;
 
   Long64_t nEntries = JetTree->GetEntries();
@@ -906,6 +922,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     int nFatJet = 0;
     int nSubJet = 0;
+
+    bool evtPass(0);
 
     //---------------------------- Start fat jet loop ---------------------------------------//
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
@@ -1442,18 +1460,23 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if( nTotalFat>0 ) p1_FatJetPt_SharedTracksRatio->Fill(FatJetInfo.Jet_pt[iJet], double(nSharedFat)/double(nTotalFat-nSharedFat), wtPU*wtFatJet);
 
       } //// ------- end process subjets --------------
-    }    
 
-    //----------------------------- End fat jet loop ----------------------------------------//
+      evtPass = true;
+
+    } ////----------------------------- End fat jet loop ----------------------------------------//
+
+    if ( evtPass == true ) outtree_->Fill();
 
     // fill jet multiplicity
     h1_nFatJet->Fill(nFatJet, wtPU);
     if( usePrunedSubjets_ || useSoftDropSubjets_ ) h1_nSubJet->Fill(nSubJet, wtPU);
 
-    if( !isData && nFatJet>0 ) h1_pt_hat_sel->Fill(EvtInfo.pthat,wtPU);
+    if( !isData && nFatJet>0 ) {
+      h1_pt_hat_sel->Fill(EvtInfo.pthat,wtPU);
+    }
 
-  }
-  //----------------------------- End event loop ----------------------------------------//
+  } ////----------------------------- End event loop ----------------------------------------//
+
 }
 
 // ------------------------------------------------------------------------------
@@ -1794,18 +1817,6 @@ void BTagValidation::endJob() {
   h1_CutFlow->SetBinError(2, TMath::Sqrt(nEventsStored)); //// strictly speaking not correct since event weights not applied
   h1_CutFlow_unw->SetBinError(1, TMath::Sqrt(nEventsAll));
   h1_CutFlow_unw->SetBinError(2, TMath::Sqrt(nEventsStored));
-
-  JetTree->SetBranchStatus("*"                   ,0);
-  JetTree->SetBranchStatus("*.nJet"              ,1);
-  JetTree->SetBranchStatus("*.Jet_CombIVF"       ,1);
-  JetTree->SetBranchStatus("*.Jet_DoubleSV"      ,1);
-  JetTree->SetBranchStatus("*.Jet_pt"            ,1);
-  JetTree->SetBranchStatus("*.Jet_eta"           ,1);
-  JetTree->SetBranchStatus("*.Jet_Proba"         ,1);
-  JetTree->SetBranchStatus("*.Jet_flavour"       ,1);
-  JetTree->SetBranchStatus("*.Jet_hadronFlavour" ,1);
-  outtree_ = JetTree->CloneTree();
-  outtree_->SetName("SlimmedTree"); 
 
   outtree_->Write();
 
