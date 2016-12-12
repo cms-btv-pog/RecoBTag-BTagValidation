@@ -493,19 +493,7 @@ void BTagValidation::beginJob() {
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
 
-  JetTree->SetBranchStatus("*"                   ,0);
-  JetTree->SetBranchStatus("*.nJet"              ,1);
-  JetTree->SetBranchStatus("*.Jet_CombIVF"       ,1);
-  JetTree->SetBranchStatus("*.Jet_DoubleSV"      ,1);
-  JetTree->SetBranchStatus("*.Jet_pt"            ,1);
-  JetTree->SetBranchStatus("*.Jet_eta"           ,1);
-  JetTree->SetBranchStatus("*.Jet_Proba"         ,1);
-  JetTree->SetBranchStatus("*.Jet_flavour"       ,1);
-  JetTree->SetBranchStatus("*.Jet_hadronFlavour" ,1);
-  JetTree->SetBranchStatus("*.Jet_nbHadrons"     ,1);
-  JetTree->SetBranchStatus("*.Jet_ncHadrons"     ,1);
-  outtree_ = JetTree->CloneTree(0);
-  outtree_->SetName("SlimmedTree"); 
+  outtree_ = fs->make<TTree>("SlimmedTree", "SlimmedTree") ; 
 
   double PtMax = 5000.;
 
@@ -868,12 +856,33 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   using namespace edm;
 
-  JetTree->SetBranchStatus("*", 1);
-
   if(JetTree == 0 && JetTreeEvtInfo == 0) return;
 
   Long64_t nEntries = JetTree->GetEntries();
   if(maxEvents_>=0) nEntries = maxEvents_;
+
+  int   nFatJet = 0;
+  int   nSubJet = 0;
+  float Jet_pt       [nMaxJets_];
+  float Jet_eta      [nMaxJets_];
+  int   Jet_flavour  [nMaxJets_];	
+  int   Jet_nbHadrons[nMaxJets_];
+  int   Jet_ncHadrons[nMaxJets_];
+  float Jet_Proba    [nMaxJets_];
+  float Jet_CombIVF  [nMaxJets_];
+  float Jet_DoubleSV [nMaxJets_];
+  bool  Jet_passed   [nMaxJets_];
+
+  outtree_->Branch("nFatJet"       ,&nFatJet      ,"nFatJet/I") ; 
+  outtree_->Branch("Jet_pt"        ,Jet_pt        ,"Jet_pt[nFatJet]/F");
+  outtree_->Branch("Jet_eta"       ,Jet_eta       ,"Jet_eta[nFatJet]/F");
+  outtree_->Branch("Jet_flavour"   ,Jet_flavour   ,"Jet_flavour[nFatJet]/I");
+  outtree_->Branch("Jet_nbHadrons" ,Jet_nbHadrons ,"Jet_nbHadrons[nFatJet]/I");
+  outtree_->Branch("Jet_ncHadrons" ,Jet_ncHadrons ,"Jet_ncHadrons[nFatJet]/I");
+  outtree_->Branch("Jet_Proba"     ,Jet_Proba     ,"Jet_Proba[nFatJet]/F");
+  outtree_->Branch("Jet_CombIVF"   ,Jet_CombIVF   ,"Jet_CombIVF[nFatJet]/F");
+  outtree_->Branch("Jet_DoubleSV"  ,Jet_DoubleSV  ,"Jet_DoubleSV[nFatJet]/F");
+  outtree_->Branch("Jet_passed"    ,Jet_passed    ,"Jet_passed[nFatJet]/O");
 
   //---------------------------- Start event loop ---------------------------------------//
   for(Long64_t iEntry = 0; iEntry < nEntries; ++iEntry) {
@@ -904,7 +913,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
     if( !passTrigger() ) continue; //// apply trigger selection
-    
+
     h1_CutFlow->Fill(3.,wtPU); //// count events passing trigger selection
     h1_CutFlow_unw->Fill(3.);
 
@@ -920,10 +929,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if(FatJetInfo.nJet <= 0) continue; //// require at least 1 fat jet in the event
 
-    int nFatJet = 0;
-    int nSubJet = 0;
-
-    bool evtPass(0);
+    nFatJet = 0;
+    nSubJet = 0;
 
     //---------------------------- Start fat jet loop ---------------------------------------//
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
@@ -946,7 +953,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float tau21 = (tau1!=0 ? tau2/tau1 : 0.);
       if ( tau21 > fatJetTau21Max_ ||tau21 < fatJetTau21Min_ ) continue ; ////apply jet substructure tau21 cut.
       //added by rizki - end
-
+      
       int idxFirstMuon = -1;
       int nselmuon = 0;
       int nmu = 0;
@@ -999,7 +1006,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       int idxMuon_inFirstSubjet = -1; //1st Muon tagged (in double muon tagged fatjets) - //added by rizki
       int idxMuon_inSecondSubjet = -1; //2nd Muon tagged (in double muon tagged fatjets) - //added by rizki
-      
+
       int nselmuon_sj1 = 0, nselmuon_sj2 =0;
 
       if ( (fatJetDoubleTagging_ || applyFatJetMuonTaggingV2_) && SubJets.nPFMuon>0) {
@@ -1011,13 +1018,13 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
             if (passMuonSelection(iMu, SubJets, iSubJet1, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))){
               selectedMuonIdx1.push_back(iMu);
               nselmuon_sj1++;
-              }
+            }
           }
           if ( SubJets.PFMuon_IdxJet[iMu]==iSubJet2 ) {
             if (passMuonSelection(iMu, SubJets, iSubJet2, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))){
               selectedMuonIdx2.push_back(iMu);
               nselmuon_sj2++;
-              }
+            }
           }
 
         }
@@ -1088,6 +1095,18 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtFatJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
         wtFatJet *= wtFatJetPt ;
       }
+
+      Jet_passed[iJet] = true; 
+
+      Jet_pt       [nFatJet] = FatJetInfo.Jet_pt       [iJet] ;
+      Jet_eta      [nFatJet] = FatJetInfo.Jet_eta      [iJet];
+      Jet_flavour  [nFatJet] = FatJetInfo.Jet_flavour  [iJet];  
+      Jet_nbHadrons[nFatJet] = FatJetInfo.Jet_nbHadrons[iJet];  
+      Jet_ncHadrons[nFatJet] = FatJetInfo.Jet_ncHadrons[iJet];  
+      Jet_Proba    [nFatJet] = FatJetInfo.Jet_Proba    [iJet];  
+      Jet_CombIVF  [nFatJet] = FatJetInfo.Jet_CombIVF  [iJet];  
+      Jet_DoubleSV [nFatJet] = FatJetInfo.Jet_DoubleSV [iJet];  
+      Jet_passed   [nFatJet] = Jet_passed[iJet] ; 
 
       //// fat jet multiplicity
       ++nFatJet;
@@ -1461,11 +1480,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       } //// ------- end process subjets --------------
 
-      evtPass = true;
-
     } ////----------------------------- End fat jet loop ----------------------------------------//
 
-    if ( evtPass == true ) outtree_->Fill();
+    outtree_->Fill();
 
     // fill jet multiplicity
     h1_nFatJet->Fill(nFatJet, wtPU);
@@ -1817,8 +1834,6 @@ void BTagValidation::endJob() {
   h1_CutFlow->SetBinError(2, TMath::Sqrt(nEventsStored)); //// strictly speaking not correct since event weights not applied
   h1_CutFlow_unw->SetBinError(1, TMath::Sqrt(nEventsAll));
   h1_CutFlow_unw->SetBinError(2, TMath::Sqrt(nEventsStored));
-
-  outtree_->Write();
 
 }
 
