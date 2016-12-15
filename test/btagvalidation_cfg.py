@@ -69,6 +69,36 @@ options.register('useSoftDropSubjets', False,
     VarParsing.varType.bool,
     "Process soft drop subjets"
     )
+options.register('doBFrag', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do b fragmentation reweighting'
+    )
+options.register('doBFragUp', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do b fragmentation reweighting up'
+    )
+options.register('doBFragDown', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do b fragmentation reweighting down'
+    )
+options.register('doCDFrag', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do c->D fragmentation reweighting'
+    )
+options.register('doCFrag', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do c fragmentation reweighting'
+    )
+options.register('doK0L', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do K0 and lambda reweighting'
+    )
 options.register('applySubJetMuonTagging', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -291,6 +321,12 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetDoubleSVBTagging = cms.bool(options.fatJetDoubleSVBTagging),
     UsePrunedSubjets       = cms.bool(options.usePrunedSubjets),
     UseSoftDropSubjets     = cms.bool(options.useSoftDropSubjets),
+    DoBFrag                = cms.bool(options.doBFrag),
+    DoBFragUp              = cms.bool(options.doBFragUp),
+    DoBFragDown            = cms.bool(options.doBFragDown),                                 
+    DoCDFrag               = cms.bool(options.doCDFrag),
+    DoCFrag                = cms.bool(options.doCFrag),
+    DoK0L                  = cms.bool(options.doK0L),         
     ApplySubJetMuonTagging = cms.bool(options.applySubJetMuonTagging),
     ApplySubJetBTagging    = cms.bool(options.applySubJetBTagging),
     DynamicMuonSubJetDR    = cms.bool(options.dynamicMuonSubJetDR),
@@ -301,15 +337,17 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
-    UsePrunedMass       = cms.bool(options.usePrunedMass),
-    UseSoftDropMass     = cms.bool(options.useSoftDropMass),
+    UsePrunedMass          = cms.bool(options.usePrunedMass),
+    UseSoftDropMass        = cms.bool(options.useSoftDropMass),
     FatJetGroomedMassMin  = cms.double(options.fatJetGroomedMassMin),
     FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
+    File_PUDistMC          = cms.string('PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'),
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PUDist/RunII2016_25ns_PUSpring16V1_Xsec69200nb.root'), 
+    File_PUDistData        = cms.string('RunII2016_PUXsec69000nb.root'),
+    File_PUDistDataLow     = cms.string('RunII2016_PUXsec65550nb.root'),
+    File_PUDistDataHigh    = cms.string('RunII2016_PUXsec72450nb.root'),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt), 
     Hist_FatJetPtWt        = cms.string('FatJet_pt_all_wt'),
@@ -317,17 +355,17 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_SubJetPtWt        = cms.string('SoftDropSubJet_pt_all_wt'),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
-    FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki
+FatJetAbsEtaMax            = cms.double(options.fatJetAbsEtaMax), #added by rizki
     SFbShift               = cms.double(options.SFbShift),
     SFlShift               = cms.double(options.SFlShift),
-    MuonJetPtRatio               = cms.double(options.MuonJetPtRatio),
+MuonJetPtRatio             = cms.double(options.MuonJetPtRatio),
     DoPUReweightingOfficial= cms.bool(options.doPUReweightingOfficial),
     DoPUReweightingNPV     = cms.bool(options.doPUReweightingNPV),
     DoFatJetPtReweighting  = cms.bool(options.doFatJetPtReweighting),
     DoSubJetPtReweighting  = cms.bool(options.doSubJetPtReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
-      options.triggerSelection
-      ),
+        options.triggerSelection
+        ),
     TriggerPathNames       = bTagAnalyzerCommon.TriggerPathNames,
     ApplySFs               = cms.bool(options.applySFs),
     btagCSVFile            = cms.string(options.btagCSVFile),

@@ -21,6 +21,7 @@ Implementation:
 // system include files
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -186,6 +187,8 @@ class BTagValidation : public edm::EDAnalyzer {
 
     //// Lumi reweighting object
     edm::LumiReWeighting LumiWeights_;
+    edm::LumiReWeighting LumiWeightsLow_;
+    edm::LumiReWeighting LumiWeightsHigh_;
 
     //// Configurables
     const int                       maxEvents_;
@@ -227,6 +230,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_PVWt_ ; 
     const std::string               file_PUDistMC_ ;
     const std::string               file_PUDistData_ ;
+    const std::string               file_PUDistDataLow_ ;
+    const std::string               file_PUDistDataHigh_ ;
     const std::string               file_FatJetPtWt_ ;
     const std::string               file_SubJetPtWt_ ;
     const std::string               hist_PVWt_ ; 
@@ -240,6 +245,14 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      doSubJetPtReweighting_ ;
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
+
+    const bool                      doBFrag_;
+    const bool                      doBFragUp_;
+    const bool                      doBFragDown_;
+
+    const bool                      doCDFrag_;
+    const bool                      doCFrag_;
+    const bool                      doK0L_;
 
     const bool                      applySFs_;
     const std::string               btagCSVFile_ ; 
@@ -307,6 +320,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_PVWt_(iConfig.getParameter<std::string>("File_PVWt")),
   file_PUDistMC_(iConfig.getParameter<std::string>("File_PUDistMC")),
   file_PUDistData_(iConfig.getParameter<std::string>("File_PUDistData")),
+  file_PUDistDataLow_(iConfig.getParameter<std::string>("File_PUDistDataLow")),
+  file_PUDistDataHigh_(iConfig.getParameter<std::string>("File_PUDistDataHigh")),
   file_FatJetPtWt_(iConfig.getParameter<std::string>("File_FatJetPtWt")),
   file_SubJetPtWt_(iConfig.getParameter<std::string>("File_SubJetPtWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
@@ -320,6 +335,12 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doSubJetPtReweighting_(iConfig.getParameter<bool>("DoSubJetPtReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
+  doBFrag_(iConfig.getParameter<bool>("DoBFrag")),
+  doBFragUp_(iConfig.getParameter<bool>("DoBFragUp")),
+  doBFragDown_(iConfig.getParameter<bool>("DoBFragDown")),
+  doCDFrag_(iConfig.getParameter<bool>("DoCDFrag")),
+  doCFrag_(iConfig.getParameter<bool>("DoCFrag")),
+  doK0L_(iConfig.getParameter<bool>("DoK0L")),
   applySFs_(iConfig.getParameter<bool>("ApplySFs")),
   btagCSVFile_(iConfig.getParameter<std::string>("btagCSVFile")), 
   btagOperatingPoint_(iConfig.getParameter<int>("btagOperatingPoint")), 
@@ -340,7 +361,11 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   //    BTagEntry::FLAV_B,    // btag flavour
   //    "comb") ;             // measurement type
 
-  if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
+  if (doPUReweightingOfficial_) {
+    LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
+    LumiWeightsLow_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistDataLow_ , hist_PUDistMC_, hist_PUDistData_) ;
+    LumiWeightsHigh_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistDataHigh_, hist_PUDistMC_, hist_PUDistData_) ;
+  }
 
   // Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
@@ -873,6 +898,59 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   float Jet_DoubleSV [nMaxJets_];
   bool  Jet_passed   [nMaxJets_];
 
+  float wtPU(1.) ; 
+  float wtPULow(1.) ;  
+  float wtPUHigh(1.) ; 
+
+  float wtBFragLow(1.) ;
+  float wtBFragHigh(1.) ; 
+  float wtCDFrag(1.);
+  float wtCFrag(1.);
+  float wtK0LSyst(1.);
+
+  float BTemplateCorrections[100][20][2];
+
+  if (doBFrag_) {
+
+    int nPtRelPtBins = 15;
+
+    TString PtRelPtBin[] = {
+      "Pt2030", "Pt3040", "Pt4050", "Pt5060", "Pt6070",
+      "Pt7080", "Pt80100", "Pt100120", "Pt120160", "Pt160210", 
+      "Pt210260", "Pt260320", "Pt320400", "Pt400500", "Pt500" 
+    } ; 
+
+    for( int ptb=0;ptb<nPtRelPtBins;ptb++ ) {
+
+      for(int ib=0;ib<100;ib++ ) {
+        BTemplateCorrections[ib][ptb][0] = 1.;
+        BTemplateCorrections[ib][ptb][1] = 1.;
+      }
+
+      std::ifstream MnusCorrectionsFile;
+      MnusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt");
+      while( MnusCorrectionsFile ) {
+        float xBin, efcorr;
+        MnusCorrectionsFile >> xBin >> efcorr;
+        if ( efcorr > 4. ) efcorr = 1.;
+        int ib = int(xBin/0.02);
+        BTemplateCorrections[ib][ptb][0] = efcorr;
+      }
+
+      std::ifstream PlusCorrectionsFile; 
+      PlusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt");
+      while( PlusCorrectionsFile ) {
+        float xBin, efcorr;
+        PlusCorrectionsFile >> xBin >> efcorr;
+        if ( efcorr > 4. ) efcorr = 1.;
+        int ib = int(xBin/0.02);
+        BTemplateCorrections[ib][ptb][1] = efcorr;
+      }
+
+    }
+
+  } //// doBFrag_ 
+
   outtree_->Branch("nFatJet"       ,&nFatJet      ,"nFatJet/I") ; 
   outtree_->Branch("Jet_pt"        ,Jet_pt        ,"Jet_pt[nFatJet]/F");
   outtree_->Branch("Jet_eta"       ,Jet_eta       ,"Jet_eta[nFatJet]/F");
@@ -883,6 +961,16 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   outtree_->Branch("Jet_CombIVF"   ,Jet_CombIVF   ,"Jet_CombIVF[nFatJet]/F");
   outtree_->Branch("Jet_DoubleSV"  ,Jet_DoubleSV  ,"Jet_DoubleSV[nFatJet]/F");
   outtree_->Branch("Jet_passed"    ,Jet_passed    ,"Jet_passed[nFatJet]/O");
+
+  outtree_->Branch("wtPU"          ,&wtPU         ,"wtPU/F");
+  outtree_->Branch("wtPULow"       ,&wtPULow      ,"wtPULow/F");
+  outtree_->Branch("wtPUHigh"      ,&wtPUHigh     ,"wtPUHigh/F");
+
+  outtree_->Branch("wtBFragLow"    ,&wtBFragLow   ,"wtBFragLow/F");
+  outtree_->Branch("wtBFragHigh"   ,&wtBFragHigh  ,"wtBFragHigh/F");
+  outtree_->Branch("wtCDFrag"      ,&wtCDFrag     ,"wtCDFrag/F");
+  outtree_->Branch("wtCFrag"       ,&wtCFrag      ,"wtCFrag/F");
+  outtree_->Branch("wtK0LSyst"     ,&wtK0LSyst    ,"wtK0LSyst/F");
 
   //---------------------------- Start event loop ---------------------------------------//
   for(Long64_t iEntry = 0; iEntry < nEntries; ++iEntry) {
@@ -900,9 +988,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if ( iEntry == 0) edm::LogInfo("IsMC") << ">>>>> Running on simulation\n" ;
     }
     else if( iEntry == 0 ) edm::LogInfo("IsData") << ">>>>> Running on data\n" ;
-    double wtPU = 1.;
-    if ( doPUReweightingOfficial_ && !isData )
-      wtPU *= LumiWeights_.weight(EvtInfo.nPUtrue);
+    if ( doPUReweightingOfficial_ && !isData ) {
+      wtPU = LumiWeights_.weight(EvtInfo.nPUtrue);
+      wtPULow = LumiWeightsLow_.weight(EvtInfo.nPUtrue) ;
+      wtPUHigh = LumiWeightsHigh_.weight(EvtInfo.nPUtrue) ;
+    }
     else if ( doPUReweightingNPV_ && !isData ) 
       wtPU *= GetLumiWeightsPVBased(file_PVWt_, hist_PVWt_, EvtInfo.nPV) ;  
     h1_CutFlow->Fill(2.,wtPU); //// count all events
@@ -953,7 +1043,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float tau21 = (tau1!=0 ? tau2/tau1 : 0.);
       if ( tau21 > fatJetTau21Max_ ||tau21 < fatJetTau21Min_ ) continue ; ////apply jet substructure tau21 cut.
       //added by rizki - end
-      
+
       int idxFirstMuon = -1;
       int nselmuon = 0;
       int nmu = 0;
@@ -977,7 +1067,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       int iSubJet1 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]] ; //added by rizki
       int iSubJet2 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]+1] ; //added by rizki
-
 
       //// If  processing subjets, discard fat jet with any one subjet having pt = 0
       if( (usePrunedSubjets_ || useSoftDropSubjets_)
@@ -1107,6 +1196,148 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       Jet_CombIVF  [nFatJet] = FatJetInfo.Jet_CombIVF  [iJet];  
       Jet_DoubleSV [nFatJet] = FatJetInfo.Jet_DoubleSV [iJet];  
       Jet_passed   [nFatJet] = Jet_passed[iJet] ; 
+
+      //// B frag wts
+      if (doBFrag_ && abs(FatJetInfo.Jet_flavour[iJet]) == 5) {
+        //float sfbFrag = 1.;
+        float drMin = 0.8;   
+        float jPT = FatJetInfo.Jet_pt[iJet];
+        float jeta = FatJetInfo.Jet_eta[iJet];
+        float jphi = FatJetInfo.Jet_phi[iJet];
+        float EnergyFraction = 0.; 
+        int iB = -1, iptBin = 0, efbin = -1;
+        if( jPT > 500 ) iptBin = 14;
+        else if( jPT > 400 ) iptBin = 13;
+        else if( jPT > 320 ) iptBin = 12;  
+        else if( jPT > 260 ) iptBin = 11;
+        else if( jPT > 210 ) iptBin = 10;
+        else if( jPT > 160 ) iptBin =  9;
+        else if( jPT > 120 ) iptBin =  8;  
+        else if( jPT > 100 ) iptBin =  7;  
+        else if( jPT >  80 ) iptBin =  6;  
+        else if( jPT >  70 ) iptBin =  5;  
+        else if( jPT >  60 ) iptBin =  4;  
+        else if( jPT >  50 ) iptBin =  3;  
+        else if( jPT >  40 ) iptBin =  2;  
+        else if( jPT >  30 ) iptBin =  1;  
+        else                 iptBin =  0;
+
+        float B_Mass = 0.;
+        for( int ib=0;ib<EvtInfo.nBHadrons;ib++ ) {
+          float drB = reco::deltaR(jeta,jphi,EvtInfo.BHadron_eta[ib],EvtInfo.BHadron_phi[ib]);
+          if( drB < drMin ) {
+            if( EvtInfo.BHadron_mass[ib] > B_Mass ) {
+              B_Mass = EvtInfo.BHadron_mass[ib];
+              iB = ib;
+            } 
+          }    
+        }
+
+        if( iB >= 0 ) {
+          EnergyFraction = EvtInfo.BHadron_pT[iB]/FatJetInfo.Jet_genpt[iJet];
+          efbin = int( EnergyFraction / 0.02 );
+          if( efbin >= 0 && efbin < 100 ) {
+            wtBFragLow = BTemplateCorrections[efbin][iptBin][0];
+            wtBFragHigh = BTemplateCorrections[efbin][iptBin][1];
+          }    
+        }
+
+      } //// if doBFrag_ and jet flavour == 5
+
+      ////cd Frag Systematic
+      if ( doCDFrag_ && (abs(FatJetInfo.Jet_flavour[iJet]) == 5 || abs(FatJetInfo.Jet_flavour[iJet]) == 4) ) {
+        float drMin = 0.8;   
+        float jeta = FatJetInfo.Jet_eta[iJet];
+        float jphi = FatJetInfo.Jet_phi[iJet];   
+        bool isDplusMu = false, isDzeroMu = false, isDsubsMu = false;
+
+        int ndaughters = 0;
+        for( int k=0;k<EvtInfo.nDHadrons;k++ )
+        {
+          double dR = reco::deltaR(EvtInfo.DHadron_eta[k], 
+              EvtInfo.DHadron_phi[k], 
+              jeta,
+              jphi);
+          if( dR > drMin ) continue;
+          bool isSemiMu = false;
+          int nd = EvtInfo.DHadron_nDaughters[k];
+          for( int kk=0;kk<nd;kk++ )
+          {
+            if( abs(EvtInfo.DHadron_DaughtersPdgID[kk+ndaughters]) == 13 ) isSemiMu = true;
+          }
+
+          ndaughters += nd;
+
+          if( !isSemiMu ) continue;
+          if( abs(EvtInfo.DHadron_pdgID[k]) == 411 ) isDplusMu = true;
+          if( abs(EvtInfo.DHadron_pdgID[k]) == 421 ) isDzeroMu = true;
+          if( abs(EvtInfo.DHadron_pdgID[k]) == 431 ) isDsubsMu = true;
+        }
+
+        if( isDplusMu ) wtCDFrag = 0.176 / 0.172;
+        if( isDzeroMu ) wtCDFrag = 0.067 / 0.077;
+        if( isDsubsMu ) wtCDFrag = 0.067 / 0.080;
+
+      } //// cd frag 
+
+      //// c fragmentation
+      if (doCFrag_&& abs(FatJetInfo.Jet_flavour[iJet]) == 4) {
+        float drMin = 0.8;   
+        float jeta = FatJetInfo.Jet_eta[iJet];
+        float jphi = FatJetInfo.Jet_phi[iJet];
+
+        bool hasCquark = 0;
+        for( int c=0;c<EvtInfo.ncQuarks;c++ )
+        {
+          double dRc = reco::deltaR(EvtInfo.cQuark_eta[c], 
+              EvtInfo.cQuark_phi[c], 
+              jeta,
+              jphi);
+          if( dRc < drMin ) hasCquark = 1;
+        }
+
+        if( hasCquark )
+        { 
+          bool isDplus = false, isDzero = false, isDsubs = false;// isDbary = false;
+          for( int k=0;k<EvtInfo.nDHadrons;k++ )
+          {
+            double dR = reco::deltaR(EvtInfo.DHadron_eta[k], 
+                EvtInfo.DHadron_phi[k], 
+                jeta, 
+                jphi);
+            if( dR > drMin ) continue;
+
+            if( abs(EvtInfo.DHadron_pdgID[k]) == 411 ) isDplus = true;
+            if( abs(EvtInfo.DHadron_pdgID[k]) == 421 ) isDzero = true;
+            if( abs(EvtInfo.DHadron_pdgID[k]) == 431 ) isDsubs = true;
+            ////if((abs(EvtInfo.DHadron_pdgID[k])/1000)%10 == 4 ) isDbary = true;  //// ATTENTION! what is this? ASK ALICE/Kirill!
+          }       
+
+          if( isDplus ) wtCFrag *= 1.37; // PDG2008(0.246+-0.020)
+          if( isDzero ) wtCFrag *= 0.91; // PDG2008(0.565+-0.032)
+          if( isDsubs ) wtCFrag *= 0.67; // PDG2008(0.080+-0.017)
+          //// 0.185072, 0.58923, 0.115961
+        }
+      } //// c frag 
+
+      //// K0s/ Lambda syst
+      if ( doK0L_ && (abs(FatJetInfo.Jet_flavour[iJet]) < 4 || abs(FatJetInfo.Jet_flavour[iJet])==21) ) {
+        float jeta = FatJetInfo.Jet_eta[iJet];
+        float jphi = FatJetInfo.Jet_phi[iJet];
+        int nK0s = 0, nLambda = 0;
+        for( int k=0;k<EvtInfo.nGenV0;k++ ) {
+          double dR = reco::deltaR(EvtInfo.GenV0_eta[k], 
+              EvtInfo.GenV0_phi[k], 
+              jeta,
+              jphi);
+          if( dR > 0.3 ) continue;
+          int pdgid = abs(EvtInfo.GenV0_pdgID[k]);
+          if( pdgid == 310 )  nK0s++;
+          if( pdgid == 3122 ) nLambda++;
+        }
+        if( nK0s > 0 )    wtK0LSyst *= 1.3;
+        if( nLambda > 0 ) wtK0LSyst *= 1.5;
+      } //// KOs/ Lambda syst
 
       //// fat jet multiplicity
       ++nFatJet;
@@ -1483,6 +1714,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     } ////----------------------------- End fat jet loop ----------------------------------------//
 
     outtree_->Fill();
+
+    std::cout << " nFatJet = " << nFatJet << " wtPU = " << wtPU << " wtCDFrag = " << wtCDFrag << std::endl;
 
     // fill jet multiplicity
     h1_nFatJet->Fill(nFatJet, wtPU);
