@@ -1715,8 +1715,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     outtree_->Fill();
 
-    std::cout << " nFatJet = " << nFatJet << " wtPU = " << wtPU << " wtCDFrag = " << wtCDFrag << std::endl;
-
     // fill jet multiplicity
     h1_nFatJet->Fill(nFatJet, wtPU);
     if( usePrunedSubjets_ || useSoftDropSubjets_ ) h1_nSubJet->Fill(nSubJet, wtPU);
