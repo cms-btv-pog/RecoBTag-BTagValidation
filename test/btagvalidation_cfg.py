@@ -24,6 +24,11 @@ options.register('triggerSelection', '',
     VarParsing.varType.string,
     "Trigger selection"
     )
+options.register('triggerLogicIsOR', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Trigger logic: True = OR, False = AND'
+    )
 options.register('useJetProbaTree', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -69,35 +74,40 @@ options.register('useSoftDropSubjets', False,
     VarParsing.varType.bool,
     "Process soft drop subjets"
     )
-options.register('doBFrag', False,
+options.register('doBFrag', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do b fragmentation reweighting'
     )
-options.register('doBFragUp', False,
+options.register('doBFragUp', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do b fragmentation reweighting up'
     )
-options.register('doBFragDown', False,
+options.register('doBFragDown', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do b fragmentation reweighting down'
     )
-options.register('doCDFrag', False,
+options.register('doCDFrag', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do c->D fragmentation reweighting'
     )
-options.register('doCFrag', False,
+options.register('doCFrag', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do c fragmentation reweighting'
     )
-options.register('doK0L', False,
+options.register('doK0L', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do K0 and lambda reweighting'
+    )
+options.register('doNtracksReweighting', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'Do ntracks reweighting'
     )
 options.register('applySubJetMuonTagging', False,
     VarParsing.multiplicity.singleton,
@@ -129,7 +139,7 @@ options.register('fatJetAbsEtaMax', 2.4,
     VarParsing.varType.float,
     "Maximum abs(eta)"
     )
-options.register('fatJetPtMin', 450.,
+options.register('fatJetPtMin', 250.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet Pt"
@@ -164,7 +174,7 @@ options.register('fatJetTau21Min', 0.0, #added by rizki
     VarParsing.varType.float,
     "tau2/tau1 jet substructure min cut for fat jets"
     )
-options.register('fatJetTau21Max', 0.6, #added by rizki
+options.register('fatJetTau21Max', 1., #added by rizki
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "tau2/tau1 jet substructure max cut for fat jets"
@@ -264,6 +274,11 @@ options.register('FileSubJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
     )
+options.register('FileNtracksWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Mar21-2016_reproduceCommPlotsForPreApproval/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/dataMCntracks/ntracks_dataMC_weight_single.root",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File with data/MC weights for fat jet ntracks reweighting"
+    )
 
 options.parseArguments()
 
@@ -283,7 +298,7 @@ process.MessageLogger.cout = cms.untracked.PSet(
     threshold = cms.untracked.string('INFO'),
     )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) ) # Keep as such
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) ) # Keep as such
 
 process.source = cms.Source("EmptySource")
 
@@ -343,16 +358,18 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string('PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'),
+    File_PUDistMC          = cms.string('/afs/cern.ch/work/a/asady/SF80X/ttree/80X_branch/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'),
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('RunII2016_PUXsec69000nb.root'),
-    File_PUDistDataLow     = cms.string('RunII2016_PUXsec65550nb.root'),
-    File_PUDistDataHigh    = cms.string('RunII2016_PUXsec72450nb.root'),
+    File_PUDistData        = cms.string('/afs/cern.ch/work/a/asady/SF80X/ttree/80X_branch/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/RunII2016_PUXsec69000nb.root'),
+    File_PUDistDataLow     = cms.string('/afs/cern.ch/work/a/asady/SF80X/ttree/80X_branch/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/RunII2016_PUXsec65550nb.root'),
+    File_PUDistDataHigh    = cms.string('/afs/cern.ch/work/a/asady/SF80X/ttree/80X_branch/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/RunII2016_PUXsec72450nb.root'),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt), 
     Hist_FatJetPtWt        = cms.string('FatJet_pt_all_wt'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('SoftDropSubJet_pt_all_wt'),
+    File_NtracksWt         = cms.string(options.FileNtracksWt), 
+    Hist_NtracksWt         = cms.string('nTracksweight_mc_data'),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
 FatJetAbsEtaMax            = cms.double(options.fatJetAbsEtaMax), #added by rizki
@@ -361,12 +378,14 @@ FatJetAbsEtaMax            = cms.double(options.fatJetAbsEtaMax), #added by rizk
 MuonJetPtRatio             = cms.double(options.MuonJetPtRatio),
     DoPUReweightingOfficial= cms.bool(options.doPUReweightingOfficial),
     DoPUReweightingNPV     = cms.bool(options.doPUReweightingNPV),
+    DoNtracksReweighting  = cms.bool(options.doNtracksReweighting),
     DoFatJetPtReweighting  = cms.bool(options.doFatJetPtReweighting),
     DoSubJetPtReweighting  = cms.bool(options.doSubJetPtReweighting),
     TriggerSelection       = cms.vstring( # OR of all listed triggers applied, empty list --> no trigger selection applied
         options.triggerSelection
         ),
     TriggerPathNames       = bTagAnalyzerCommon.TriggerPathNames,
+    triggerLogicIsOR      = cms.bool(options.triggerLogicIsOR),
     ApplySFs               = cms.bool(options.applySFs),
     btagCSVFile            = cms.string(options.btagCSVFile),
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),
