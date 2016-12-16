@@ -55,9 +55,9 @@ def process_input_dir(input_dir, match, filelist):
     return
 
 
-cfi_template = """FileNames = [
+cfi_template = """FileNames = {'FileNames':[
 INPUT_FILES
-]
+]}
 """
 
 
@@ -71,9 +71,9 @@ eval `scram runtime -sh`
 
 cp -v MAIN_WORKDIR/CMSSW_cfg.py $BATCHDIR/CMSSW_cfg.py
 cp -v MAIN_WORKDIR/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root $BATCHDIR/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root
-cp -v MAIN_WORKDIR/RunII2016_25ns_PUSpring16V1_Xsec69000nb.root $BATCHDIR/RunII2016_25ns_PUSpring16V1_Xsec69000nb.root 
-cp -v MAIN_WORKDIR/RunII2016_25ns_PUSpring16V1_Xsec72450nb.root $BATCHDIR/RunII2016_25ns_PUSpring16V1_Xsec72450nb.root 
-cp -v MAIN_WORKDIR/RunII2016_25ns_PUSpring16V1_Xsec65550nb.root $BATCHDIR/RunII2016_25ns_PUSpring16V1_Xsec65550nb.root 
+cp -v MAIN_WORKDIR/RunII2016_PUXsec69000nb.root $BATCHDIR/RunII2016_PUXsec69000nb.root
+cp -v MAIN_WORKDIR/RunII2016_PUXsec72450nb.root $BATCHDIR/RunII2016_PUXsec72450nb.root
+cp -v MAIN_WORKDIR/RunII2016_PUXsec65550nb.root $BATCHDIR/RunII2016_PUXsec65550nb.root
 cp -v DATASET_WORKDIR/input/inputFiles_JOB_NUMBER_cfi.py $BATCHDIR/inputFiles_cfi.py
 cp -v MAIN_WORKDIR/CSVv2_4invfb.csv $BATCHDIR/
 cd $BATCHDIR
@@ -138,11 +138,11 @@ def main():
   for filename in os.listdir(cfg_dirname):
     if not os.path.isfile(os.path.join(cfg_dirname,filename)):
       continue
-    if re.search("^RunII2016_25ns_PUSpring16V1_Xsec69000nb.root$", filename):
+    if re.search("^RunII2016_PUXsec69000nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^RunII2016_25ns_PUSpring16V1_Xsec72450nb.root$", filename):
+    if re.search("^RunII2016_PUXsec72450nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^RunII2016_25ns_PUSpring16V1_Xsec65550nb.root$", filename):
+    if re.search("^RunII2016_PUXsec65550nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
