@@ -81,7 +81,13 @@ echo "Running CMSSW job"
 cmsRun CMSSW_cfg.py CFG_PARAMETERS
 exitcode=$?
 
-cp -v OUTPUT_FILENAME.root DATASET_WORKDIR/output/OUTPUT_FILENAME_JOB_NUMBER.root
+copytoeos=COPYTOEOS
+
+if [ "$copytoeos" = "true" ]; then
+  /afs/cern.ch/project/eos/installation/cms/bin/eos.select cp OUTPUT_FILENAME.root EOS_OUTDIR/OUTPUT_FILENAME_JOB_NUMBER.root
+else
+  cp -v OUTPUT_FILENAME.root DATASET_WORKDIR/output/OUTPUT_FILENAME_JOB_NUMBER.root
+fi 
 
 exit $exitcode
 
@@ -105,6 +111,7 @@ def main():
   parser.add_option('-f', '--fraction', dest='fraction', action='store', default='1.0', help='Fraction of files to be processed. Default value is 1 (This parameter is optional)', metavar='FRACTION')
   parser.add_option("-q", "--queue", dest="queue", action='store', default='8nh', help="LXBatch queue (choose among cmst3 8nm 1nh 8nh 1nd 1nw). Default is '8nh' (This parameter is optional)", metavar="QUEUE")
   parser.add_option("-n", "--no_submission", dest="no_submission", action='store_true', default=False, help="Create the necessary configuration files and skip the job submission (This parameter is optional)")
+  parser.add_option("-e", "--copy_to_eos", dest="copy_to_eos", action='store', default='false', help="Set to 'true' for copying to EOS")
 
   (options, args) = parser.parse_args()
 
@@ -177,7 +184,12 @@ def main():
     os.mkdir(os.path.join(dataset_workdir,'output'))
 
     filelist = []
-    process_input_dir(line_elements[2], options.match, filelist)
+    input_dir = line_elements[2]
+    process_input_dir(input_dir, options.match, filelist)
+
+    if options.copy_to_eos == 'true':
+      eos_outdir = os.path.join(input_dir,'SlimmedTrees')
+      proc = subprocess.Popen( [ '/afs/cern.ch/project/eos/installation/cms/bin/eos.select', 'mkdir', eos_outdir ], stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
 
     ##################################################
     njobs = line_elements[1]
@@ -217,7 +229,9 @@ def main():
        bash_script_content = re.sub('DATASET_WORKDIR',dataset_workdir,bash_script_content)
        bash_script_content = re.sub('JOB_NUMBER',str(ijob),bash_script_content)
        bash_script_content = re.sub('CFG_PARAMETERS',cfg_parameters,bash_script_content)
+       bash_script_content = re.sub('EOS_OUTDIR',eos_outdir,bash_script_content)
        bash_script_content = re.sub('OUTPUT_FILENAME',output_filename,bash_script_content)
+       bash_script_content = re.sub('COPYTOEOS',options.copy_to_eos,bash_script_content)
        bash_script.write(bash_script_content)
        bash_script.close()
 
