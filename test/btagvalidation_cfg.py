@@ -14,7 +14,7 @@ options.register('outFilename', 'bTagValPlots.root',
     VarParsing.varType.string,
     "Output file name"
     )
-options.register('makeSlimmedTree', False,
+options.register('makeSlimmedTree', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Make slimmed trees for SF measurements"
