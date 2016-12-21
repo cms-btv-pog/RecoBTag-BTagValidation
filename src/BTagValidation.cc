@@ -38,6 +38,10 @@ Implementation:
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 
+/*#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+*/
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -57,6 +61,8 @@ Implementation:
 #include <string>
 #include <map>
 #include <vector>
+
+//#include <boost/algorithm/string.hpp>
 
 //
 // class declaration
@@ -109,6 +115,10 @@ class BTagValidation : public edm::EDAnalyzer {
 
     double GetLumiWeightsPVBased (const std::string file, const std::string hist, const int npv) ; 
     double GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) ;
+    double GetWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) ;
+  /*    void ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) ;
+    double GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) ;
+  */
     // ----------member data ---------------------------
     EventInfoBranches EvtInfo;
     JetInfoBranches FatJetInfo;
@@ -227,6 +237,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    MuonJetPtRatio_;
     const std::vector<std::string>  triggerSelection_;
     const std::vector<std::string>  triggerPathNames_;
+    const bool                      triggerLogicIsOR_;
     const std::string               file_PVWt_ ; 
     const std::string               file_PUDistMC_ ;
     const std::string               file_PUDistData_ ;
@@ -234,15 +245,18 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               file_PUDistDataHigh_ ;
     const std::string               file_FatJetPtWt_ ;
     const std::string               file_SubJetPtWt_ ;
+    const std::string               file_NtracksWt_;
     const std::string               hist_PVWt_ ; 
     const std::string               hist_PUDistMC_ ;
     const std::string               hist_PUDistData_ ;
     const std::string               hist_FatJetPtWt_ ;
     const std::string               hist_SubJetPtWt_ ;
+    const std::string               hist_NtracksWt_;
     const bool                      doPUReweightingOfficial_ ;
     const bool                      doPUReweightingNPV_ ;
     const bool                      doFatJetPtReweighting_ ;
     const bool                      doSubJetPtReweighting_ ;
+    const bool                      doNtracksReweighting_ ;  
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
 
@@ -259,7 +273,14 @@ class BTagValidation : public edm::EDAnalyzer {
     const int                       btagOperatingPoint_ ; 
     const std::string               btagMeasurementType_ ; 
     const std::string               btagSFType_  ; 
+  /*    const std::vector<std::string>  newJECPayloadNames_;
+    const std::string               jecUncPayloadName_;
+    const bool                      doNewJEC_;
+    const bool                      doJECUncert_;
 
+    boost::shared_ptr<JetCorrectionUncertainty> ptr_jecUnc_ ; 
+    boost::shared_ptr<FactorizedJetCorrector> ptr_newJEC_  ;
+  */
     const BTagCalibration calib; 
     const BTagCalibrationReader reader; 
 
@@ -317,6 +338,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   MuonJetPtRatio_(iConfig.getParameter<double>("MuonJetPtRatio")),
   triggerSelection_(iConfig.getParameter<std::vector<std::string> >("TriggerSelection")),
   triggerPathNames_(iConfig.getParameter<std::vector<std::string> >("TriggerPathNames")),
+  triggerLogicIsOR_(iConfig.getParameter<bool>("triggerLogicIsOR")),
   file_PVWt_(iConfig.getParameter<std::string>("File_PVWt")),
   file_PUDistMC_(iConfig.getParameter<std::string>("File_PUDistMC")),
   file_PUDistData_(iConfig.getParameter<std::string>("File_PUDistData")),
@@ -324,15 +346,18 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   file_PUDistDataHigh_(iConfig.getParameter<std::string>("File_PUDistDataHigh")),
   file_FatJetPtWt_(iConfig.getParameter<std::string>("File_FatJetPtWt")),
   file_SubJetPtWt_(iConfig.getParameter<std::string>("File_SubJetPtWt")),
+  file_NtracksWt_(iConfig.getParameter<std::string>("File_NtracksWt")),
   hist_PVWt_(iConfig.getParameter<std::string>("Hist_PVWt")),
   hist_PUDistMC_(iConfig.getParameter<std::string>("Hist_PUDistMC")),
   hist_PUDistData_(iConfig.getParameter<std::string>("Hist_PUDistData")),
   hist_FatJetPtWt_(iConfig.getParameter<std::string>("Hist_FatJetPtWt")),
   hist_SubJetPtWt_(iConfig.getParameter<std::string>("Hist_SubJetPtWt")),
+  hist_NtracksWt_(iConfig.getParameter<std::string>("Hist_NtracksWt")),
   doPUReweightingOfficial_(iConfig.getParameter<bool>("DoPUReweightingOfficial")),
   doPUReweightingNPV_(iConfig.getParameter<bool>("DoPUReweightingNPV")),
   doFatJetPtReweighting_(iConfig.getParameter<bool>("DoFatJetPtReweighting")),
   doSubJetPtReweighting_(iConfig.getParameter<bool>("DoSubJetPtReweighting")),
+  doNtracksReweighting_(iConfig.getParameter<bool>("DoNtracksReweighting")),
   usePrunedSubjets_(iConfig.getParameter<bool>("UsePrunedSubjets")),
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   doBFrag_(iConfig.getParameter<bool>("DoBFrag")),
@@ -346,6 +371,10 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   btagOperatingPoint_(iConfig.getParameter<int>("btagOperatingPoint")), 
   btagMeasurementType_(iConfig.getParameter<std::string>("btagMeasurementType")), 
   btagSFType_(iConfig.getParameter<std::string>("btagSFType")),
+  /*  newJECPayloadNames_(iConfig.getParameter<std::vector<std::string>>("newJECPayloadNames")),
+  jecUncPayloadName_(iConfig.getParameter<std::string>("jecUncPayloadName")),
+  doNewJEC_(iConfig.getParameter<bool>("doNewJEC")), 
+  doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), */
   calib("csvv2", btagCSVFile_),  
   reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
   //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
@@ -361,6 +390,18 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   //    BTagEntry::FLAV_B,    // btag flavour
   //    "comb") ;             // measurement type
 
+  /*    if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
+    std::vector<JetCorrectorParameters> vPar;  
+    for ( std::vector<std::string>::const_iterator it = newJECPayloadNames_.begin(); it != newJECPayloadNames_.end(); ++it) {
+      JetCorrectorParameters pars(*it);
+      vPar.push_back(pars) ; 
+    }
+    ptr_newJEC_ = boost::shared_ptr<FactorizedJetCorrector> ( new FactorizedJetCorrector(vPar) ); 
+
+  }
+
+  if ( doJECUncert_ ) ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ;
+  */
   if (doPUReweightingOfficial_) {
     LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
     LumiWeightsLow_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistDataLow_ , hist_PUDistMC_, hist_PUDistData_) ;
@@ -897,6 +938,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   float Jet_CombIVF  [nMaxJets_];
   float Jet_DoubleSV [nMaxJets_];
   bool  Jet_passed   [nMaxJets_];
+  float Jet_ptUp     [nMaxJets_];
+  float Jet_ptDown   [nMaxJets_];
 
   float wtPU(1.) ; 
   float wtPULow(1.) ;  
@@ -907,6 +950,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   float wtCDFrag(1.);
   float wtCFrag(1.);
   float wtK0LSyst(1.);
+  float wtSJbtagSF(1.);
+  float wtNtracks(1.);
 
   float BTemplateCorrections[100][20][2];
 
@@ -953,6 +998,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   outtree_->Branch("nFatJet"       ,&nFatJet      ,"nFatJet/I") ; 
   outtree_->Branch("Jet_pt"        ,Jet_pt        ,"Jet_pt[nFatJet]/F");
+  outtree_->Branch("Jet_ptUp"      ,&Jet_ptUp     ,"Jet_ptUp/F");
+  outtree_->Branch("Jet_ptDown"    ,&Jet_ptDown   ,"Jet_ptDown/F");
   outtree_->Branch("Jet_eta"       ,Jet_eta       ,"Jet_eta[nFatJet]/F");
   outtree_->Branch("Jet_flavour"   ,Jet_flavour   ,"Jet_flavour[nFatJet]/I");
   outtree_->Branch("Jet_nbHadrons" ,Jet_nbHadrons ,"Jet_nbHadrons[nFatJet]/I");
@@ -971,7 +1018,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   outtree_->Branch("wtCDFrag"      ,&wtCDFrag     ,"wtCDFrag/F");
   outtree_->Branch("wtCFrag"       ,&wtCFrag      ,"wtCFrag/F");
   outtree_->Branch("wtK0LSyst"     ,&wtK0LSyst    ,"wtK0LSyst/F");
-
+  outtree_->Branch("wtSJbtagSF"    ,&wtSJbtagSF   ,"wtSJbtagSF/F");
+  outtree_->Branch("wtNtracks"     ,&wtNtracks    ,"wtNtracks/F");
   //---------------------------- Start event loop ---------------------------------------//
   for(Long64_t iEntry = 0; iEntry < nEntries; ++iEntry) {
     JetTreeEvtInfo->GetEntry(iEntry);
@@ -1173,10 +1221,12 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           //    scaleFactor(SubJets.Jet_flavour[iSubJet2], SubJets.Jet_pt[iSubJet2], SubJets.Jet_eta[iSubJet2], (subJetBDiscrMin_>0.25)) );
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet1]), SubJets.Jet_eta[iSubJet1], SubJets.Jet_pt[iSubJet1]); 
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet2]), SubJets.Jet_eta[iSubJet2], SubJets.Jet_pt[iSubJet2]); 
+	  wtSJbtagSF = (reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet1]), SubJets.Jet_eta[iSubJet1], SubJets.Jet_pt[iSubJet1]))*(reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet2]), SubJets.Jet_eta[iSubJet2], SubJets.Jet_pt[iSubJet2]));
         }
         else if( applyFatJetBTagging_ && !fatJetDoubleBTagging_ )
           //wtFatJet *= scaleFactor(FatJetInfo.Jet_flavour[iJet], FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], (fatJetBDiscrCut_>0.25));
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]); 
+          wtSJbtagSF = reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]);
       }
       //added by Erich - jetPt reweighting factor
       double wtFatJetPt = 1.;
@@ -1184,6 +1234,10 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtFatJetPt *= GetLumiWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
         wtFatJet *= wtFatJetPt ;
       }
+
+      
+      if (doNtracksReweighting_ && !isData) wtNtracks = GetWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
+        
 
       Jet_passed[iJet] = true; 
 
@@ -1197,6 +1251,29 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       Jet_DoubleSV [nFatJet] = FatJetInfo.Jet_DoubleSV [iJet];  
       Jet_passed   [nFatJet] = Jet_passed[iJet] ; 
 
+      /*      double jesup(1.0), jesdown(1.0);
+      if ( doJECUncert_ ) {
+	jesup = GetJESUncert(1.0, FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], jesup) ; 
+	jesdown = GetJESUncert(-1.0, FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], jesdown) ; 
+      }
+
+      edm::LogInfo("JEC") << " jetpt = " << FatJetInfo.Jet_pt[iJet]
+			  << " jes uncert up = " << jesup 
+			  << " jes uncert down = " << jesdown
+			  << " jetpt_up = " << FatJetInfo.Jet_pt[iJet]*(1 + jesup)
+			  << " jetpt_down = " << FatJetInfo.Jet_pt[iJet]*(1+jesdown) ; 
+              
+      double jetpt_up, jetpt_down;
+      jetpt_up =  FatJetInfo.Jet_pt[iJet]*(1 + jesup);
+      jetpt_down = FatJetInfo.Jet_pt[iJet]*(1+jesdown) ;
+      if (doJECUncert_ ){
+	Jet_ptUp[nFatJet] = jetpt_up;
+	Jet_ptDown[nFatJet] = jetpt_down;
+      }
+      else{*/
+      Jet_ptUp[nFatJet] = FatJetInfo.Jet_pt[iJet];
+      Jet_ptDown[nFatJet] = FatJetInfo.Jet_pt[iJet];
+	//	}
       //// B frag wts
       if (doBFrag_ && abs(FatJetInfo.Jet_flavour[iJet]) == 5) {
         //float sfbFrag = 1.;
@@ -1338,6 +1415,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if( nK0s > 0 )    wtK0LSyst *= 1.3;
         if( nLambda > 0 ) wtK0LSyst *= 1.5;
       } //// KOs/ Lambda syst
+
+      
 
       //// fat jet multiplicity
       ++nFatJet;
@@ -2219,7 +2298,9 @@ bool BTagValidation::passTrigger() {
 
   if(triggerSelection_.size()==0) ret = true;
   else {
+    std::vector<bool> triggerBits;
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
+      triggerBits.push_back(false);
       std::string trigpath = triggerSelection_.at(i) ; 
       std::vector<std::string>::const_iterator it ;
       for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
@@ -2228,11 +2309,30 @@ bool BTagValidation::passTrigger() {
           int bitIdx = int(triggerIdx/32);
           if ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) {
             //std::cout << " fired trigger " << *it << std::endl;
-            ret = true;
+            triggerBits.at(i) = true;
             break;
           }
         }
       }
+    }
+    bool isOR = triggerLogicIsOR_; 
+    
+    for(unsigned i=0; i<triggerSelection_.size(); ++i) {
+
+      // makes trigger logic: AND
+      if(!triggerBits.at(i) && !isOR){
+	ret=false;
+	break;
+      }
+      else if(!isOR){
+	ret=true;
+      }
+
+      // makes trigger logic: OR
+      if(triggerBits.at(i) && isOR){
+	ret=true;
+	break;
+      } 
     }
   }
 
@@ -2390,6 +2490,41 @@ double BTagValidation::GetLumiWeightsPVBased (const std::string file, const std:
   return wtPU ;
 }
 
+// ----For calculating MC event weight for reweighting to the ntracks distribution in data
+double BTagValidation::GetWeightsNtracksBased (const std::string file, const std::string hist, const double jetpt) {
+  double wtPt(1) ;
+  TFile* f = new TFile(file.c_str()) ;
+  TH1D* hwt = new TH1D( *(static_cast<TH1D*>(f->Get( hist.c_str() )->Clone() )) );
+  wtPt = jetpt > -1 && jetpt <= 90 ? hwt->GetBinContent(hwt->GetXaxis()->FindBin(jetpt)) : 1.;
+  f->Close() ;
+  delete f ;
+  delete hwt ;
+  return wtPt ;
+}
+/*
+void BTagValidation::ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) {
+  newjec = 1.0; 
+  TLorentzVector uncorrJetP4 = jetp4;
+  uncorrJetP4 *= jes != 0. ? 1./jes : 1. ; 
+  ptr_newJEC_->setJetPt ( uncorrJetP4.Pt()     );
+  ptr_newJEC_->setJetEta( uncorrJetP4.Eta()    );
+  ptr_newJEC_->setJetE  ( uncorrJetP4.Energy() );
+  ptr_newJEC_->setJetA  ( jetarea );
+  ptr_newJEC_->setRho   ( jetrho ) ;  
+  ptr_newJEC_->setNPV   ( npv ) ; 
+  newjec = ptr_newJEC_->getCorrection();
+}
+double BTagValidation::GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) {
+  ptr_jecUnc_->setJetPt ( jetpt );
+  ptr_jecUnc_->setJetEta( jeteta);
+  jesunc = ptr_jecUnc_->getUncertainty(true);
+  std::cout<<"jesunc = " << jesunc << std::endl;
+  std::cout<<"jecShift = " << jecShift << std::endl;
+  jesunc *= jecShift ; 
+  std::cout<<"jesunc (after) = " << jesunc << std::endl;
+  return jesunc;
+}
+*/
 // ----For calculating MC event weight for reweighting to the jetPt distribution in the data
 double BTagValidation::GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) {
   double wtPt(1) ;
