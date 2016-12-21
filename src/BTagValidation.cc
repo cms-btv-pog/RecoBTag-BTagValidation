@@ -203,6 +203,7 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Configurables
     const int                       maxEvents_;
     const int                       reportEvery_;
+    const bool                      makeSlimmedTree_;
     const bool                      useJetProbaTree_;
     const std::string               inputTTreeEvtInfo_;
     const std::string               inputTTree_;
@@ -304,6 +305,7 @@ class BTagValidation : public edm::EDAnalyzer {
 BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   maxEvents_(iConfig.getParameter<int>("MaxEvents")),
   reportEvery_(iConfig.getParameter<int>("ReportEvery")),
+  makeSlimmedTree_(iConfig.getParameter<bool>("makeSlimmedTree")),
   useJetProbaTree_(iConfig.getParameter<bool>("UseJetProbaTree")),
   inputTTreeEvtInfo_(iConfig.getParameter<std::string>("InputTTreeEvtInfo")),
   inputTTree_(iConfig.getParameter<std::string>("InputTTree")),
@@ -559,7 +561,7 @@ void BTagValidation::beginJob() {
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
 
-  outtree_ = fs->make<TTree>("SlimmedTree", "SlimmedTree") ; 
+  if (makeSlimmedTree_) outtree_ = fs->make<TTree>("SlimmedTree", "SlimmedTree") ; 
 
   double PtMax = 5000.;
 
@@ -996,30 +998,33 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   } //// doBFrag_ 
 
-  outtree_->Branch("nFatJet"       ,&nFatJet      ,"nFatJet/I") ; 
-  outtree_->Branch("Jet_pt"        ,Jet_pt        ,"Jet_pt[nFatJet]/F");
-  outtree_->Branch("Jet_ptUp"      ,&Jet_ptUp     ,"Jet_ptUp/F");
-  outtree_->Branch("Jet_ptDown"    ,&Jet_ptDown   ,"Jet_ptDown/F");
-  outtree_->Branch("Jet_eta"       ,Jet_eta       ,"Jet_eta[nFatJet]/F");
-  outtree_->Branch("Jet_flavour"   ,Jet_flavour   ,"Jet_flavour[nFatJet]/I");
-  outtree_->Branch("Jet_nbHadrons" ,Jet_nbHadrons ,"Jet_nbHadrons[nFatJet]/I");
-  outtree_->Branch("Jet_ncHadrons" ,Jet_ncHadrons ,"Jet_ncHadrons[nFatJet]/I");
-  outtree_->Branch("Jet_Proba"     ,Jet_Proba     ,"Jet_Proba[nFatJet]/F");
-  outtree_->Branch("Jet_CombIVF"   ,Jet_CombIVF   ,"Jet_CombIVF[nFatJet]/F");
-  outtree_->Branch("Jet_DoubleSV"  ,Jet_DoubleSV  ,"Jet_DoubleSV[nFatJet]/F");
-  outtree_->Branch("Jet_passed"    ,Jet_passed    ,"Jet_passed[nFatJet]/O");
+  if (makeSlimmedTree_) {
+    outtree_->Branch("nFatJet"       ,&nFatJet      ,"nFatJet/I") ; 
+    outtree_->Branch("Jet_pt"        ,Jet_pt        ,"Jet_pt[nFatJet]/F");
+    outtree_->Branch("Jet_ptUp"      ,&Jet_ptUp     ,"Jet_ptUp/F");
+    outtree_->Branch("Jet_ptDown"    ,&Jet_ptDown   ,"Jet_ptDown/F");
+    outtree_->Branch("Jet_eta"       ,Jet_eta       ,"Jet_eta[nFatJet]/F");
+    outtree_->Branch("Jet_flavour"   ,Jet_flavour   ,"Jet_flavour[nFatJet]/I");
+    outtree_->Branch("Jet_nbHadrons" ,Jet_nbHadrons ,"Jet_nbHadrons[nFatJet]/I");
+    outtree_->Branch("Jet_ncHadrons" ,Jet_ncHadrons ,"Jet_ncHadrons[nFatJet]/I");
+    outtree_->Branch("Jet_Proba"     ,Jet_Proba     ,"Jet_Proba[nFatJet]/F");
+    outtree_->Branch("Jet_CombIVF"   ,Jet_CombIVF   ,"Jet_CombIVF[nFatJet]/F");
+    outtree_->Branch("Jet_DoubleSV"  ,Jet_DoubleSV  ,"Jet_DoubleSV[nFatJet]/F");
+    outtree_->Branch("Jet_passed"    ,Jet_passed    ,"Jet_passed[nFatJet]/O");
 
-  outtree_->Branch("wtPU"          ,&wtPU         ,"wtPU/F");
-  outtree_->Branch("wtPULow"       ,&wtPULow      ,"wtPULow/F");
-  outtree_->Branch("wtPUHigh"      ,&wtPUHigh     ,"wtPUHigh/F");
+    outtree_->Branch("wtPU"          ,&wtPU         ,"wtPU/F");
+    outtree_->Branch("wtPULow"       ,&wtPULow      ,"wtPULow/F");
+    outtree_->Branch("wtPUHigh"      ,&wtPUHigh     ,"wtPUHigh/F");
 
-  outtree_->Branch("wtBFragLow"    ,&wtBFragLow   ,"wtBFragLow/F");
-  outtree_->Branch("wtBFragHigh"   ,&wtBFragHigh  ,"wtBFragHigh/F");
-  outtree_->Branch("wtCDFrag"      ,&wtCDFrag     ,"wtCDFrag/F");
-  outtree_->Branch("wtCFrag"       ,&wtCFrag      ,"wtCFrag/F");
-  outtree_->Branch("wtK0LSyst"     ,&wtK0LSyst    ,"wtK0LSyst/F");
-  outtree_->Branch("wtSJbtagSF"    ,&wtSJbtagSF   ,"wtSJbtagSF/F");
-  outtree_->Branch("wtNtracks"     ,&wtNtracks    ,"wtNtracks/F");
+    outtree_->Branch("wtBFragLow"    ,&wtBFragLow   ,"wtBFragLow/F");
+    outtree_->Branch("wtBFragHigh"   ,&wtBFragHigh  ,"wtBFragHigh/F");
+    outtree_->Branch("wtCDFrag"      ,&wtCDFrag     ,"wtCDFrag/F");
+    outtree_->Branch("wtCFrag"       ,&wtCFrag      ,"wtCFrag/F");
+    outtree_->Branch("wtK0LSyst"     ,&wtK0LSyst    ,"wtK0LSyst/F");
+    outtree_->Branch("wtSJbtagSF"    ,&wtSJbtagSF   ,"wtSJbtagSF/F");
+    outtree_->Branch("wtNtracks"     ,&wtNtracks    ,"wtNtracks/F");
+  }
+
   //---------------------------- Start event loop ---------------------------------------//
   for(Long64_t iEntry = 0; iEntry < nEntries; ++iEntry) {
     JetTreeEvtInfo->GetEntry(iEntry);
@@ -1221,12 +1226,12 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           //    scaleFactor(SubJets.Jet_flavour[iSubJet2], SubJets.Jet_pt[iSubJet2], SubJets.Jet_eta[iSubJet2], (subJetBDiscrMin_>0.25)) );
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet1]), SubJets.Jet_eta[iSubJet1], SubJets.Jet_pt[iSubJet1]); 
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet2]), SubJets.Jet_eta[iSubJet2], SubJets.Jet_pt[iSubJet2]); 
-	  wtSJbtagSF = (reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet1]), SubJets.Jet_eta[iSubJet1], SubJets.Jet_pt[iSubJet1]))*(reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet2]), SubJets.Jet_eta[iSubJet2], SubJets.Jet_pt[iSubJet2]));
+          wtSJbtagSF = (reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet1]), SubJets.Jet_eta[iSubJet1], SubJets.Jet_pt[iSubJet1]))*(reader.eval(BTagEntry::JetFlavor(SubJets.Jet_flavour[iSubJet2]), SubJets.Jet_eta[iSubJet2], SubJets.Jet_pt[iSubJet2]));
         }
         else if( applyFatJetBTagging_ && !fatJetDoubleBTagging_ )
           //wtFatJet *= scaleFactor(FatJetInfo.Jet_flavour[iJet], FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], (fatJetBDiscrCut_>0.25));
           wtFatJet *= reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]); 
-          wtSJbtagSF = reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]);
+        wtSJbtagSF = reader.eval(BTagEntry::JetFlavor(FatJetInfo.Jet_flavour[iJet]), FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_pt[iJet]);
       }
       //added by Erich - jetPt reweighting factor
       double wtFatJetPt = 1.;
@@ -1235,9 +1240,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         wtFatJet *= wtFatJetPt ;
       }
 
-      
+
       if (doNtracksReweighting_ && !isData) wtNtracks = GetWeightsNtracksBased(file_NtracksWt_, hist_NtracksWt_, FatJetInfo.Jet_ntracks[iJet]) ;
-        
+
 
       Jet_passed[iJet] = true; 
 
@@ -1252,28 +1257,28 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       Jet_passed   [nFatJet] = Jet_passed[iJet] ; 
 
       /*      double jesup(1.0), jesdown(1.0);
-      if ( doJECUncert_ ) {
-	jesup = GetJESUncert(1.0, FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], jesup) ; 
-	jesdown = GetJESUncert(-1.0, FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], jesdown) ; 
-      }
+              if ( doJECUncert_ ) {
+              jesup = GetJESUncert(1.0, FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], jesup) ; 
+              jesdown = GetJESUncert(-1.0, FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], jesdown) ; 
+              }
 
-      edm::LogInfo("JEC") << " jetpt = " << FatJetInfo.Jet_pt[iJet]
-			  << " jes uncert up = " << jesup 
-			  << " jes uncert down = " << jesdown
-			  << " jetpt_up = " << FatJetInfo.Jet_pt[iJet]*(1 + jesup)
-			  << " jetpt_down = " << FatJetInfo.Jet_pt[iJet]*(1+jesdown) ; 
-              
-      double jetpt_up, jetpt_down;
-      jetpt_up =  FatJetInfo.Jet_pt[iJet]*(1 + jesup);
-      jetpt_down = FatJetInfo.Jet_pt[iJet]*(1+jesdown) ;
-      if (doJECUncert_ ){
-	Jet_ptUp[nFatJet] = jetpt_up;
-	Jet_ptDown[nFatJet] = jetpt_down;
-      }
-      else{*/
+              edm::LogInfo("JEC") << " jetpt = " << FatJetInfo.Jet_pt[iJet]
+              << " jes uncert up = " << jesup 
+              << " jes uncert down = " << jesdown
+              << " jetpt_up = " << FatJetInfo.Jet_pt[iJet]*(1 + jesup)
+              << " jetpt_down = " << FatJetInfo.Jet_pt[iJet]*(1+jesdown) ; 
+
+              double jetpt_up, jetpt_down;
+              jetpt_up =  FatJetInfo.Jet_pt[iJet]*(1 + jesup);
+              jetpt_down = FatJetInfo.Jet_pt[iJet]*(1+jesdown) ;
+              if (doJECUncert_ ){
+              Jet_ptUp[nFatJet] = jetpt_up;
+              Jet_ptDown[nFatJet] = jetpt_down;
+              }
+              else{*/
       Jet_ptUp[nFatJet] = FatJetInfo.Jet_pt[iJet];
       Jet_ptDown[nFatJet] = FatJetInfo.Jet_pt[iJet];
-	//	}
+      //	}
       //// B frag wts
       if (doBFrag_ && abs(FatJetInfo.Jet_flavour[iJet]) == 5) {
         //float sfbFrag = 1.;
@@ -1416,7 +1421,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if( nLambda > 0 ) wtK0LSyst *= 1.5;
       } //// KOs/ Lambda syst
 
-      
+
 
       //// fat jet multiplicity
       ++nFatJet;
@@ -1792,7 +1797,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     } ////----------------------------- End fat jet loop ----------------------------------------//
 
-    outtree_->Fill();
+    if (makeSlimmedTree_) outtree_->Fill();
 
     // fill jet multiplicity
     h1_nFatJet->Fill(nFatJet, wtPU);
@@ -2316,22 +2321,22 @@ bool BTagValidation::passTrigger() {
       }
     }
     bool isOR = triggerLogicIsOR_; 
-    
+
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
 
       // makes trigger logic: AND
       if(!triggerBits.at(i) && !isOR){
-	ret=false;
-	break;
+        ret=false;
+        break;
       }
       else if(!isOR){
-	ret=true;
+        ret=true;
       }
 
       // makes trigger logic: OR
       if(triggerBits.at(i) && isOR){
-	ret=true;
-	break;
+        ret=true;
+        break;
       } 
     }
   }
@@ -2502,29 +2507,29 @@ double BTagValidation::GetWeightsNtracksBased (const std::string file, const std
   return wtPt ;
 }
 /*
-void BTagValidation::ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) {
-  newjec = 1.0; 
-  TLorentzVector uncorrJetP4 = jetp4;
-  uncorrJetP4 *= jes != 0. ? 1./jes : 1. ; 
-  ptr_newJEC_->setJetPt ( uncorrJetP4.Pt()     );
-  ptr_newJEC_->setJetEta( uncorrJetP4.Eta()    );
-  ptr_newJEC_->setJetE  ( uncorrJetP4.Energy() );
-  ptr_newJEC_->setJetA  ( jetarea );
-  ptr_newJEC_->setRho   ( jetrho ) ;  
-  ptr_newJEC_->setNPV   ( npv ) ; 
-  newjec = ptr_newJEC_->getCorrection();
-}
-double BTagValidation::GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) {
-  ptr_jecUnc_->setJetPt ( jetpt );
-  ptr_jecUnc_->setJetEta( jeteta);
-  jesunc = ptr_jecUnc_->getUncertainty(true);
-  std::cout<<"jesunc = " << jesunc << std::endl;
-  std::cout<<"jecShift = " << jecShift << std::endl;
-  jesunc *= jecShift ; 
-  std::cout<<"jesunc (after) = " << jesunc << std::endl;
-  return jesunc;
-}
-*/
+   void BTagValidation::ApplyJES(TLorentzVector jetp4, double jetarea, double jetrho, double jes, int npv, double& newjec) {
+   newjec = 1.0; 
+   TLorentzVector uncorrJetP4 = jetp4;
+   uncorrJetP4 *= jes != 0. ? 1./jes : 1. ; 
+   ptr_newJEC_->setJetPt ( uncorrJetP4.Pt()     );
+   ptr_newJEC_->setJetEta( uncorrJetP4.Eta()    );
+   ptr_newJEC_->setJetE  ( uncorrJetP4.Energy() );
+   ptr_newJEC_->setJetA  ( jetarea );
+   ptr_newJEC_->setRho   ( jetrho ) ;  
+   ptr_newJEC_->setNPV   ( npv ) ; 
+   newjec = ptr_newJEC_->getCorrection();
+   }
+   double BTagValidation::GetJESUncert( int jecShift, double jetpt, double jeteta, double& jesunc ) {
+   ptr_jecUnc_->setJetPt ( jetpt );
+   ptr_jecUnc_->setJetEta( jeteta);
+   jesunc = ptr_jecUnc_->getUncertainty(true);
+   std::cout<<"jesunc = " << jesunc << std::endl;
+   std::cout<<"jecShift = " << jecShift << std::endl;
+   jesunc *= jecShift ; 
+   std::cout<<"jesunc (after) = " << jesunc << std::endl;
+   return jesunc;
+   }
+   */
 // ----For calculating MC event weight for reweighting to the jetPt distribution in the data
 double BTagValidation::GetLumiWeightsJetPtBased (const std::string file, const std::string hist, const double jetpt) {
   double wtPt(1) ;
