@@ -1456,7 +1456,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
-    //std::cout << "In event loop" << std::endl;
+    std::cout << "Event loop:" << iEntry << std::endl;
     if( !passTrigger() ) continue; //// apply trigger selection
     std::cout << "Event selection: pass Trigger "<< std::endl;
 
@@ -3202,14 +3202,23 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   	std::vector<bool> triggerBits;
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
       triggerBits.push_back(false);
+      //std::cout << "i = " << i << std::endl;
       std::string trigpath = triggerSelection_.at(i) ; 
       std::vector<std::string>::const_iterator it ;
       for ( it = triggerPathNames_.begin(); it != triggerPathNames_.end(); ++it) {
+        //std::cout << "Comparing triggers : " << *it << " -- " << trigpath << " = " << it->find(trigpath) <<std::endl;
         if ( it->find(trigpath) < std::string::npos ) {
           int triggerIdx = ( it - triggerPathNames_.begin() );
           int bitIdx = int(triggerIdx/32);
+//           std::cout << "Checking (matching) trigger bits : " << *it << std::endl;
+//           std::cout << "                                   " << " triggerIdx                        = " << triggerIdx << std::endl;
+//           std::cout << "                                   " << " bitIdx                            = " << bitIdx << std::endl;
+//           std::cout << "                                   " << " (triggerIdx - bitIdx*32)          = " << (triggerIdx - bitIdx*32) << std::endl;
+//           std::cout << "                                   " << " ( 1 << (triggerIdx - bitIdx*32) ) = " << ( 1 <<(triggerIdx - bitIdx*32) )<< std::endl;
+//           std::cout << "                                   " << " EvtInfo.BitTrigger[bitIdx]        = " << EvtInfo.BitTrigger[bitIdx] << std::endl;
+//           std::cout << "                                   " << " ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) )  = " << ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) << std::endl;
           if ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) {
-            //std::cout << " fired trigger " << *it << std::endl;
+//             std::cout << "fired trigger : " << *it << std::endl;
             triggerBits.at(i) = true;
             break; 
           }

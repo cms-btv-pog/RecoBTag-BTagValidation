@@ -46,11 +46,7 @@ FileNames_QCD_Pt_800to1000 = [
 
 ### Do not remove the following lines
 FileNames = [
-    'JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
-    #'/afs/cern.ch/user/d/devdatta/eos/cms/store/group/phys_btag/BoostedBTag/7_6_X_v1.02/BulkGravTohhTohbbhbb_narrow_M-1000_13TeV-madgraph/JetTree_mc_FatJets_Subjets_BoostedCommissioning_1.root'
-    #'JetTree_mc_FatJets_Subjets_BoostedCommissioning_1.root',
-    #'/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_GluGluToBulkGravitonToHHTo4B_M-800_JetTree_mc_FatJets_Subjets_BoostedCommissioning.root',
-    #'/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/signalMC_GluGluToBulkGravitonToHHTo4B_M-900_JetTree_mc_FatJets_Subjets_BoostedCommissioning.root',
-    #'/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Update_11Dec/CMSSW_7_4_14/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/BulkGravTohhTohbbhbb_narrow_M-1000_13TeV_JetTree_mc_FatJets_Subjets_BoostedCommissioning.root'
+#     'BTagMu_Run2016B-23Sep2016-v3_MINIAOD_mcJPcalib_12616_v4_JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
+    'BTagMu_Run2016G-23Sep2016-v1_MINIAOD_mcJPcalib_12616_v4_JetTree_data_FatJets_Subjets_BoostedCommissioning_1.root',
     ]
 
