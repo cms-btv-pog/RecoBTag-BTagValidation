@@ -189,7 +189,7 @@ options.register('doPUReweightingOfficial', False,
     VarParsing.varType.bool,
     "Do pileup reweighting"
     )
-options.register('FilePUDistData', '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/RunII2016_PUXsec69000nb.root',
+options.register('FilePUDistData', '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/RunII2016Rereco_25ns_PUXsec69000nb.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File for data/MC weights for PU reweight (official)"
@@ -425,7 +425,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/PUDistMC_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU.root'), 
+    File_PUDistMC          = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root'), 
     Hist_PUDistMC          = cms.string('pileup'),
 #     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V2_Xsec69200nb.root'), #some lumi sections were missing?
 #     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec69200nb.root'), #devdatta's file

@@ -122,6 +122,7 @@ def main():
 
       # open input ROOT file
       root_file = TFile(input_root_file)
+      print "input_root_file:", input_root_file
       htemp = root_file.Get(os.path.join(options.analyzer_module,'h1_CutFlow_unw'))
       nEventsAll = htemp.GetBinContent(1)
       nEventsStored = htemp.GetBinContent(2)
@@ -177,7 +178,7 @@ def main():
           final_histos[histoName].Scale(scale)
         else:
           final_histos[histoName].Add(htemp, scale)
-        print "final scale " + str(scale)
+        #print "final scale " + str(scale)
 
     print ''
     print 'TOTAL Fatjets (before scale) = %.0f (b: %.0f,bgsp: %.0f,c: %.0f,l: %.0f)'%(_totalFatjets,_totalFatjets_b,_totalFatjets_bfromg,_totalFatjets_c,_totalFatjets_l)

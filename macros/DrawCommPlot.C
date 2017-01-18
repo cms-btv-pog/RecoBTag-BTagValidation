@@ -32,7 +32,8 @@ TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCom
 
 TString filename_ext="" ;
 
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_14Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_14Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_18Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;

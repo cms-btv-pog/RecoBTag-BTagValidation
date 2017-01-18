@@ -6,7 +6,9 @@ BTagMu_RRC -1 -1
 BTagMu_RRD -1 -1
 BTagMu_RRE -1 -1
 BTagMu_RRF -1 -1
-BTagMu_RRG -1 -1
+BTagMu_RRG_pt1 -1 -1
+BTagMu_RRG_pt2 -1 -1
+BTagMu_RRG_pt3 -1 -1
 BTagMu_PRHv2 -1 -1
 BTagMu_PRHv3 -1 -1
 
