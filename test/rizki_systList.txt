@@ -1,0 +1,29 @@
+# Dataset_name - uncomment the filenames you want to merge for SF template 
+
+UNWEIGHTED:
+/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval -1 -1
+#/Final_DoubleMuonTaggedFatJets_histograms_btagval -1 -1
+
+#NTRACKS:
+#/Final_ntracks -1 -1
+
+#CD:
+#/Final_histograms_CD -1 -1
+
+#CFRAG:
+#/Final_histograms_C -1 -1
+
+#K0L:
+#/Final_histograms_K0L -1 -1
+
+#BFRAGUP:
+#/Final_histograms_bfrag_up -1 -1
+
+#BFRAGDOWN:
+#/Final_bfrag_down -1 -1
+
+#PUUP:
+#/Final_PU_up -1 -1
+
+#PUDOWN:
+#/Final_PU_down -1 -1
