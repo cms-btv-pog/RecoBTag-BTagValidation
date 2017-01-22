@@ -86,7 +86,7 @@ def main():
 #    print "groupL " + str(group_L[group])
 
   # final output file
-  filename='Final_histograms'
+  filename='Final_histograms_sysMerged'
 #  if (len(options.analyzer_module)>0):
 #    filename+=str('_'+options.analyzer_module)
   filename+=str('.root')
