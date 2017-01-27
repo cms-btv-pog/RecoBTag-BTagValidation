@@ -1008,6 +1008,11 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_DoubleB_pt5" ,";DoubleB_pt5;;",100,-1,1.);
   AddHisto(histoTag+"_DoubleB_pt6" ,";DoubleB_pt6;;",100,-1,1.);
   AddHisto(histoTag+"_DoubleB_pt7" ,";DoubleB_pt7;;",100,-1,1.);
+  AddHisto(histoTag+"_DoubleB_pt8" ,";DoubleB_pt8;;",100,-1,1.);
+  AddHisto(histoTag+"_DoubleB_pt9" ,";DoubleB_pt9;;",100,-1,1.);
+  AddHisto(histoTag+"_DoubleB_pt10" ,";DoubleB_pt10;;",100,-1,1.);
+  AddHisto(histoTag+"_DoubleB_pt11" ,";DoubleB_pt11;;",100,-1,1.);
+  AddHisto(histoTag+"_DoubleB_pt12" ,";DoubleB_pt12;;",100,-1,1.);
   
   // for SF LT method calculation - start
     
@@ -1021,6 +1026,11 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_all_pt5", ";JP_all_pt5;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_pt6", ";JP_all_pt6;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_pt7", ";JP_all_pt7;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_pt8", ";JP_all_pt8;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_pt9", ";JP_all_pt9;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_pt10", ";JP_all_pt10;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_pt11", ";JP_all_pt11;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_pt12", ";JP_all_pt12;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_ptall", ";JP_all_ptall;;", 50, 0., 2.5);  
 
   // JP ALL - JESup
@@ -1033,6 +1043,11 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_all_JESup_pt5", ";JP_all_JESup_pt5;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_JESup_pt6", ";JP_all_JESup_pt6;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_JESup_pt7", ";JP_all_JESup_pt7;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESup_pt8", ";JP_all_JESup_pt8;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESup_pt9", ";JP_all_JESup_pt9;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESup_pt10", ";JP_all_JESup_pt10;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESup_pt11", ";JP_all_JESup_pt11;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESup_pt12", ";JP_all_JESup_pt12;;", 50, 0., 2.5);
 
   // JP ALL - JESdown
 
@@ -1044,6 +1059,11 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_all_JESdown_pt5", ";JP_all_JESdown_pt5;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_JESdown_pt6", ";JP_all_JESdown_pt6;;", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_all_JESdown_pt7", ";JP_all_JESdown_pt7;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESdown_pt8", ";JP_all_JESdown_pt8;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESdown_pt9", ";JP_all_JESdown_pt9;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESdown_pt10", ";JP_all_JESdown_pt10;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESdown_pt11", ";JP_all_JESdown_pt11;;", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_all_JESdown_pt12", ";JP_all_JESdown_pt12;;", 50, 0., 2.5);
 
   // DoubleBL - nominal
 
@@ -1074,6 +1094,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_DoubleBLpass_pt7", "JP_DoubleBLpass_pt7", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBLfail_pt7", "JP_DoubleBLfail_pt7", 50, 0., 2.5);
 
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt8", "JP_DoubleBLpass_pt8", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt8", "JP_DoubleBLfail_pt8", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt9", "JP_DoubleBLpass_pt9", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt9", "JP_DoubleBLfail_pt9", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt10", "JP_DoubleBLpass_pt10", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt10", "JP_DoubleBLfail_pt10", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt11", "JP_DoubleBLpass_pt11", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt11", "JP_DoubleBLfail_pt11", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt12", "JP_DoubleBLpass_pt12", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt12", "JP_DoubleBLfail_pt12", 50, 0., 2.5);
+
   // DoubleBM1 - nominal
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_pt0", "JP_DoubleBM1pass_pt0", 50, 0., 2.5);
@@ -1099,6 +1134,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_pt7", "JP_DoubleBM1pass_pt7", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM1fail_pt7", "JP_DoubleBM1fail_pt7", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt8", "JP_DoubleBM1pass_pt8", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt8", "JP_DoubleBM1fail_pt8", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt9", "JP_DoubleBM1pass_pt9", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt9", "JP_DoubleBM1fail_pt9", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt10", "JP_DoubleBM1pass_pt10", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt10", "JP_DoubleBM1fail_pt10", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt11", "JP_DoubleBM1pass_pt11", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt11", "JP_DoubleBM1fail_pt11", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt12", "JP_DoubleBM1pass_pt12", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt12", "JP_DoubleBM1fail_pt12", 50, 0., 2.5);
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_ptall", "JP_DoubleBM1pass_ptall", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM1fail_ptall", "JP_DoubleBM1fail_ptall", 50, 0., 2.5);
@@ -1128,6 +1178,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
   AddHisto(histoTag+"_JP_DoubleBM2pass_pt7", "JP_DoubleBM2pass_pt7", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM2fail_pt7", "JP_DoubleBM2fail_pt7", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt8", "JP_DoubleBM2pass_pt8", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt8", "JP_DoubleBM2fail_pt8", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt9", "JP_DoubleBM2pass_pt9", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt9", "JP_DoubleBM2fail_pt9", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt10", "JP_DoubleBM2pass_pt10", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt10", "JP_DoubleBM2fail_pt10", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt11", "JP_DoubleBM2pass_pt11", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt11", "JP_DoubleBM2fail_pt11", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt12", "JP_DoubleBM2pass_pt12", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt12", "JP_DoubleBM2fail_pt12", 50, 0., 2.5);
 
   AddHisto(histoTag+"_JP_DoubleBM2pass_ptall", "JP_DoubleBM2pass_ptall", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM2fail_ptall", "JP_DoubleBM2fail_ptall", 50, 0., 2.5);
@@ -1159,6 +1224,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_DoubleBHpass_pt7", "JP_DoubleBHpass_pt7", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBHfail_pt7", "JP_DoubleBHfail_pt7", 50, 0., 2.5);
 
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt8", "JP_DoubleBHpass_pt8", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt8", "JP_DoubleBHfail_pt8", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt9", "JP_DoubleBHpass_pt9", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt9", "JP_DoubleBHfail_pt9", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt10", "JP_DoubleBHpass_pt10", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt10", "JP_DoubleBHfail_pt10", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt11", "JP_DoubleBHpass_pt11", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt11", "JP_DoubleBHfail_pt11", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt12", "JP_DoubleBHpass_pt12", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt12", "JP_DoubleBHfail_pt12", 50, 0., 2.5);
+
   AddHisto(histoTag+"_JP_DoubleBHpass_ptall", "JP_DoubleBHpass_ptall", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBHfail_ptall", "JP_DoubleBHfail_ptall", 50, 0., 2.5);
 
@@ -1188,6 +1268,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_DoubleBLpass_pt7_JESup", "JP_DoubleBLpass_pt7_JESup", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBLfail_pt7_JESup", "JP_DoubleBLfail_pt7_JESup", 50, 0., 2.5);
 
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt8_JESup", "JP_DoubleBLpass_pt8_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt8_JESup", "JP_DoubleBLfail_pt8_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt9_JESup", "JP_DoubleBLpass_pt9_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt9_JESup", "JP_DoubleBLfail_pt9_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt10_JESup", "JP_DoubleBLpass_pt10_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt10_JESup", "JP_DoubleBLfail_pt10_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt11_JESup", "JP_DoubleBLpass_pt11_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt11_JESup", "JP_DoubleBLfail_pt11_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt12_JESup", "JP_DoubleBLpass_pt12_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt12_JESup", "JP_DoubleBLfail_pt12_JESup", 50, 0., 2.5);
+
   // DoubleBM1 - JESup
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_pt0_JESup", "JP_DoubleBM1pass_pt0_JESup", 50, 0., 2.5);
@@ -1213,6 +1308,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_pt7_JESup", "JP_DoubleBM1pass_pt7_JESup", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM1fail_pt7_JESup", "JP_DoubleBM1fail_pt7_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt8_JESup", "JP_DoubleBM1pass_pt8_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt8_JESup", "JP_DoubleBM1fail_pt8_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt9_JESup", "JP_DoubleBM1pass_pt9_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt9_JESup", "JP_DoubleBM1fail_pt9_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt10_JESup", "JP_DoubleBM1pass_pt10_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt10_JESup", "JP_DoubleBM1fail_pt10_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt11_JESup", "JP_DoubleBM1pass_pt11_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt11_JESup", "JP_DoubleBM1fail_pt11_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt12_JESup", "JP_DoubleBM1pass_pt12_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt12_JESup", "JP_DoubleBM1fail_pt12_JESup", 50, 0., 2.5);
 
   // DoubleBM2 - JESup
 
@@ -1240,6 +1350,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_DoubleBM2pass_pt7_JESup", "JP_DoubleBM2pass_pt7_JESup", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM2fail_pt7_JESup", "JP_DoubleBM2fail_pt7_JESup", 50, 0., 2.5);
 
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt8_JESup", "JP_DoubleBM2pass_pt8_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt8_JESup", "JP_DoubleBM2fail_pt8_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt9_JESup", "JP_DoubleBM2pass_pt9_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt9_JESup", "JP_DoubleBM2fail_pt9_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt10_JESup", "JP_DoubleBM2pass_pt10_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt10_JESup", "JP_DoubleBM2fail_pt10_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt11_JESup", "JP_DoubleBM2pass_pt11_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt11_JESup", "JP_DoubleBM2fail_pt11_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt12_JESup", "JP_DoubleBM2pass_pt12_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt12_JESup", "JP_DoubleBM2fail_pt12_JESup", 50, 0., 2.5);
+
   // DoubleBH - JESup
 
   AddHisto(histoTag+"_JP_DoubleBHpass_pt0_JESup", "JP_DoubleBHpass_pt0_JESup", 50, 0., 2.5);
@@ -1265,6 +1390,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
   AddHisto(histoTag+"_JP_DoubleBHpass_pt7_JESup", "JP_DoubleBHpass_pt7_JESup", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBHfail_pt7_JESup", "JP_DoubleBHfail_pt7_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt8_JESup", "JP_DoubleBHpass_pt8_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt8_JESup", "JP_DoubleBHfail_pt8_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt9_JESup", "JP_DoubleBHpass_pt9_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt9_JESup", "JP_DoubleBHfail_pt9_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt10_JESup", "JP_DoubleBHpass_pt10_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt10_JESup", "JP_DoubleBHfail_pt10_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt11_JESup", "JP_DoubleBHpass_pt11_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt11_JESup", "JP_DoubleBHfail_pt11_JESup", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt12_JESup", "JP_DoubleBHpass_pt12_JESup", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt12_JESup", "JP_DoubleBHfail_pt12_JESup", 50, 0., 2.5);
 
   // DoubleBL - JESdown
 
@@ -1292,6 +1432,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_DoubleBLpass_pt7_JESdown", "JP_DoubleBLpass_pt7_JESdown", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBLfail_pt7_JESdown", "JP_DoubleBLfail_pt7_JESdown", 50, 0., 2.5);
 
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt8_JESdown", "JP_DoubleBLpass_pt8_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt8_JESdown", "JP_DoubleBLfail_pt8_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt9_JESdown", "JP_DoubleBLpass_pt9_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt9_JESdown", "JP_DoubleBLfail_pt9_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt10_JESdown", "JP_DoubleBLpass_pt10_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt10_JESdown", "JP_DoubleBLfail_pt10_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt11_JESdown", "JP_DoubleBLpass_pt11_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt11_JESdown", "JP_DoubleBLfail_pt11_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBLpass_pt12_JESdown", "JP_DoubleBLpass_pt12_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBLfail_pt12_JESdown", "JP_DoubleBLfail_pt12_JESdown", 50, 0., 2.5);
+
   // DoubleBM1 - JESdown
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_pt0_JESdown", "JP_DoubleBM1pass_pt0_JESdown", 50, 0., 2.5);
@@ -1317,6 +1472,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
   AddHisto(histoTag+"_JP_DoubleBM1pass_pt7_JESdown", "JP_DoubleBM1pass_pt7_JESdown", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM1fail_pt7_JESdown", "JP_DoubleBM1fail_pt7_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt8_JESdown", "JP_DoubleBM1pass_pt8_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt8_JESdown", "JP_DoubleBM1fail_pt8_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt9_JESdown", "JP_DoubleBM1pass_pt9_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt9_JESdown", "JP_DoubleBM1fail_pt9_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt10_JESdown", "JP_DoubleBM1pass_pt10_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt10_JESdown", "JP_DoubleBM1fail_pt10_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt11_JESdown", "JP_DoubleBM1pass_pt11_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt11_JESdown", "JP_DoubleBM1fail_pt11_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM1pass_pt12_JESdown", "JP_DoubleBM1pass_pt12_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM1fail_pt12_JESdown", "JP_DoubleBM1fail_pt12_JESdown", 50, 0., 2.5);
 
   // DoubleBM2 - JESdown
 
@@ -1344,6 +1514,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
   AddHisto(histoTag+"_JP_DoubleBM2pass_pt7_JESdown", "JP_DoubleBM2pass_pt7_JESdown", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBM2fail_pt7_JESdown", "JP_DoubleBM2fail_pt7_JESdown", 50, 0., 2.5);
 
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt8_JESdown", "JP_DoubleBM2pass_pt8_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt8_JESdown", "JP_DoubleBM2fail_pt8_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt9_JESdown", "JP_DoubleBM2pass_pt9_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt9_JESdown", "JP_DoubleBM2fail_pt9_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt10_JESdown", "JP_DoubleBM2pass_pt10_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt10_JESdown", "JP_DoubleBM2fail_pt10_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt11_JESdown", "JP_DoubleBM2pass_pt11_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt11_JESdown", "JP_DoubleBM2fail_pt11_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBM2pass_pt12_JESdown", "JP_DoubleBM2pass_pt12_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBM2fail_pt12_JESdown", "JP_DoubleBM2fail_pt12_JESdown", 50, 0., 2.5);
+
   // DoubleBH - JESdown
 
   AddHisto(histoTag+"_JP_DoubleBHpass_pt0_JESdown", "JP_DoubleBHpass_pt0_JESdown", 50, 0., 2.5);
@@ -1369,6 +1554,21 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
   AddHisto(histoTag+"_JP_DoubleBHpass_pt7_JESdown", "JP_DoubleBHpass_pt7_JESdown", 50, 0., 2.5);
   AddHisto(histoTag+"_JP_DoubleBHfail_pt7_JESdown", "JP_DoubleBHfail_pt7_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt8_JESdown", "JP_DoubleBHpass_pt8_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt8_JESdown", "JP_DoubleBHfail_pt8_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt9_JESdown", "JP_DoubleBHpass_pt9_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt9_JESdown", "JP_DoubleBHfail_pt9_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt10_JESdown", "JP_DoubleBHpass_pt10_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt10_JESdown", "JP_DoubleBHfail_pt10_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt11_JESdown", "JP_DoubleBHpass_pt11_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt11_JESdown", "JP_DoubleBHfail_pt11_JESdown", 50, 0., 2.5);
+
+  AddHisto(histoTag+"_JP_DoubleBHpass_pt12_JESdown", "JP_DoubleBHpass_pt12_JESdown", 50, 0., 2.5);
+  AddHisto(histoTag+"_JP_DoubleBHfail_pt12_JESdown", "JP_DoubleBHfail_pt12_JESdown", 50, 0., 2.5);
 
   // for SF LT method calculation - start
 
@@ -2684,8 +2884,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	jetpt_up =  jetpt*(1 + jesup);
 	jetpt_down = jetpt*(1+jesdown) ;
     
-    double ptbinsLow[6] ; 
-    double ptbinsHigh[6] ; 
+    double ptbinsLow[7] ; 
+    double ptbinsHigh[7] ; 
 
     ptbinsLow[0] = 400.; 
     ptbinsLow[1] = 450.; 
@@ -2693,6 +2893,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     ptbinsLow[3] = 600.;
     ptbinsLow[4] = 300.;
     ptbinsLow[5] = 250.;
+    ptbinsLow[6] = 350.;
 
     ptbinsHigh[0] = 450.; 
     ptbinsHigh[1] = 500.; 
@@ -2700,6 +2901,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     ptbinsHigh[3] = 2000.;
     ptbinsHigh[4] = 400.;
     ptbinsHigh[5] = 300.;
+    ptbinsHigh[6] = 350.;
 
 	//Double B
     if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_DoubleB_pt0", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
@@ -2710,6 +2912,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_DoubleB_pt7", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-300
     if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_DoubleB_pt4", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-500
     if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_DoubleB_pt6", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //500-2000
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_DoubleB_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_DoubleB_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_DoubleB_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_DoubleB_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_DoubleB_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	
     //JP nominal
 
@@ -2721,26 +2928,28 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_all_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt); //250-300
     if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_all_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt); //400-500
     if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt); //500-2000
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_all_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_all_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_all_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_all_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
     FillHisto(histoTag+"_JP_all_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     
     if ( doubleb >= DoubleBL_  ) {
       //       std::cout << "got to doubleb > 0.3" << std::endl;
-      if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[0] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt0", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-      else if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[1] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt1", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-      else if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[2] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt2", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-      else if ( jetpt > ptbinsLow[3] && jetpt <= ptbinsHigh[3] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt3", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-      else if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[4] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt5", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-      else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-      if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-      if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ){
-        FillHisto(histoTag+"_JP_DoubleBLpass_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
+      if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt0", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+      else if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt1", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+      else if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[2] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt2", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+      else if ( jetpt > ptbinsLow[3] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt3", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+      else if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt5", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+      else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+      if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+      if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+	if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+	if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+	if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+	if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+	if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBLpass_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
     else if ( doubleb < DoubleBL_  ) {
@@ -2752,6 +2961,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBLfail_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
     
@@ -2764,6 +2978,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBM1pass_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
     else if ( doubleb < DoubleBM1_  ) {
@@ -2775,6 +2994,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBM1fail_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
 
@@ -2787,6 +3011,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBM2pass_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
     else if ( doubleb < DoubleBM2_  ) {
@@ -2798,6 +3027,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBM2fail_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
 
@@ -2810,6 +3044,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBHpass_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
     else if ( doubleb < DoubleBH_  ) {
@@ -2821,6 +3060,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       else if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt7", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
       if ( jetpt > ptbinsLow[0] && jetpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt4", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
       if ( jetpt > ptbinsLow[2] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt6", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+    if ( jetpt > ptbinsLow[5] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt > ptbinsLow[1] && jetpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt > ptbinsLow[4] && jetpt <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt > ptbinsLow[6] && jetpt <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
       FillHisto(histoTag+"_JP_DoubleBHfail_ptall", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
     }
     
@@ -2834,24 +3078,26 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_all_JESup_pt7", flav, isGSPbb, isGSPcc , jetproba,wt);
 	if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_all_JESup_pt4", flav, isGSPbb, isGSPcc , jetproba,wt);
 	if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_JESup_pt6", flav, isGSPbb, isGSPcc , jetproba,wt);
+    if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_all_JESup_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_all_JESup_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_JESup_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_all_JESup_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_all_JESup_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBL_  ) {
-		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[0] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt0_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);}
-		else if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[1] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt1_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-		else if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[2] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt2_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-		else if ( jetpt_up > ptbinsLow[3] && jetpt_up <= ptbinsHigh[3] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt3_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-		else if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[4] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt5_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt4_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);} 
-		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt6_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);} 
+		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt0_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);
+		else if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt1_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+		else if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[2] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt2_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+		else if ( jetpt_up > ptbinsLow[3] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt3_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		else if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt5_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt4_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt); 
+		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt6_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt); 
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBL_  ) {
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt0_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -2862,6 +3108,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBM1_  ) {
@@ -2873,6 +3124,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);       
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba ,wt); 
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba ,wt); 
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBM1_  ) {
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt0_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -2883,6 +3139,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBM2_  ) {
@@ -2894,6 +3155,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);       
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba ,wt); 
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba ,wt); 
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBM2_  ) {
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt0_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -2904,6 +3170,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBH_  ) {
@@ -2915,6 +3186,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBH_  ) {
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt0_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -2925,6 +3201,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt7_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_up > ptbinsLow[0] && jetpt_up <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt4_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
 		if ( jetpt_up > ptbinsLow[2] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt6_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+		if ( jetpt_up > ptbinsLow[5] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt8_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt9_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_up > ptbinsLow[1] && jetpt_up <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt10_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_up > ptbinsLow[4] && jetpt_up <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt11_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_up > ptbinsLow[6] && jetpt_up <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt12_JESup", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}    
 
 	// jesdown
@@ -2937,25 +3218,27 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_all_JESdown_pt7", flav, isGSPbb, isGSPcc , jetproba,wt);
 	if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_all_JESdown_pt4", flav, isGSPbb, isGSPcc , jetproba,wt);   
 	if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_JESdown_pt6", flav, isGSPbb, isGSPcc , jetproba,wt);   
+    if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_all_JESdown_pt8", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+    if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_all_JESdown_pt9", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+    if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_JESdown_pt10", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+    if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_all_JESdown_pt11", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+    if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_all_JESdown_pt12", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBL_  ) {
-		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[0] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt0_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);}
-		else if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[1] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt1_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-		else if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[2] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt2_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);}
-		else if ( jetpt_down > ptbinsLow[3] && jetpt_down <= ptbinsHigh[3] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt3_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-		else if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[4] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt5_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); }
-		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt4_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);}
-		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ){
-		  FillHisto(histoTag+"_JP_DoubleBLpass_pt6_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);}
+		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt0_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);
+		else if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt1_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+		else if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[2] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt2_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
+		else if ( jetpt_down > ptbinsLow[3] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt3_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		else if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt5_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt4_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);
+		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt6_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLpass_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBL_  ) {
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt0_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -2966,6 +3249,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBLfail_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBM1_  ) {
@@ -2977,6 +3265,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba ,wt);  
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba ,wt);  
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM1pass_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBM1_  ) {
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt0_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -2987,6 +3280,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM1fail_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBM2_  ) {
@@ -2998,6 +3296,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba ,wt);  
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba ,wt);  
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM2pass_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBM2_  ) {
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt0_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -3008,6 +3311,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBM2fail_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
 	if ( FatJetInfo.Jet_DoubleSV[iJet] >= DoubleBH_  ) {
@@ -3019,6 +3327,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBHpass_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 	else if ( FatJetInfo.Jet_DoubleSV[iJet] < DoubleBH_  ) {
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt0_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
@@ -3029,6 +3342,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		else if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[5] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt7_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);
 		if ( jetpt_down > ptbinsLow[0] && jetpt_down <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt4_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
 		if ( jetpt_down > ptbinsLow[2] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt6_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt);  
+		if ( jetpt_down > ptbinsLow[5] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt8_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //250-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt9_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-450
+		if ( jetpt_down > ptbinsLow[1] && jetpt_down <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt10_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //450-2000
+		if ( jetpt_down > ptbinsLow[4] && jetpt_down <= ptbinsHigh[6] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt11_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //300-350
+		if ( jetpt_down > ptbinsLow[6] && jetpt_down <= ptbinsHigh[4] ) FillHisto(histoTag+"_JP_DoubleBHfail_pt12_JESdown", flav, isGSPbb, isGSPcc ,doubleb  ,wt); //350-400
 	}
 
     // for SF LT method calculation - end
