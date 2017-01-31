@@ -61,7 +61,7 @@ def main():
   # open and read the dataset_list_for_merging
   dataset_list_for_merging = open(options.dataset_list_for_merging,'r')
   dataset_list_for_merging_lines = dataset_list_for_merging.readlines()
-
+  
   for line in dataset_list_for_merging_lines:
 
     line_elements = line.split()
@@ -189,7 +189,7 @@ def main():
     histos.sort()
     print "Writing histograms..."
     for histo in histos:
-      print "Writing histogram: " , final_histos[histo].GetName()
+      #print "Writing histogram: " , final_histos[histo].GetName()
       final_histos[histo].Write()
     print 'Done'
 

@@ -330,18 +330,18 @@ options.register('FileZratioWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal
     "File with data/MC weights for Zratio reweighting"
     )
 options.register('newJECPayloadNames',  
-    "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_L1FastJet_AK8PFchs.txt,/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt,/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt", 
+    "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_L1FastJet_AK8PFchs.txt,/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt,/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt", 
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     "New JEC payload names"
     ),
 options.register('jecUncPayloadName', 
-    "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/Spring16_25nsV6_MC_Uncertainty_AK8PFchs.txt",
+    "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string, 
     "JEC uncertainty payload name"
     ),
-options.register('doNewJEC', False,
+options.register('doNewJEC', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Apply new JECs"

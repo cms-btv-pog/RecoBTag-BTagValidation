@@ -16,36 +16,6 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
    
    Float_t kScale = kScales[6];
 
-///////////
-
-//    TFile *f = TFile::Open("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_JetHT_QCDincl_merged/Final_histograms.root");
-
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_JetHT_QCDincl_DoubleBH.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_JetHT_QCDincl_DoubleBM.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_JetHT_QCDincl_DoubleBL.root","RECREATE");
-
-//    TFile *f = TFile::Open("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_merged/Final_histograms.root");
-
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_DoubleBH.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_DoubleBM.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_DoubleBL.root","RECREATE");
-
-///////////
-
-//    TFile *f = TFile::Open("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_merged/Final_histograms.root");
-
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_DoubleBH.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_DoubleBM.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_DoubleBL.root","RECREATE");
-
-//    TFile *f = TFile::Open("/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_merged/Final_histograms.root");
-
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_DoubleBH.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_DoubleBM.root","RECREATE");
-//    TFile *fNew = TFile::Open("Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_DoubleBL.root","RECREATE");
-
-///////////
-
    TFile *f;
 
    TFile *fNew;
@@ -62,12 +32,36 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
    
    std::string var = "JP";
    const int npt = 8;
-//    std::string ptt[npt] = {"pt5","pt4","pt2","pt3"};
    std::string ptt[npt] = {"pt5","pt4","pt2","pt3","pt0","pt1","pt6","pt7"};
-//   std::string ptt[npt] = {"pt5","pt4","pt2","pt3","ptall"};
-   const int nSys = 7;
-  std::string sysName[nSys] = {"JES","NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
-//   std::string sysName[nSys] = {"NTRACKS","BFRAG"};
+
+//    const int npt = 13;
+//    std::string ptt[npt] = {"pt5","pt4","pt2","pt3","pt0","pt1","pt6","pt7","pt8","pt9","pt10","pt11","pt12"};
+
+/*
+250-300 - pt7
+300-350 - pt11
+350-400 - pt12
+400-450 - pt0
+450-500 - pt1
+
+250-350 - pt8
+350-450 - pt9
+
+300-400 - pt5
+400-500 - pt4
+500-600 - pt2
+600-2000 - pt3
+
+500-2000 - pt6
+450-2000 - pt10
+*/
+
+//    const int nSys = 7;
+//   std::string sysName[nSys] = {"JES","NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
+
+   const int nSys = 6;
+  std::string sysName[nSys] = {"NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
+
 //    const int nSys=0;
 //    std::string sysName[nSys];
 
@@ -825,323 +819,17 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 }
 
 void convert(){
+	system("mkdir -v SFtemplates");
 	TString fin;
 	std::string fout;
-	//double kScales[7];
 	std::string kScaleStr;
-	
-	/*
-	
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3";
-// 	convert(fin,fout,"H");
-// 	convert(fin,fout,"M1");
-// 	convert(fin,fout,"M2");
-// 	convert(fin,fout,"L");
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-// 
-// 	std::cout << "Processing to convert single-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3";
-// 	convert(fin,fout,"H");
-// 	convert(fin,fout,"M1");
-// 	convert(fin,fout,"M2");
-// 	convert(fin,fout,"L");
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
 
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300";
-// 	convert(fin,fout,"H");
-// 	convert(fin,fout,"M1");
-// 	convert(fin,fout,"M2");
-// 	convert(fin,fout,"L");
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-// 
-// 	std::cout << "Processing to convert single-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuAK8TrigJet300";
-// 	convert(fin,fout,"H");
-// 	convert(fin,fout,"M1");
-// 	convert(fin,fout,"M2");
-// 	convert(fin,fout,"L");
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300";
-// 	convert(fin,fout,"H");
-// 	convert(fin,fout,"M1");
-// 	convert(fin,fout,"M2");
-// 	convert(fin,fout,"L");
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-
-// 	std::cout << "Processing to convert single-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300";
-// 	convert(fin,fout,"H");
-// 	convert(fin,fout,"M1");
-// 	convert(fin,fout,"M2");
-// 	convert(fin,fout,"L");
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-// 
-// 	{
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170";
-// 	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.};
-// 	kScaleStr = "";
-// 	convert(fin,fout,"H",kScales,kScaleStr);
-// 	convert(fin,fout,"M1",kScales,kScaleStr);
-// 	convert(fin,fout,"M2",kScales,kScaleStr);
-// 	convert(fin,fout,"L",kScales,kScaleStr);
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-// 	}
-// 
-// 	std::cout << "Processing to convert single-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_SingleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_singlemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170";
-// 	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.};
-// 	kScaleStr = "";
-// 	convert(fin,fout,"H",kScales,kScaleStr);
-// 	convert(fin,fout,"M1",kScales,kScaleStr);
-// 	convert(fin,fout,"M2",kScales,kScaleStr);
-// 	convert(fin,fout,"L",kScales,kScaleStr);
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_QCDincl_dataWithMCJP_v2_12p9_correctedJP_ptALL_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_JetHT_QCDincl_dataWithMCJP_v2_12p9_correctedJP_ptALL";
-// 	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.};
-// 	kScaleStr = "";
-// 	convert(fin,fout,"H",kScales,kScaleStr);
-// 	convert(fin,fout,"M1",kScales,kScaleStr);
-// 	convert(fin,fout,"M2",kScales,kScaleStr);
-// 	convert(fin,fout,"L",kScales,kScaleStr);
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-
-// 	{
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_BTagMuTrigJet300_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_BTagMuTrigJet300";
-// 	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.};
-// 	kScaleStr = "";
-// 	convert(fin,fout,"H",kScales,kScaleStr);
-// 	convert(fin,fout,"M1",kScales,kScaleStr);
-// 	convert(fin,fout,"M2",kScales,kScaleStr);
-// 	convert(fin,fout,"L",kScales,kScaleStr);
-// 	std::cout << "Done. " << std::endl; 
-// 	std::cout << "" << std::endl; 
-// 	}
-*/
-	
-	/*
-	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300_merged/Final_histograms_sysMerged.root";
-	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigJet300";
-	
-	{
-	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
-	kScaleStr = "_b_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
-	kScaleStr = "_cfromg_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
-	kScaleStr = "_c_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
-	kScaleStr = "_l_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
-	kScaleStr = "_b_cfromg_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
-	kScaleStr = "_c_l_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	std::cout << "Done. " << std::endl; 
-	std::cout << "" << std::endl; 
-
-	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_merged/Final_histograms_sysMerged.root";
-	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170";
-
-	{
-	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
-	kScaleStr = "_b_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
-	kScaleStr = "_cfromg_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
-	kScaleStr = "_c_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
-	kScaleStr = "_l_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
-	kScaleStr = "_b_cfromg_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
-	kScaleStr = "_c_l_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	std::cout << "Done. " << std::endl; 
-	std::cout << "" << std::endl; 
-
-	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_BTagMuTrigJet300_merged/Final_histograms_sysMerged.root";
-	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_BTagMuTrigJet300";
-
-	{
-	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
-	kScaleStr = "_b_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
-	kScaleStr = "_cfromg_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
-	kScaleStr = "_c_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
-	kScaleStr = "_l_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
-	kScaleStr = "_b_cfromg_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	{
-	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
-	kScaleStr = "_c_l_1p5";
-	convert(fin,fout,"H",kScales,kScaleStr);
-	convert(fin,fout,"M1",kScales,kScaleStr);
-	convert(fin,fout,"M2",kScales,kScaleStr);
-	convert(fin,fout,"L",kScales,kScaleStr);
-	}
-
-	std::cout << "Done. " << std::endl; 
-	std::cout << "" << std::endl; 
-	*/
-	
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << std::endl; 
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300";
-
-// 	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_2016G_merged/Final_histograms_sysMerged.root";
-// 	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_2016G";
-// 	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
-
+/*
+		
 	{
 
-	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_2016G_350to450_merged/Final_histograms_sysMerged.root";
-	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigAK8Jet300_2016G_350to450";
+	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_histograms_sysMerged.root";
+	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_run2016G-H_pt350";
 	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
 
 	
@@ -1264,11 +952,11 @@ void convert(){
 	}
 	
 	}
-
+*/
 	{
 
-	fin = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_2016G_250to350_merged/Final_histograms_sysMerged.root";
-	fout = "Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP_v3_BTagMuTrigDiJet170_2016G_250to350";
+	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_noSlimmedTrees_merged/Final_histograms_sysMerged.root";
+	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuDiJet170Mu5_run2016G-H_pt250";
 	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
 
 	

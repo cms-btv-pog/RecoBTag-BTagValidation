@@ -5,10 +5,10 @@
 
 # ./cleanUpOutput.py -w Mu_350_noSlimmedTrees_bfragdown 
 # ./cleanUpOutput.py -w Mu_250_noSlimmedTrees_bfragdown
-# 
+
 # ./cleanUpOutput.py -w Mu_350_noSlimmedTrees_bfragup 
 # ./cleanUpOutput.py -w Mu_250_noSlimmedTrees_bfragup
-# 
+
 # ./cleanUpOutput.py -w Mu_350_noSlimmedTrees_CD 
 # ./cleanUpOutput.py -w Mu_250_noSlimmedTrees_CD
 # 
