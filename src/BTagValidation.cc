@@ -446,6 +446,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
     std::vector<JetCorrectorParameters> vPar;  
     for ( std::vector<std::string>::const_iterator it = newJECPayloadNames_.begin(); it != newJECPayloadNames_.end(); ++it) {
+      std::cout << "correcting Jets using: " << *it << std::endl;
       JetCorrectorParameters pars(*it);
       vPar.push_back(pars) ; 
     }
@@ -453,7 +454,10 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
 
   }
 
-  if ( doJECUncert_ ) ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
+  if ( doJECUncert_ ) {  
+    std::cout << "deriving JEC unc using: " << jecUncPayloadName_ << std::endl;  	
+  	ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
+  }
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
 
