@@ -4,12 +4,12 @@ import ROOT
 
 dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/";
 
-# fname = 'Mu_250_noSlimmedTrees'
-# f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
-
-
-fname = 'Mu_350_noSlimmedTrees'
+fname = 'Mu_250_noSlimmedTrees'
 f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+
+
+# fname = 'Mu_350_noSlimmedTrees'
+# f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
 
 print 'Processing file: ', f
 

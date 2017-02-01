@@ -27,21 +27,21 @@ mv -v Mu_350_noSlimmedTrees_merged/Final_histograms_btagval.root Mu_350_noSlimme
 #
 # -Double 
 #
-# mkdir Mu_250_noSlimmedTrees_bfragdown_combined
-# ./combineOutput.py -w Mu_250_noSlimmedTrees_bfragdown -o Mu_250_noSlimmedTrees_bfragdown_combined
-# 
-# mkdir Mu_250_noSlimmedTrees_bfragdown_merged
-# ./mergeDatasets.py -w Mu_250_noSlimmedTrees_bfragdown_combined -o Mu_250_noSlimmedTrees_bfragdown_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt250.txt
-# 
-# mv -v Mu_250_noSlimmedTrees_bfragdown_merged/Final_histograms_btagval.root Mu_250_noSlimmedTrees_bfragdown_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
-# 
-# mkdir Mu_350_noSlimmedTrees_bfragdown_combined
-# ./combineOutput.py -w Mu_350_noSlimmedTrees_bfragdown -o Mu_350_noSlimmedTrees_bfragdown_combined
-# 
-# mkdir Mu_350_noSlimmedTrees_bfragdown_merged
-# ./mergeDatasets.py -w Mu_350_noSlimmedTrees_bfragdown_combined -o Mu_350_noSlimmedTrees_bfragdown_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt350.txt
-# 
-# mv -v Mu_350_noSlimmedTrees_bfragdown_merged/Final_histograms_btagval.root Mu_350_noSlimmedTrees_bfragdown_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
+mkdir Mu_250_noSlimmedTrees_bfragdown_combined
+./combineOutput.py -w Mu_250_noSlimmedTrees_bfragdown -o Mu_250_noSlimmedTrees_bfragdown_combined
+
+mkdir Mu_250_noSlimmedTrees_bfragdown_merged
+./mergeDatasets.py -w Mu_250_noSlimmedTrees_bfragdown_combined -o Mu_250_noSlimmedTrees_bfragdown_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt250.txt
+
+mv -v Mu_250_noSlimmedTrees_bfragdown_merged/Final_histograms_btagval.root Mu_250_noSlimmedTrees_bfragdown_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
+
+mkdir Mu_350_noSlimmedTrees_bfragdown_combined
+./combineOutput.py -w Mu_350_noSlimmedTrees_bfragdown -o Mu_350_noSlimmedTrees_bfragdown_combined
+
+mkdir Mu_350_noSlimmedTrees_bfragdown_merged
+./mergeDatasets.py -w Mu_350_noSlimmedTrees_bfragdown_combined -o Mu_350_noSlimmedTrees_bfragdown_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt350.txt
+
+mv -v Mu_350_noSlimmedTrees_bfragdown_merged/Final_histograms_btagval.root Mu_350_noSlimmedTrees_bfragdown_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
 
 
 ## BTagMu + QCD MuEnriched - bfragup

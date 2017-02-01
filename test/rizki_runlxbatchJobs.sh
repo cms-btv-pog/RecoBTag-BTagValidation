@@ -1,11 +1,11 @@
 #!/bin/bash
 
-./createAndSubmitJobs.py -w Mu_350_noSlimmedTrees -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_pt350.txt -q 8nh
-./createAndSubmitJobs.py -w Mu_250_noSlimmedTrees -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350.txt -q 8nh
+# ./createAndSubmitJobs.py -w Mu_350_noSlimmedTrees -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_pt350.txt -q 8nh
+# ./createAndSubmitJobs.py -w Mu_250_noSlimmedTrees -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350.txt -q 8nh
 
-# ./createAndSubmitJobs.py -w Mu_350_noSlimmedTrees_bfragdown -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_pt350_bfragdown.txt -q 8nh
-# ./createAndSubmitJobs.py -w Mu_250_noSlimmedTrees_bfragdown -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_bfragdown.txt -q 8nh
-
+./createAndSubmitJobs.py -w Mu_350_noSlimmedTrees_bfragdown -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_pt350_bfragdown.txt -q 8nh
+./createAndSubmitJobs.py -w Mu_250_noSlimmedTrees_bfragdown -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_bfragdown.txt -q 8nh
+# 
 # ./createAndSubmitJobs.py -w Mu_350_noSlimmedTrees_bfragup -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_pt350_bfragup.txt -q 8nh
 # ./createAndSubmitJobs.py -w Mu_250_noSlimmedTrees_bfragup -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_bfragup.txt -q 8nh
 

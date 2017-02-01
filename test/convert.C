@@ -2,6 +2,8 @@
 #include "TString.h"
 #include "TH1F.h"
 
+bool DEBUG = false;
+
 void convert(TString fin, std::string fout, std::string WP, double kScales[7], std::string kScaleStr)
 {
    Float_t nReBin = 2.5;
@@ -31,11 +33,11 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
    tag = "DoubleB"+WP;
    
    std::string var = "JP";
-   const int npt = 8;
-   std::string ptt[npt] = {"pt5","pt4","pt2","pt3","pt0","pt1","pt6","pt7"};
+//    const int npt = 8;
+//    std::string ptt[npt] = {"pt5","pt4","pt2","pt3","pt0","pt1","pt6","pt7"};
 
-//    const int npt = 13;
-//    std::string ptt[npt] = {"pt5","pt4","pt2","pt3","pt0","pt1","pt6","pt7","pt8","pt9","pt10","pt11","pt12"};
+   const int npt = 13;
+   std::string ptt[npt] = {"pt5","pt4","pt2","pt3","pt0","pt1","pt6","pt7","pt8","pt9","pt10","pt11","pt12"};
 
 /*
 250-300 - pt7
@@ -59,11 +61,14 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 //    const int nSys = 7;
 //   std::string sysName[nSys] = {"JES","NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
 
-   const int nSys = 6;
-  std::string sysName[nSys] = {"NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
+//    const int nSys = 6;
+//   std::string sysName[nSys] = {"NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
 
 //    const int nSys=0;
 //    std::string sysName[nSys];
+
+   const int nSys = 1;
+  std::string sysName[nSys] = {"JES"};
 
 
    for(int i=0;i<npt;i++)
@@ -74,11 +79,11 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	std::string hname_data = "UNWEIGHTED__DATA__FatJet_"+var+"_all_"+pt+"_data";
 	std::string hname_data_tag = "UNWEIGHTED__DATA__FatJet_"+var+"_"+tag+"pass_"+pt+"_data";
 	std::string hname_data_untag = "UNWEIGHTED__DATA__FatJet_"+var+"_"+tag+"fail_"+pt+"_data";
-	std::cout<< "attempt get data histograms "<< var << ", "<<tag <<", pt = "<<pt<< std::endl;
+	if(DEBUG)std::cout<< "attempt get data histograms "<< var << ", "<<tag <<", pt = "<<pt<< std::endl;
 	TH1F *h_data = (TH1F*)f->Get(hname_data.c_str());
 	TH1F *h_data_tag = (TH1F*)f->Get(hname_data_tag.c_str());
 	TH1F *h_data_untag = (TH1F*)f->Get(hname_data_untag.c_str());
-	std::cout<< "got data histograms."<<std::endl;	
+	if(DEBUG)std::cout<< "got data histograms."<<std::endl;	
 	float int_data = h_data->Integral(0,h_data->GetXaxis()->GetNbins()+1);
 	float int_data_tag = h_data_tag->Integral(0,h_data_tag->GetXaxis()->GetNbins()+1);
 	float int_data_untag = h_data_untag->Integral(0,h_data_untag->GetXaxis()->GetNbins()+1);
@@ -126,7 +131,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_cfromg_JESdown[100];
 	TH1F *h_c_JESdown[100];
 	TH1F *h_l_JESdown[100];
-	std::cout<< "CHECK A "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK A "<< std::endl;
 
 	for(int is=0;is<nSys;is++)
 	  {	    
@@ -230,7 +235,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	     h_c_JESdown[is]->Scale(k_lumi);
 	     h_l_JESdown[is]->Scale(k_lumi);
 	  }	
-	std::cout<< "CHECK B "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK B "<< std::endl;
 
 	// tag
 	std::string hname_bfromg_tag = "UNWEIGHTED__QCD__FatJet_"+var+"_"+tag+"pass_"+pt+"_bfromg";
@@ -267,7 +272,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_cfromg_tag_JESdown[100];
 	TH1F *h_c_tag_JESdown[100];
 	TH1F *h_l_tag_JESdown[100];
-	std::cout<< "CHECK C "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK C "<< std::endl;
 	
 	for(int is=0;is<nSys;is++)
 	  {	    	
@@ -371,7 +376,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	     h_c_tag_JESdown[is]->Scale(k_lumi);
 	     h_l_tag_JESdown[is]->Scale(k_lumi);
 	  }	
-	std::cout<< "CHECK D "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK D "<< std::endl;
 
 	// untag
 	std::string hname_bfromg_untag = "UNWEIGHTED__QCD__FatJet_"+var+"_"+tag+"fail_"+pt+"_bfromg";
@@ -408,7 +413,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_cfromg_untag_JESdown[100];
 	TH1F *h_c_untag_JESdown[100];
 	TH1F *h_l_untag_JESdown[100];
-	std::cout<< "CHECK E "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK E "<< std::endl;
 	
 	for(int is=0;is<nSys;is++)
 	  {	    	
@@ -513,7 +518,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	     h_l_untag_JESdown[is]->Scale(k_lumi);
 	  }	
 
-	std::cout<< "CHECK F "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK F "<< std::endl;
 
 	// COMBINATIONS
 	
@@ -534,7 +539,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_c_opt = (TH1F*)h_c->Rebin(nReBin,hname_c_opt.c_str());
 	std::string hname_l_opt = hname_l+"_opt";
 	TH1F *h_l_opt = (TH1F*)h_l->Rebin(nReBin,hname_l_opt.c_str());
-	std::cout<< "CHECK G "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK G "<< std::endl;
 
 	// combine pre-tag
 	std::string hname_b_cfromg_opt = hname_b+"_cfromg_opt";
@@ -568,7 +573,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_b_cfromg_JESdown_opt[100];
 	TH1F *h_c_l_JESdown_opt[100];
 	TH1F *h_b_cfromg_c_l_JESdown_opt[100];
-	std::cout<< "CHECK H "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK H "<< std::endl;
 
 	for(int is=0;is<nSys;is++)
 	  {	    		
@@ -620,7 +625,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	  }	
 
 	// TAG
-	std::cout<< "CHECK I "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK I "<< std::endl;
 	
 	std::string hname_bfromg_tag_opt = hname_bfromg_tag+"_opt";
 	TH1F *h_bfromg_tag_opt = (TH1F*)h_bfromg_tag->Rebin(nReBin,hname_bfromg_tag_opt.c_str());
@@ -665,7 +670,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_b_cfromg_tag_JESdown_opt[100];
 	TH1F *h_c_l_tag_JESdown_opt[100];
 	TH1F *h_b_cfromg_c_l_tag_JESdown_opt[100];
-	std::cout<< "CHECK J "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK J "<< std::endl;
 	
 	for(int is=0;is<nSys;is++)
 	  {
@@ -715,7 +720,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	     h_b_cfromg_c_l_tag_JESdown_opt[is] = (TH1F*)h_b_cfromg_tag_JESdown_opt[is]->Clone(hname_b_cfromg_c_l_tag_JESdown_opt.c_str());
 	     h_b_cfromg_c_l_tag_JESdown_opt[is]->Add(h_c_l_tag_JESdown_opt[is]);
 	  }	
-	std::cout<< "CHECK K "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK K "<< std::endl;
 	
 	std::string hname_bfromg_untag_opt = hname_bfromg_untag+"_opt";
 	TH1F *h_bfromg_untag_opt = (TH1F*)h_bfromg_untag->Rebin(nReBin,hname_bfromg_untag_opt.c_str());
@@ -760,7 +765,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	TH1F *h_b_cfromg_untag_JESdown_opt[100];
 	TH1F *h_c_l_untag_JESdown_opt[100];
 	TH1F *h_b_cfromg_c_l_untag_JESdown_opt[100];
-	std::cout<< "CHECK L "<< std::endl;
+	if(DEBUG)std::cout<< "CHECK L "<< std::endl;
 	
 	for(int is=0;is<nSys;is++)
 	  {	    					
@@ -811,7 +816,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 	     h_b_cfromg_c_l_untag_JESdown_opt[is]->Add(h_c_l_untag_JESdown_opt[is]);
 	  }	
      }
-	std::cout<< "CHECK M "<< std::endl;
+	if(DEBUG)if(DEBUG)std::cout<< "CHECK M "<< std::endl;
    
    fNew->Write();
    fNew->Close();
@@ -824,8 +829,7 @@ void convert(){
 	std::string fout;
 	std::string kScaleStr;
 
-/*
-		
+/*		
 	{
 
 	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_histograms_sysMerged.root";
@@ -953,6 +957,7 @@ void convert(){
 	
 	}
 */
+
 	{
 
 	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_noSlimmedTrees_merged/Final_histograms_sysMerged.root";
