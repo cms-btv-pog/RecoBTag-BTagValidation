@@ -14,6 +14,16 @@ options.register('reportEvery', 1000,
     VarParsing.varType.int,
     "Report every N events (default is N=1000)"
     )
+options.register('DEBUG', False,
+   VarParsing.multiplicity.singleton,
+   VarParsing.varType.bool,
+   "Display debugging statements"
+   )
+options.register('DEBUGlevel', 0,
+   VarParsing.multiplicity.singleton,
+   VarParsing.varType.int,
+   "Debugging statements level."
+   )
 options.register('triggerSelection', '',
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
@@ -114,6 +124,11 @@ options.register('fatJetPtMax', 1.E6,
     VarParsing.varType.float,
     "Maximum fat jet Pt"
     )
+options.register('removeProblemJet', True,
+   VarParsing.multiplicity.singleton,
+   VarParsing.varType.bool,
+   "Remove problematic jets from low pT MC bins"
+   )
 options.register('usePrunedMass', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -391,6 +406,8 @@ from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
 #print bTagAnalyzerCommon.TriggerPathNames 
 
 process.btagval = cms.EDAnalyzer('BTagValidation',
+    DEBUG    = cms.bool(options.DEBUG),
+    DEBUGlevel    = cms.int32(options.DEBUGlevel),
     MaxEvents              = cms.int32(options.maxEvents),
     ReportEvery            = cms.int32(options.reportEvery),
     UseJetProbaTree        = cms.bool(options.useJetProbaTree),
@@ -419,6 +436,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     MuonPtMin            = cms.double(options.muonPtMin),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
+    RemoveProblemJet    = cms.bool(options.removeProblemJet),
     UsePrunedMass       = cms.bool(options.usePrunedMass),
     UseSoftDropMass     = cms.bool(options.useSoftDropMass),
     FatJetGroomedMassMin  = cms.double(options.fatJetGroomedMassMin),
