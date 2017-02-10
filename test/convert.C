@@ -64,11 +64,11 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 //    const int nSys = 6;
 //   std::string sysName[nSys] = {"NTRACKS","BFRAG","CFRAG","CD","K0L","PU"};
 
-//    const int nSys=0;
-//    std::string sysName[nSys];
+   const int nSys=0;
+   std::string sysName[nSys];
 
-   const int nSys = 1;
-  std::string sysName[nSys] = {"JES"};
+//    const int nSys = 1;
+//   std::string sysName[nSys] = {"JES"};
 
 
    for(int i=0;i<npt;i++)
@@ -828,8 +828,7 @@ void convert(){
 	TString fin;
 	std::string fout;
 	std::string kScaleStr;
-
-/*		
+/*
 	{
 
 	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_histograms_sysMerged.root";
@@ -956,12 +955,519 @@ void convert(){
 	}
 	
 	}
-*/
 
 	{
 
 	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_noSlimmedTrees_merged/Final_histograms_sysMerged.root";
 	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuDiJet170Mu5_run2016G-H_pt250";
+	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
+
+	
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.}; //nominal
+	kScaleStr = "";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	{
+	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
+	kScaleStr = "_c_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
+	kScaleStr = "_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
+	kScaleStr = "_b_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
+	kScaleStr = "_c_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+
+	{
+	double kScales[7] = {0.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,0.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,0.5,1.,1.,1.,1.};
+	kScaleStr = "_c_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,0.5,1.,1.,1.};
+	kScaleStr = "_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,0.5,1.,1.};
+	kScaleStr = "_b_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,0.5,1.};
+	kScaleStr = "_c_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	}
+*/
+	{
+
+	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_dataJPcalib_merged/Final_histograms_sysMerged.root";
+	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_run2016G-H_pt350_dataJPcalib";
+	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
+
+	
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.}; //nominal
+	kScaleStr = "";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	{
+	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
+	kScaleStr = "_c_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
+	kScaleStr = "_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
+	kScaleStr = "_b_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
+	kScaleStr = "_c_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+
+	{
+	double kScales[7] = {0.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,0.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,0.5,1.,1.,1.,1.};
+	kScaleStr = "_c_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,0.5,1.,1.,1.};
+	kScaleStr = "_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,0.5,1.,1.};
+	kScaleStr = "_b_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,0.5,1.};
+	kScaleStr = "_c_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	}
+
+	{
+
+	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_noSlimmedTrees_dataJPcalib_merged/Final_histograms_sysMerged.root";
+	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuDiJet170Mu5_run2016G-H_pt250_dataJPcalib";
+	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
+
+	
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.}; //nominal
+	kScaleStr = "";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	{
+	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
+	kScaleStr = "_c_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
+	kScaleStr = "_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
+	kScaleStr = "_b_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
+	kScaleStr = "_c_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+
+	{
+	double kScales[7] = {0.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,0.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,0.5,1.,1.,1.,1.};
+	kScaleStr = "_c_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,0.5,1.,1.,1.};
+	kScaleStr = "_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,0.5,1.,1.};
+	kScaleStr = "_b_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,0.5,1.};
+	kScaleStr = "_c_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	}
+
+	{
+
+	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_run2016BtoF_merged/Final_histograms_sysMerged.root";
+	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_run2016B-F_pt350";
+	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
+
+	
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.,1.}; //nominal
+	kScaleStr = "";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	{
+	double kScales[7] = {1.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.5,1.,1.,1.,1.};
+	kScaleStr = "_c_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.5,1.,1.,1.};
+	kScaleStr = "_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.5,1.,1.};
+	kScaleStr = "_b_cfromg_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,1.5,1.};
+	kScaleStr = "_c_l_1p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+
+	{
+	double kScales[7] = {0.5,1.,1.,1.,1.,1.,1.};
+	kScaleStr = "_b_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,0.5,1.,1.,1.,1.,1.};
+	kScaleStr = "_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,0.5,1.,1.,1.,1.};
+	kScaleStr = "_c_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,0.5,1.,1.,1.};
+	kScaleStr = "_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,0.5,1.,1.};
+	kScaleStr = "_b_cfromg_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+
+	{
+	double kScales[7] = {1.,1.,1.,1.,1.,0.5,1.};
+	kScaleStr = "_c_l_0p5";
+	convert(fin,fout,"H",kScales,kScaleStr);
+	convert(fin,fout,"M1",kScales,kScaleStr);
+	convert(fin,fout,"M2",kScales,kScaleStr);
+	convert(fin,fout,"L",kScales,kScaleStr);
+	}
+	
+	}
+
+	{
+
+	fin = "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_noSlimmedTrees_run2016BtoF_merged/Final_histograms_sysMerged.root";
+	fout = "SFtemplates/Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuDiJet170Mu5_run2016B-F_pt250";
 	std::cout << "Processing to convert double-Mu-tag file ... " << fin << std::endl; 
 
 	

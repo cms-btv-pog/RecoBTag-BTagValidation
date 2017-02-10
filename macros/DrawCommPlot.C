@@ -29,16 +29,21 @@ using namespace std;
 TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
 TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root";
+
 
 TString filename_ext="" ;
 
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_14Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_18Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_18Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_1Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_dataWithDATAJPcalib";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC_dataWithMCJPcalib";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
-TString title1 = "36.46 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
+TString title1 = "36.8 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
@@ -350,18 +355,18 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     //DrawStacked(histoTag+"_sv_aboveC"            ,"IP2D of the first track above the charm threshold" ,logy ,dodata ,extNorm ,0. ,0.);
   }
   if (Draw_muons_plots){
-//     DrawStacked(histoTag+"_muon_multi",     "Number of muons"                ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_muon_multi_sel", "Number of selected muons"       ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_mu_ptrel",       "p_{T} rel. of the muon [GeV/c]" ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_mu_chi2",        "Norm. #chi^{2} of the muon"     ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_muon_Pt",        "Muon p_{T} [GeV/c]"             ,logy ,dodata ,extNorm ,2. ,0.);
-//     DrawStacked(histoTag+"_muon_eta",       "Muon #eta"                      ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_muon_phi",       "Muon #phi"                      ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_muon_Ip3d",      "Muon 3D IP [cm]"                ,logy ,dodata ,extNorm ,6. ,0.);
-//     DrawStacked(histoTag+"_muon_Ip2d",      "Muon 2D IP [cm]"                ,logy ,dodata ,extNorm ,6. ,0.);
-//     DrawStacked(histoTag+"_muon_Sip3d",     "Muon 3D IP significance"        ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_muon_Sip2d",     "Muon 2D IP significance"        ,logy ,dodata ,extNorm ,0. ,0.);
-//     DrawStacked(histoTag+"_muon_DeltaR",    "Muon1 #Delta R"                 ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_multi",     "Number of muons"                ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_multi_sel", "Number of selected muons"       ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_mu_ptrel",       "p_{T} rel. of the muon [GeV/c]" ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_mu_chi2",        "Norm. #chi^{2} of the muon"     ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_Pt",        "Muon p_{T} [GeV/c]"             ,logy ,dodata ,extNorm ,2. ,0.);
+    DrawStacked(histoTag+"_muon_eta",       "Muon #eta"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_phi",       "Muon #phi"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_Ip3d",      "Muon 3D IP [cm]"                ,logy ,dodata ,extNorm ,6. ,0.);
+    DrawStacked(histoTag+"_muon_Ip2d",      "Muon 2D IP [cm]"                ,logy ,dodata ,extNorm ,6. ,0.);
+    DrawStacked(histoTag+"_muon_Sip3d",     "Muon 3D IP significance"        ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_Sip2d",     "Muon 2D IP significance"        ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon_DeltaR",    "Muon1 #Delta R"                 ,logy ,dodata ,extNorm ,0. ,0.);
     DrawStacked(histoTag+"_muon_ptRatio", "(p_{T}(#mu_{1})/p_{T}(jet)" ,logy ,dodata ,extNorm ,0. ,0.);
     DrawStacked(histoTag+"_muComb_ptRatio", "(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet)" ,logy ,dodata ,extNorm ,0. ,0.);
 

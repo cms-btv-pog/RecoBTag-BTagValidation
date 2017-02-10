@@ -6,13 +6,11 @@ BTagMu_RRC -1 -1
 BTagMu_RRD -1 -1
 BTagMu_RRE -1 -1
 BTagMu_RRF -1 -1
-BTagMu_RRG_pt1 -1 -1
-BTagMu_RRG_pt2 -1 -1
-BTagMu_RRG_pt3 -1 -1
+BTagMu_RRG -1 -1
 BTagMu_PRHv2 -1 -1
 BTagMu_PRHv3 -1 -1
 
-#(HLT_BTagMu_DiJet170_Mu5 Run2016 B-H)
+#(HLT_BTagMu_DiJet170_Mu5 Run2016 G-H)
 
 QCD: L=7592 
 QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8 25190.51514

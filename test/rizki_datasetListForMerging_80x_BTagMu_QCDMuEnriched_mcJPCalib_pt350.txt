@@ -1,11 +1,11 @@
 
 
 DATA:
-#BTagMu_RRB -1 -1
-#BTagMu_RRC -1 -1
-#BTagMu_RRD -1 -1
-#BTagMu_RRE -1 -1
-#BTagMu_RRF -1 -1
+BTagMu_RRB -1 -1
+BTagMu_RRC -1 -1
+BTagMu_RRD -1 -1
+BTagMu_RRE -1 -1
+BTagMu_RRF -1 -1
 BTagMu_RRG_pt1 -1 -1
 BTagMu_RRG_pt2 -1 -1
 BTagMu_RRG_pt3 -1 -1
@@ -13,7 +13,7 @@ BTagMu_PRHv2 -1 -1
 BTagMu_PRHv3 -1 -1
 
 
-#(HLT_BTagMu_DiJet170_Mu5 Run2016 G-H)
+#(HLT_BTagMu_AK8Jet300_Mu5 OR HLT_BTagMu_Jet300_Mu5 Run2016 B-H)
 
 QCD: L=16578 
 
