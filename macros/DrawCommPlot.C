@@ -27,9 +27,11 @@
 using namespace std;
 
 TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
-TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
 // TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root";
+
+TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
 
 TString filename_ext="" ;
@@ -38,7 +40,8 @@ TString filename_ext="" ;
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_18Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_1Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_dataWithDATAJPcalib";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC_dataWithMCJPcalib";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC_dataWithMCJPcalib";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -138,13 +141,13 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     //DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_DoubleB"      ,"DoubleB"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 
-    DrawStacked(histoTag+"_DoubleB_pt0"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt1"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt2"      ,"DoubleB (500<p_T<600)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt3"      ,"DoubleB (600<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt4"      ,"DoubleB (400<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt5"      ,"DoubleB (300<p_T<400)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt6"      ,"DoubleB (500<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt400to450"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt450to500"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt500to600"      ,"DoubleB (500<p_T<600)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt600to2000"      ,"DoubleB (600<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt400to500"      ,"DoubleB (400<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt300to400"      ,"DoubleB (300<p_T<400)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB_pt500to2000"      ,"DoubleB (500<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 
     //////added by rizki - start
 

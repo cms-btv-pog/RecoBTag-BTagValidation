@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
-import ROOT
 
-dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/";
-fname = 'rizki_SF_80x_DoubleMuonTag_BTagMu_QCDMuEnriched_dataWithMCJP_v2_12p9_correctedJP'
-f_ = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+import ROOT
+import os
+
+dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/"
+fname = 'Mu_350'
+f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+
 
 files_data = [
 f_

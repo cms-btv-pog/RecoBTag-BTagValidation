@@ -46,6 +46,11 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 400-450 - pt0
 450-500 - pt1
 
+400-470 - pt13
+470-2000 - pt14
+350-430 - pt15
+430-2000 - pt16
+
 250-350 - pt8
 350-450 - pt9
 
@@ -56,6 +61,7 @@ void convert(TString fin, std::string fout, std::string WP, double kScales[7], s
 
 500-2000 - pt6
 450-2000 - pt10
+
 */
 
 //    const int nSys = 7;

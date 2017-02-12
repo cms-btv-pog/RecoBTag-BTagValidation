@@ -8,18 +8,18 @@
 # mkdir Mu_250_combined
 # ./combineOutput.py -w Mu_250 -o Mu_250_combined
 # 
-mkdir Mu_250_merged
-./mergeDatasets.py -w Mu_250_combined -o Mu_250_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt250.txt
-
-mv -v Mu_250_merged/Final_histograms_btagval.root Mu_250_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
-
+# mkdir Mu_250_merged
+# ./mergeDatasets.py -w Mu_250_combined -o Mu_250_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt250.txt
+# 
+# mv -v Mu_250_merged/Final_histograms_btagval.root Mu_250_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
+# 
 # mkdir Mu_350_combined
 # ./combineOutput.py -w Mu_350 -o Mu_350_combined
 # 
-mkdir Mu_350_merged
-./mergeDatasets.py -w Mu_350_combined -o Mu_350_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt350.txt
-
-mv -v Mu_350_merged/Final_histograms_btagval.root Mu_350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
+# mkdir Mu_350_merged
+# ./mergeDatasets.py -w Mu_350_combined -o Mu_350_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt350.txt
+# 
+# mv -v Mu_350_merged/Final_histograms_btagval.root Mu_350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root
 
 
 
@@ -202,16 +202,18 @@ mv -v Mu_350_merged/Final_histograms_btagval.root Mu_350_merged/Final_DoubleMuon
 #
 # -Double 
 #
-mkdir Mu_250_dataJPcalib_combined
-./combineOutput.py -w Mu_250_dataJPcalib -o Mu_250_dataJPcalib_combined
+# mkdir Mu_250_dataJPcalib_combined
+# ./combineOutput.py -w Mu_250_dataJPcalib -o Mu_250_dataJPcalib_combined
+./combineOutput_new.py -w Mu_250_dataJPcalib -o Mu_250_dataJPcalib_combined -e true --eospath /eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v2.03/BTagValJobs_rizki/
 
 mkdir Mu_250_dataJPcalib_merged
 ./mergeDatasets.py -w Mu_250_dataJPcalib_combined -o Mu_250_dataJPcalib_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt250_dataJPcalib.txt
 
 mv -v Mu_250_dataJPcalib_merged/Final_histograms_btagval.root Mu_250_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root
 
-mkdir Mu_350_dataJPcalib_combined
-./combineOutput.py -w Mu_350_dataJPcalib -o Mu_350_dataJPcalib_combined
+# mkdir Mu_350_dataJPcalib_combined
+# ./combineOutput.py -w Mu_350_dataJPcalib -o Mu_350_dataJPcalib_combined
+./combineOutput_new.py -w Mu_350_dataJPcalib -o Mu_350_dataJPcalib_combined -e true --eospath /eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v2.03/BTagValJobs_rizki/
 
 mkdir Mu_350_dataJPcalib_merged
 ./mergeDatasets.py -w Mu_350_dataJPcalib_combined -o Mu_350_dataJPcalib_merged -d rizki_datasetListForMerging_80x_BTagMu_QCDMuEnriched_mcJPCalib_pt350_dataJPcalib.txt
