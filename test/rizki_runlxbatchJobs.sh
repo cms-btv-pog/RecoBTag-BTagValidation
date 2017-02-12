@@ -8,11 +8,14 @@ eospath=/eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v2.03/BTagV
 # ./createAndSubmitJobs_new.py -w Mu_350_ptReweighted -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_ptReweighted.txt -q 8nh
 # ./createAndSubmitJobs_new.py -w Mu_250_ptReweighted -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_ptReweighted.txt -q 8nh
 # 
-# ./createAndSubmitJobs_new.py -w Mu_350_bfragdown -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_bfragdown.txt -q 8nh
-# ./createAndSubmitJobs_new.py -w Mu_250_bfragdown -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_bfragdown.txt -q 8nh
-# 
-# ./createAndSubmitJobs_new.py -w Mu_350_bfragup -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_bfragup.txt -q 8nh
+./createAndSubmitJobs_new.py -w Mu_350_bfragdown -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_bfragdown.txt -q 8nh
+./createAndSubmitJobs_new.py -w Mu_250_bfragdown -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_bfragdown.txt -q 8nh
+
+./createAndSubmitJobs_new.py -w Mu_350_bfragup -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_bfragup.txt -q 8nh
 ./createAndSubmitJobs_new.py -w Mu_250_bfragup -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_bfragup.txt -q 8nh
+
+./createAndSubmitJobs_new.py -w Mu_350_nTracks -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_nTracks.txt -q 8nh
+./createAndSubmitJobs_new.py -w Mu_250_nTracks -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_nTracks.txt -q 8nh
 
 ./createAndSubmitJobs_new.py -w Mu_350_CD -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_CD.txt -q 8nh
 ./createAndSubmitJobs_new.py -w Mu_250_CD -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_CD.txt -q 8nh
@@ -22,9 +25,6 @@ eospath=/eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/8_0_X_v2.03/BTagV
 
 ./createAndSubmitJobs_new.py -w Mu_350_K0L -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_K0L.txt -q 8nh
 ./createAndSubmitJobs_new.py -w Mu_250_K0L -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_K0L.txt -q 8nh
-
-./createAndSubmitJobs_new.py -w Mu_350_nTracks -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_nTracks.txt -q 8nh
-./createAndSubmitJobs_new.py -w Mu_250_nTracks -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_nTracks.txt -q 8nh
 
 ./createAndSubmitJobs_new.py -w Mu_350_puDown -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTAK8Jet300_OR_HLTJet300_pt350_puDown.txt -q 8nh
 ./createAndSubmitJobs_new.py -w Mu_250_puDown -e true -o $eospath -c btagvalidation_cfg.py -d txt_forJobSubmits/rizki_SF_80x_DoubleMuonTag_QCDMuEnriched_BTagMu_mcJPcalib_HLTDiJet170_pt250to350_puDown.txt -q 8nh
