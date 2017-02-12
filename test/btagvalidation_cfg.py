@@ -314,12 +314,12 @@ options.register('btagSFType', "central",
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('FileFatJetPtWt', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_test/BTagValidation/test/FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root",
+options.register('FileFatJetPtWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/dataMC_weight_calc/FatJet_pt_all_data_mc_weight_Mu_350.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
-options.register('FileNtracksWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Mar21-2016_reproduceCommPlotsForPreApproval/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/dataMCntracks/ntracks_dataMC_weight_single.root",
+options.register('FileNtracksWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/dataMC_weight_calc/FatJet_track_multi_data_mc_weight_Mu_350.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for fat jet ntracks reweighting"
@@ -452,9 +452,9 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     File_PUDistData        = cms.string(options.FilePUDistData),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
-    Hist_FatJetPtWt        = cms.string('jetptweight_mc_data'),
+    Hist_FatJetPtWt        = cms.string('FatJet_pt_all_weight_data_mc'),
     File_NtracksWt         = cms.string(options.FileNtracksWt),                             
-    Hist_NtracksWt         = cms.string('nTracksweight_mc_data'),
+    Hist_NtracksWt         = cms.string('FatJet_track_multi_weight_data_mc'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
     File_SubJetPtBalanceWt = cms.string('subjetptbalance_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.

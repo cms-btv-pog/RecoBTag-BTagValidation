@@ -461,13 +461,17 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   }
 
   if ( doJECUncert_ ) {  
-    if(DEBUG_)std::cout << "deriving JEC unc using: " << jecUncPayloadName_ << std::endl;  	
+    std::cout << "deriving JEC unc using: " << jecUncPayloadName_ << std::endl;  	
   	ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
   }
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
+  
+  //checks for weights
+  if (doFatJetPtReweighting_) std::cout << "pT reweigthing enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
+  if (doNtracksReweighting_)  std::cout << "nTracks reweigthing enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
 
-  // Pt bins for SFb
+// Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
 
   // CSVL scale factors
