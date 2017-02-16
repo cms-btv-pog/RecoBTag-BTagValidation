@@ -65,7 +65,7 @@ void Rebin_postConvert(TString fin, TString WP, TString pt1low,TString pt1high, 
 						h.push_back( (TH1D*)fout->Get("UNWEIGHTED__QCD__FatJet_JP_"+tag.at(itag)+"_pt"+pt1low+"to"+pt1high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys) ) );
 						h_.push_back( (TH1D*)fout->Get("UNWEIGHTED__QCD__FatJet_JP_"+tag.at(itag)+"_pt"+pt2low+"to"+pt2high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys) ) );
 						h.at(i)->Add(h_.at(i));
-						h.at(i)->SetName("UNWEIGHTED__DATA__FatJet_JP_"+tag.at(itag)+"_pt"+pt1low+"to"+pt2high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys) ) ;
+						h.at(i)->SetName("UNWEIGHTED__QCD__FatJet_JP_"+tag.at(itag)+"_pt"+pt1low+"to"+pt2high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys) ) ;
 						h.at(i)->SetTitle("");
 						h.at(i)->Write();
 						i++;
@@ -78,7 +78,7 @@ void Rebin_postConvert(TString fin, TString WP, TString pt1low,TString pt1high, 
 						h.push_back( (TH1D*)fout->Get("UNWEIGHTED__QCD__FatJet_JP_"+tag.at(itag)+"_pt"+pt1low+"to"+pt1high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys)+ud.at(iUD) ) );
 						h_.push_back( (TH1D*)fout->Get("UNWEIGHTED__QCD__FatJet_JP_"+tag.at(itag)+"_pt"+pt2low+"to"+pt2high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys)+ud.at(iUD) ) );
 						h.at(i)->Add(h_.at(i));
-						h.at(i)->SetName("UNWEIGHTED__DATA__FatJet_JP_"+tag.at(itag)+"_pt"+pt1low+"to"+pt2high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys)+ud.at(iUD) ) ;
+						h.at(i)->SetName("UNWEIGHTED__QCD__FatJet_JP_"+tag.at(itag)+"_pt"+pt1low+"to"+pt2high+"_"+flavor.at(iFl)+"_opt"+sys.at(iSys)+ud.at(iUD) ) ;
 						h.at(i)->SetTitle("");
 						h.at(i)->Write();
 						i++;
