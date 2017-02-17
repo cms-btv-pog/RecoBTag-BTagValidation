@@ -45,7 +45,7 @@ void Rebin_postConvert(TString fin, TString WP, TString pt1low,TString pt1high, 
 	vector<TH1D*> h_;	
 	cout << "	Adding pt"+pt1low+"to"+pt2high+" for :	fail data" << endl;	
 
-	vector<TString> sys = {"","_JES","_NTRACKS","_BFRAG","_CFRAG","_CD","_K0L","_PU"};
+	vector<TString> sys = {""};//,"_JES","_NTRACKS","_BFRAG","_CFRAG","_CD","_K0L","_PU"};
 	vector<TString> ud = {"up","down"};
 	vector<TString> flavor = {"bfromg","b","cfromg","c","l","b_cfromg","c_l","b_cfromg_c_l"};
 	vector<TString> tag = {"all","DoubleB"+WP+"pass","DoubleB"+WP+"fail"};
@@ -93,31 +93,37 @@ void Rebin_postConvert(TString fin, TString WP, TString pt1low,TString pt1high, 
 	
 	fout->Close();
 	
-// 	fin->Close();
-
 }
 
 void Rebin_postConvert(){
 
 	TString WP = 'H';
 
-	vector<TString> f={
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP,
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_b_0p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_b_1p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_b_cfromg_0p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_b_cfromg_1p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_c_0p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_c_1p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_c_l_0p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_c_l_1p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_cfromg_0p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_cfromg_1p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_l_0p5",
-		"Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP+"_l_1p5",
+	vector<TString> flavor_kScale {
+			"",
+			"_b_0p5",
+			"_b_1p5",
+			"_b_cfromg_0p5",
+			"_b_cfromg_1p5",
+			"_c_0p5",
+			"_c_1p5",
+			"_c_l_0p5",
+			"_c_l_1p5",
+			"_cfromg_0p5",
+			"_cfromg_1p5",
+			"_l_0p5",
+			"_l_1p5",	
 	};
 
-	for(int i=0; i<f.size();i++){
+	vector<TString> f;
+	
+// 	f.push_back("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_DoubleB"+WP);		
+// 	for(int i=0; i<flavor_kScale.size();i++) f.push_back(f.at(0)+flavor_kScale.at(i));
+
+	f.push_back("Final_histograms_btagval_optimized_doublemu_BTagMu_QCDMuEnriched_HLTBTagMuAK8Jet300Mu5_OR_HLTBTagMuJet300Mu5_run2016B-H_pt350_dataJPcalib_DoubleB"+WP);		
+	for(int i=0; i<flavor_kScale.size(); i++) f.push_back(f.at(0)+flavor_kScale.at(i));
+
+		for(int i=0; i<f.size();i++){
 		cout << "Processing: " << f.at(i) << endl;	
 		Rebin_postConvert(f.at(i),WP,"350","450","450","2000");
 		cout << "Success " << endl;	

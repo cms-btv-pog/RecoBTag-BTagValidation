@@ -83,19 +83,19 @@ if __name__ == "__main__":
 
 	dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/"
 
-	var = "FatJet_pt_all"
-	bins = 500
-	xmin = 0.
-	xmax = 5000.
-	isLog = False
-
-	fname = 'Mu_350'
-	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'	
-	main(f,var,bins,xmin,xmax,isLog)
-
-	fname = 'Mu_250'
-	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'	
-	main(f,var,bins,xmin,xmax,isLog)
+# 	var = "FatJet_pt_all"
+# 	bins = 500
+# 	xmin = 0.
+# 	xmax = 5000.
+# 	isLog = False
+# 
+# 	fname = 'Mu_350'
+# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Mu_250'
+# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
 
 	var = "FatJet_track_multi"
 	bins = 80
@@ -103,10 +103,18 @@ if __name__ == "__main__":
 	xmax = 79.5
 	isLog = False
 
-	fname = 'Mu_350'
+# 	fname = 'Mu_350'
+# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Mu_250'
+# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Mu_350_ptReweighted'
 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
 	main(f,var,bins,xmin,xmax,isLog)
 
-	fname = 'Mu_250'
+	fname = 'Mu_250_ptReweighted'
 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
 	main(f,var,bins,xmin,xmax,isLog)
