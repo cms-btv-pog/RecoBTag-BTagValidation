@@ -303,7 +303,7 @@ process.MessageLogger.cout = cms.untracked.PSet(
     threshold = cms.untracked.string('INFO'),
     )
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) ) # Keep as such
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) ) # Keep as such maxEvents == 1
 
 process.source = cms.Source("EmptySource")
 
