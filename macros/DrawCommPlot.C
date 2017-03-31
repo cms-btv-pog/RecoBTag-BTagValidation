@@ -41,8 +41,23 @@ using namespace std;
 // TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
 // TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root";
 
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_ptReweightedV2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
 TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V3_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
 
 TString filename_ext="" ;
@@ -55,8 +70,15 @@ TString filename_ext="" ;
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted_dataWithDATAJPcalib";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTDiJet170_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTDiJet170_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_27Feb2016_with1p27lightjetCorr_runBtoH_ptReweighted_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweighted_INCLUSIVE_PT_v2";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweightedV2_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V2_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -125,7 +147,9 @@ void DrawCommPlot(bool Draw_track_plots=false,
 //   else            histoTag = "SoftDropSubJet" ;
 //   DrawAll(Draw_track_plots, Draw_Nminus1_plots, Draw_sv_plots, Draw_muons_plots, Draw_discriminator_plots, Draw_tagRate_plots, Draw_2D_plots, histoTag) ;
 
-  return ;
+//   return ;
+  
+  gApplication->Terminate();
 
 }
 
@@ -851,11 +875,11 @@ void DrawStacked(TString name,
     }
   }
 
-  beautify(hist_c        , 8   ,1 , 1001    , 1) ;
-  beautify(hist_gsplit_c , 6   ,1 , 1001    , 1) ;
-  beautify(hist_b        , 2   ,1 , 1001    , 1) ;
+  beautify(hist_c        , kRed   ,1 , 1001    , 1) ;
+  beautify(hist_gsplit_c , kRed-9   ,1 , 1001    , 1) ;
+  beautify(hist_b        , kBlue   ,1 , 1001    , 1) ;
   beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
-  beautify(hist_l        , 4   ,1 , 1001    , 1) ;
+  beautify(hist_l        , 3   ,1 , 1001    , 1) ;
   beautify(histo_tot     , 0   ,1 , 0       , 0) ;
   if (inclTTbar) beautify(hist_ttbar , 6    , 1 , 1001    , 1) ;
   if (inclZjj)   beautify(hist_zjj   , 40   , 1 , 1001    , 1) ;
@@ -930,8 +954,8 @@ void DrawStacked(TString name,
 
   THStack *stack = new THStack("stack","");
   if (inclTTbar) stack->Add(hist_ttbar);
-  stack->Add(hist_b);
   stack->Add(hist_gsplit);
+  stack->Add(hist_b);
   stack->Add(hist_gsplit_c);
   stack->Add(hist_c);
   stack->Add(hist_l);
@@ -1080,11 +1104,11 @@ void DrawStacked(TString name,
   leg->SetTextSize( (dodata? 0.05:0.035) ); //added by rizki
 
   if (doData) leg->AddEntry(hist_data,     datacaption,     "e1p");
-  leg->AddEntry(hist_b,        "b"           ,         "f");
-  leg->AddEntry(hist_c,        "c"           ,         "f");
-  leg->AddEntry(hist_l,        "udsg"     ,    "f");
-  if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
+  leg->AddEntry(hist_l,        "u/d/s quark or gluon"     ,    "f");
+  leg->AddEntry(hist_c,        "c quark"           ,         "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
+  leg->AddEntry(hist_b,        "b quark"           ,         "f");
+  if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
   if (inclTTbar) leg->AddEntry(hist_ttbar,    "t#bar{t}"               ,    "f");
   if (inclZjj) leg->AddEntry(hist_zjj,    "Z#rightarrowq#bar{q}"       ,    "f");
 
