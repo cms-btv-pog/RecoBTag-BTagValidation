@@ -78,7 +78,9 @@ TString filename_ext="" ;
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweightedV2_INCLUSIVE_PT";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V2_INCLUSIVE_PT";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle_v2";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle_v3";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -875,12 +877,20 @@ void DrawStacked(TString name,
     }
   }
 
+  beautify(hist_c        , 8   ,1 , 1001    , 1) ;
+  beautify(hist_gsplit_c , 6   ,1 , 1001    , 1) ;
+  beautify(hist_b        , 2   ,1 , 1001    , 1) ;
+  beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
+  beautify(hist_l        , 4   ,1 , 1001    , 1) ;
+  beautify(histo_tot     , 0   ,1 , 0       , 0) ;
+/* for B/W as BTV-15-002
   beautify(hist_c        , kRed   ,1 , 1001    , 1) ;
   beautify(hist_gsplit_c , kRed-9   ,1 , 1001    , 1) ;
   beautify(hist_b        , kBlue   ,1 , 1001    , 1) ;
   beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
   beautify(hist_l        , 3   ,1 , 1001    , 1) ;
   beautify(histo_tot     , 0   ,1 , 0       , 0) ;
+*/
   if (inclTTbar) beautify(hist_ttbar , 6    , 1 , 1001    , 1) ;
   if (inclZjj)   beautify(hist_zjj   , 40   , 1 , 1001    , 1) ;
   if (doData)    beautify(hist_data  , 1    , 1 , 0       , 1) ;
@@ -946,7 +956,7 @@ void DrawStacked(TString name,
   if (name.Contains("vertexDeltaR")){
     yaxistitle="Jets / 0.02";
   }
-  if (name.Contains("BDTG_SV")){
+  if (name.Contains("BDTG_SV") || name.Contains("DoubleB")){
     yaxistitle="Jets / 0.04";
   }
 
@@ -1026,6 +1036,7 @@ void DrawStacked(TString name,
   pad0->SetBorderSize(2);
   pad0->SetFrameBorderMode(0);
   pad0->SetTopMargin(0.080);
+  pad0->SetLeftMargin(0.1); //reduce left white space - rizki
 
   pad0->SetLogy(log);
 
@@ -1201,6 +1212,7 @@ void DrawStacked(TString name,
     pad1->SetGridy();
     pad1->SetBottomMargin(0.31);
     pad1->SetFrameBorderMode(0);
+    pad1->SetLeftMargin(0.1); //reduce left white space - rizki
 
     histo_ratio->SetMarkerStyle(20);
     histo_ratio->SetMarkerSize(0.75);
