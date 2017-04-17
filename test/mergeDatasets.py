@@ -189,7 +189,7 @@ def main():
     histos.sort()
     print "Writing histograms..."
     for histo in histos:
-      #print "Writing histogram: " , final_histos[histo].GetName()
+#       print "Writing histogram: " , final_histos[histo].GetName()
       final_histos[histo].Write()
     print 'Done'
 
