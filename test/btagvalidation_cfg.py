@@ -14,7 +14,7 @@ options.register('reportEvery', 1000,
     VarParsing.varType.int,
     "Report every N events (default is N=1000)"
     )
-options.register('DEBUG', False,
+options.register('DEBUG', True,
    VarParsing.multiplicity.singleton,
    VarParsing.varType.bool,
    "Display debugging statements"
@@ -198,6 +198,11 @@ options.register('MuonJetPtRatio', 0.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "pT(muon)/pT(Jet) for Muon Tagging"
+    )
+options.register('DiMuonJetPtRatio', 0.6,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.float,
+    "pT(muon1+muon2)/pT(Jet) for Double Muon Tagging"
     )
 options.register('doPUReweightingOfficial', False,
     VarParsing.multiplicity.singleton,
@@ -475,6 +480,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SFbShift               = cms.double(options.SFbShift),
     SFlShift               = cms.double(options.SFlShift),
     MuonJetPtRatio               = cms.double(options.MuonJetPtRatio),
+    DiMuonJetPtRatio               = cms.double(options.DiMuonJetPtRatio),
     DoPUReweightingOfficial= cms.bool(options.doPUReweightingOfficial),
     DoPUReweightingNPV     = cms.bool(options.doPUReweightingNPV),
     DoFatJetPtReweighting  = cms.bool(options.doFatJetPtReweighting),
