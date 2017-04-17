@@ -371,6 +371,11 @@ options.register('doJECUncert', False,
     VarParsing.varType.bool,
     "Do JEC uncertainty"
     )
+options.register('FileBFrag', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File path for doBFrag systematics"
+    )
 
 options.parseArguments()
 
@@ -512,6 +517,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     jecUncPayloadName      = cms.string(options.jecUncPayloadName), 
     doNewJEC               = cms.bool(options.doNewJEC),
     doJECUncert            = cms.bool(options.doJECUncert),  
+    File_BFrag				= cms.string(options.FileBFrag), 
 )
 
 #process.btagvalsubjetmu = process.btagval.clone(

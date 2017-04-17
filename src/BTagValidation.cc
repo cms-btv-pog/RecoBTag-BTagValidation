@@ -292,6 +292,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      doBFrag_;
     const bool                      doBFragUp_; 
     const bool                      doBFragDown_;
+    const std::string               file_BFrag_ ; 
     const bool                      doCDFrag_;
     const bool                      doCFrag_;
     const bool                      doK0L_;
@@ -420,6 +421,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doBFrag_(iConfig.getParameter<bool>("DoBFrag")),
   doBFragUp_(iConfig.getParameter<bool>("DoBFragUp")),
   doBFragDown_(iConfig.getParameter<bool>("DoBFragDown")),
+  file_BFrag_(iConfig.getParameter<std::string>("File_BFrag")),
   doCDFrag_(iConfig.getParameter<bool>("DoCDFrag")),
   doCFrag_(iConfig.getParameter<bool>("DoCFrag")),
   doK0L_(iConfig.getParameter<bool>("DoK0L")),
@@ -443,8 +445,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), 
   calib("csvv2", btagCSVFile_),  
   reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
-  //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_)
-  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_)
+  //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_),
+  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_),
 {
   //now do what ever initialization is needed
   isData = true;
@@ -470,8 +472,12 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
   
   //checks for weights
-  if (doFatJetPtReweighting_) std::cout << "pT reweigthing enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
-  if (doNtracksReweighting_)  std::cout << "nTracks reweigthing enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
+  if (doFatJetPtReweighting_) std::cout << "ATTENTION: pT reweighting enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
+  if (doNtracksReweighting_)  std::cout << "ATTENTION: nTracks reweighting enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
+  if (doBFrag_)  std::cout << "ATTENTION: BFrag weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doCDFrag_)  std::cout << "ATTENTION: CDFrag weighting enabled. " << std::endl;
+  if (doCFrag_)  std::cout << "ATTENTION: CFrag weighting enabled. " << std::endl;
+  if (doK0L_)  std::cout << "ATTENTION: K0L weighting enabled. " << std::endl;
 
 // Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
@@ -940,6 +946,7 @@ void BTagValidation::createJetHistos_DoubleB() {
 
 void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 
+	//Define your desired pt binnings for SF templates here.
 	std::vector<TString> ptStr = {
 								"pt250to300",
 								"pt300to350",
@@ -1016,6 +1023,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   if (doBFrag_)
   {
+	if(DEBUG_)std::cout << "Running BFrag systematics. Initializing weights for BFrag systematics, loading files from: "+file_BFrag_ << std::endl; 
     int nPtRelPtBins = 15;
 
     TString PtRelPtBin[] = {
@@ -1032,7 +1040,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         BTemplateCorrections[ib][ptb][1] = 1.;
       }
       std::ifstream MnusCorrectionsFile;      
-      MnusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt");
+//       MnusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt"); //Make sure files are in place and up-to-date!
+      MnusCorrectionsFile.open(file_BFrag_ + "EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt"); //Make sure files are in place and up-to-date!
       while( MnusCorrectionsFile )
       {
         float xBin, efcorr;
@@ -1043,7 +1052,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       }
 
       std::ifstream PlusCorrectionsFile; 
-      PlusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt");
+//       PlusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt"); //Make sure files are in place and up-to-date!
+      PlusCorrectionsFile.open(file_BFrag_ + "EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt"); //Make sure files are in place and up-to-date!
       while( PlusCorrectionsFile )
       {
         float xBin, efcorr;
@@ -1446,6 +1456,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // -------For calculating b-fragmentation systematic
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 5){
         if (doBFrag_){
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for B Frag systematics.. " << std::endl; 
+
           //float sfbFrag = 1.;
           float drMin = 0.8;   
           float jPT = FatJetInfo.Jet_pt[iJet];
@@ -1503,6 +1515,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 5 || abs(FatJetInfo.Jet_flavour[iJet]) == 4){
         if (doCDFrag_)
         {
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for cd Frag systematics.. " << std::endl; 
+
           float sfCD = 1.;
           float drMin = 0.8;   
           float jeta = FatJetInfo.Jet_eta[iJet];
@@ -1543,6 +1557,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //c fragmentation
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 4){
         if (doCFrag_){
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for C Frag systematics.. " << std::endl; 
+
           float sfC = 1.;
           float drMin = 0.8;   
           float jeta = FatJetInfo.Jet_eta[iJet];
@@ -1589,6 +1605,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       {
         if (doK0L_)
         {
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for K0L systematics.. " << std::endl; 
+
           float sfK0L = 1.;
           float jeta = FatJetInfo.Jet_eta[iJet];
           float jphi = FatJetInfo.Jet_phi[iJet];
@@ -1678,7 +1696,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		//for signal proxy study, for subjet pt balance reweight. - end
 
 
-		/*
+		/* Uncomment below as needed.
 		//// ------- start process subjets --------------
 		if( usePrunedSubjets_ || useSoftDropSubjets_ ) {
 		  int nTotalFat = 0, nSharedFat = 0; // for track sharing
@@ -2281,6 +2299,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 										{"DoubleBH",DoubleBH_}
 										};
 
+	//Make sure this matches with what you've defined in createJetHistos_SF
 	std::vector<TString> ptStr = {
 								"pt250to300",
 								"pt300to350",
