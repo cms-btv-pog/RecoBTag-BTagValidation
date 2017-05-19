@@ -36,7 +36,7 @@ def main():
   dataset_list_file = open(os.path.join(main_workdir,'datasetList.txt'),'r')
   dataset_list_lines = dataset_list_file.readlines()
 
-  print 'Starting cleanup...'
+  print 'Starting cleanup...', main_workdir
 
   # loop over datasets
   for line in dataset_list_lines:

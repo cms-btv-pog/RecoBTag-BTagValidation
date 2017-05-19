@@ -65,24 +65,17 @@ bash_template = """#!/bin/bash
 
 BATCHDIR=${PWD}
 
-export SCRAM_ARCH=slc6_amd64_gcc491
+export SCRAM_ARCH=slc6_amd64_gcc530
 cd MAIN_WORKDIR
 eval `scram runtime -sh`
 
 cp -v MAIN_WORKDIR/CMSSW_cfg.py $BATCHDIR/CMSSW_cfg.py
-cp -v MAIN_WORKDIR/PUDist*.root $BATCHDIR/
-cp -v MAIN_WORKDIR/RunII2015_25ns_PUXsec69000nb.root $BATCHDIR/
-cp -v MAIN_WORKDIR/PUDistMC_2015_25ns_FallMC_matchData_PoissonOOTPU.root $BATCHDIR/
-cp -v MAIN_WORKDIR/hnpv_data_Run2015D_mc_RunIISpring15DR74-Asympt25ns_pvwt.root $BATCHDIR/
-cp -v MAIN_WORKDIR/hnpv_data_Run2015D_mc_RunIISpring15DR74-Asympt25ns_pvwt.root $BATCHDIR/
-cp -v MAIN_WORKDIR/PUDistData_Run2015ABCD.root $BATCHDIR/
-cp -v MAIN_WORKDIR/PUDistMC_2015_25ns_Startup_PoissonOOTPU.root $BATCHDIR/
+cp -v MAIN_WORKDIR/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root $BATCHDIR/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root
+cp -v MAIN_WORKDIR/RunII2016Rereco_25ns_PUXsec69000nb.root $BATCHDIR/RunII2016Rereco_25ns_PUXsec69000nb.root 
+cp -v MAIN_WORKDIR/RunII2016Rereco_25ns_PUXsec72450nb.root $BATCHDIR/RunII2016Rereco_25ns_PUXsec72450nb.root 
+cp -v MAIN_WORKDIR/RunII2016Rereco_25ns_PUXsec65550nb.root $BATCHDIR/RunII2016Rereco_25ns_PUXsec65550nb.root 
 cp -v DATASET_WORKDIR/input/inputFiles_JOB_NUMBER_cfi.py $BATCHDIR/inputFiles_cfi.py
-cp -v MAIN_WORKDIR/jetpt_data_mc_RunIISpring15_25ns_MINIAOD.root $BATCHDIR/
-cp -v MAIN_WORKDIR/jetpt_data_mc_SingleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
-cp -v MAIN_WORKDIR/FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
-cp -v MAIN_WORKDIR/SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root $BATCHDIR/
-cp -v MAIN_WORKDIR/CSVv2.csv $BATCHDIR/
+cp -v MAIN_WORKDIR/CSVv2_4invfb.csv $BATCHDIR/
 cd $BATCHDIR
 echo "Running CMSSW job"
 cmsRun CMSSW_cfg.py CFG_PARAMETERS
@@ -138,30 +131,22 @@ def main():
   # copy the CMSSW cfg file to the cfg_files_dir
   shutil.copyfile(cmssw_cfg,os.path.join(main_workdir,'CMSSW_cfg.py'))
 
-  # look for pileup distribution and CSV SF files and copy them into main_workdir
+  # look for pileup distribution, CSV SF files, pt and other weight files and copy them into main_workdir
   cfg_dirname = os.path.dirname(cmssw_cfg)
   if cfg_dirname=='':
     cfg_dirname = os.getcwd()
   for filename in os.listdir(cfg_dirname):
     if not os.path.isfile(os.path.join(cfg_dirname,filename)):
       continue
-    if re.search("^RunII2015_25ns_PUXsec69000nb.root$", filename):
+    if re.search("^RunII2016Rereco_25ns_PUXsec69000nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^PUDistMC_2015_25ns_FallMC_matchData_PoissonOOTPU.root$", filename):
+    if re.search("^RunII2016Rereco_25ns_PUXsec72450nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^hnpv_data_Run2015D_mc_RunIISpring15DR74-Asympt25ns_pvwt.root$", filename):
+    if re.search("^RunII2016Rereco_25ns_PUXsec65550nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^PUDist.*\.root$", filename):
+    if re.search("^PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^jetpt_data_mc_RunIISpring15_25ns_MINIAOD.root$", filename):
-      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^jetpt_data_mc_SingleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
-      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^FatJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
-      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root$", filename):
-      shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^CSVv2.csv$", filename):
+    if re.search("^CSVv2_4invfb.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
   # open and read the dataset_list file
   dataset_list_file = open(dataset_list,"r")
