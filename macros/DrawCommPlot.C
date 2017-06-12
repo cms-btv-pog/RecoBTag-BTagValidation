@@ -80,19 +80,24 @@ TString filename_ext="" ;
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle_v2";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle_v3";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle_v3";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_25Apr2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateXaxisTitle";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_25Apr2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateStyle_05252017";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_25Apr2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateStyle_05292017";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
 // TString title1 = "36.8 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 // TString title1 = "35.9 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-TString title1 = "36 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
+// TString title1 = "36 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
+TString title1 = "36 fb^{-1} (13 TeV, 2016)";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
 TString formatb=".png";
-TString formatc=".C";
+// TString formatc=".C";
+TString formatc=".root";
 
 bool bOverflow = 1;
 bool web       = 0;
@@ -182,7 +187,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
       //DrawStacked(histoTag+"_massDrop_softdrop"    ,"Mass drop (soft drop AK8 jets) [GeV]"              ,logy ,dodata ,extNorm ,4 ,0 ,0. ,0.);
     //}
     //DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_DoubleB"      ,"DoubleB"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB"      ,"double-b discriminator"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 
     DrawStacked(histoTag+"_DoubleB_pt400to450"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
     DrawStacked(histoTag+"_DoubleB_pt450to500"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
@@ -194,7 +199,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
 
     //////added by rizki - start
 
-    DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_z_ratio"           ,"z variable"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
 
     int trackSip_rebin = 5;
     DrawStacked(histoTag+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
@@ -219,14 +224,14 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_tau2_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
     DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
 
-    DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
+    DrawStacked(histoTag+"_tau1_vertexMass"  ,"corrected SV_{0} mass [GeV]"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
     DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} 2D flight distance significance"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
 
-    DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
+    DrawStacked(histoTag+"_tau2_vertexMass"  ,"corrected SV_{1} mass [GeV]"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
     DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} 2D flight distance significance"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
 
     DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
@@ -600,7 +605,7 @@ void Draw(TString name, TString histotitle, bool log) {
   histo_ratio->SetMarkerSize(0.75);
   histo_ratio->SetLineWidth(2);
 
-  histo_ratio->GetYaxis()->SetTitle("Data/MC");
+  histo_ratio->GetYaxis()->SetTitle("data/MC");
   histo_ratio->SetTitleOffset(0.9,"X");
   histo_ratio->SetTitleOffset(0.31,"Y");
   histo_ratio->GetXaxis()->SetTitle(histotitle);
@@ -627,10 +632,10 @@ void Draw(TString name, TString histotitle, bool log) {
   c1->SaveAs(dir4plots+"/"+name_plot);
   name_plot=name+"_Linear"+formatb;
   if(log) name_plot=name+"_Log"+formatb;
-  c1->SaveAs(dir4plots+"/"+name_plot);
+//   c1->SaveAs(dir4plots+"/"+name_plot);
   name_plot=name+"_Linear"+formatc;
   if(log) name_plot=name+"_Log"+formatc;
-  //c1->SaveAs(dir4plots+"/"+name_plot);
+//   c1->SaveAs(dir4plots+"/"+name_plot);
 
 }
 
@@ -907,11 +912,11 @@ void DrawStacked(TString name,
 
   if (histotitle=="number of selected tracks in the jets") {
     histotitle = "Number of selected tracks in the jets" ; 
-    yaxistitle="Jets" ; 
+    yaxistitle="jets" ; 
   }
   if (histotitle=="N(SV)") { 
     histotitle = "Number of SVs" ; 
-    yaxistitle="Jets" ; 
+    yaxistitle="jets" ; 
   }
   if (histotitle=="number of hits in the Pixel") {
     histotitle = "Number of pixel hits" ; 
@@ -919,45 +924,50 @@ void DrawStacked(TString name,
   }
   if (histotitle=="3D IP significance of tracks") {
     histotitle = "3D IP significance of tracks" ; 
-    yaxistitle="Tracks / 1" ; 
+    yaxistitle="Tracks / 1 units" ; 
   }
   if (histotitle=="Flight distance significance 3D") {
     histotitle = "SV 3D flight distance significance" ; 
-    yaxistitle="SVs / 5" ; 
+    yaxistitle="SVs / 5 units" ; 
   }
   if (histotitle=="CSVIVFv2") {
     histotitle = "CSVv2 Discriminator" ; 
-    yaxistitle="Jets / 0.02" ; 
+    yaxistitle="jets / 0.02 units" ; 
   }
   if (name.Contains("z_ratio") ){
-    yaxistitle="Jets / 1.2";
+//     yaxistitle="jets / 1.27 units";
+    yaxistitle="jets / 1.3 units";
   }
   if (name.Contains("trackSip") && !name.Contains("BDTG")){
-    yaxistitle="Tracks / 8";
+    yaxistitle="Tracks / 8 units";
   }
-  if (name.Contains("trackEtaRel") || name.Contains("vertexMass")){
-    yaxistitle="SVs / 1";
+  if (name.Contains("trackEtaRel")){
+    yaxistitle="SVs / 1 units";
+  }
+  if (name.Contains("vertexMass")){
+    yaxistitle="SVs / 1 GeV";
   }
   if (name.Contains("vertexEnergyRatio")){
-    yaxistitle="SVs / 0.05";
+    yaxistitle="SVs / 0.05 units";
   }
   if (name.Contains("flightDistance2dSig")){
-    yaxistitle="SVs / 4";
+    yaxistitle="SVs / 0.4 units";
   }
   if (name.Contains("vertexDeltaR")){
-    yaxistitle="SVs / 0.02";
+    yaxistitle="SVs / 0.02 units";
   }
   if (name.Contains("jetNTracks")){
-    yaxistitle="Tracks / 1";
+    yaxistitle="Tracks / 1 units";
   }
   if (name.Contains("_nSV")){
-    yaxistitle="SVs / 1";
+    yaxistitle="SVs / 1 units";
   }
   if (name.Contains("vertexDeltaR")){
-    yaxistitle="Jets / 0.02";
+    yaxistitle="jets / 0.02 units";
   }
   if (name.Contains("BDTG_SV") || name.Contains("DoubleB")){
-    yaxistitle="Jets / 0.04";
+    yaxistitle="jets / 0.04 units";
+	histotitle_ = "double-b discriminator" ; 
   }
 
 
@@ -1000,8 +1010,8 @@ void DrawStacked(TString name,
   }
 
   if( doData && name.Contains("FatJet_phi") && nRebin==40 )
-    cout << "Data/MC ratio:       " << histo_ratio->GetBinContent(1) << endl
-      << "Data/MC ratio error: " << histo_ratio->GetBinError(1) << endl;
+    cout << "data/MC ratio:       " << histo_ratio->GetBinContent(1) << endl
+      << "data/MC ratio error: " << histo_ratio->GetBinError(1) << endl;
 
   setTDRStyle();
   gStyle->SetErrorX(0.);
@@ -1115,10 +1125,10 @@ void DrawStacked(TString name,
   leg->SetTextSize( (dodata? 0.05:0.035) ); //added by rizki
 
   if (doData) leg->AddEntry(hist_data,     datacaption,     "e1p");
-  leg->AddEntry(hist_l,        "u/d/s quark or gluon"     ,    "f");
-  leg->AddEntry(hist_c,        "c quark"           ,         "f");
+  leg->AddEntry(hist_l,        "udsg"     ,    "f");
+  leg->AddEntry(hist_c,        "c"           ,         "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
-  leg->AddEntry(hist_b,        "b quark"           ,         "f");
+  leg->AddEntry(hist_b,        "b"           ,         "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
   if (inclTTbar) leg->AddEntry(hist_ttbar,    "t#bar{t}"               ,    "f");
   if (inclZjj) leg->AddEntry(hist_zjj,    "Z#rightarrowq#bar{q}"       ,    "f");
@@ -1135,18 +1145,18 @@ void DrawStacked(TString name,
     else if (filename.Contains("InclusiveJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of AK8 jets}" ;
     else if (filename.Contains("InclusiveJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of AK8 jets}" ;
 
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuEnrichedJet") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
+    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon enriched multijet events}{Muon-tagged AK8 jets}" ;
+    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuEnrichedJet") && name.Contains("FatJet")) sample += "#splitline{Muon enriched multijet events}{Muon-tagged AK8 jets}" ;
+    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Soft drop subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
+    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Pruned subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
 
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("FatJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Double-muon-tagged AK8 jets}" ;  
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
+    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("FatJet") ) sample += "#splitline{Muon enriched multijet events}{Double-muon-tagged AK8 jets}" ;  
+    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Soft drop subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
+    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Pruned subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
 
-    else if (filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{AK8 jets}" ;
-    else if (filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Soft drop subjets of AK8 jets}" ;
-    else if (filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Pruned subjets of AK8 jets}" ;
+    else if (filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon enriched multijet events}{AK8 jets}" ;
+    else if (filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Muon enriched multijet events}{Soft drop subjets of AK8 jets}" ;
+    else if (filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Muon enriched multijet events}{Pruned subjets of AK8 jets}" ;
 
     else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{Double-muon-tagged AK8 jets}" ;  
     else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of Double-muon-tagged AK8 jets}" ;
@@ -1218,7 +1228,7 @@ void DrawStacked(TString name,
     histo_ratio->SetMarkerSize(0.75);
     histo_ratio->SetLineWidth(2);
 
-    histo_ratio->GetYaxis()->SetTitle("Data/MC");
+    histo_ratio->GetYaxis()->SetTitle("data/MC");
     histo_ratio->SetTitleOffset(0.9,"X");
     histo_ratio->SetTitleOffset(0.31,"Y");
     histo_ratio->GetXaxis()->SetTitle(histotitle_);
@@ -1276,9 +1286,9 @@ void DrawStacked(TString name,
   c1->SaveAs(dir4plots+"/"+name_plot);
   name_plot=name+"_Linear"+formatb;
   if(log) name_plot=name+"_Log"+formatb;
-  c1->SaveAs(dir4plots+"/"+name_plot);
+//   c1->SaveAs(dir4plots+"/"+name_plot);
   name_plot=name+"_Linear"+formatc;
-//   if(log) name_plot=name+"_Log"+formatc;
+  if(log) name_plot=name+"_Log"+formatc;
 //   c1->SaveAs(dir4plots+"/"+name_plot);
 
   if (log && web) {  // save also _Linear for web
@@ -1478,7 +1488,7 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
     histo_ratio->SetMarkerSize(0.75);
     histo_ratio->SetLineWidth(2);
 
-    histo_ratio->GetYaxis()->SetTitle("Data/MC");
+    histo_ratio->GetYaxis()->SetTitle("data/MC");
     histo_ratio->GetXaxis()->SetTitle(histotitle);
     histo_ratio->GetYaxis()->SetNdivisions( 505 );
 
@@ -1497,10 +1507,10 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
   c1->SaveAs(dir4plots+"/"+name_plot);
   name_plot=name+"_Linear"+formatb;
   if(log) name_plot=name+"_Log"+formatb;
-  c1->SaveAs(dir4plots+"/"+name_plot);
+//   c1->SaveAs(dir4plots+"/"+name_plot);
   name_plot=name+"_Linear"+formatc;
   if(log) name_plot=name+"_Log"+formatc;
-  c1->SaveAs(dir4plots+"/"+name_plot);
+//   c1->SaveAs(dir4plots+"/"+name_plot);
 
   if (log && web) {  // save also _Linear for web
     c1_1 ->cd();
@@ -1741,11 +1751,11 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   TString name_plot=name+"_Linear"+formata;
   if(log) name_plot=name+"_Log"+formata;
   canvas->SaveAs(dir4plots+"/"+name_plot);
-  //   name_plot=name+"_Linear"+formatb;
-  //   if(log) name_plot=name+"_Log"+formatb;
-  //   canvas->SaveAs(dir4plots+"/"+name_plot);
-  //   name_plot=name+"_Linear"+formatc;
-  //   if(log) name_plot=name+"_Log"+formatc;
-  //   canvas->SaveAs(dir4plots+"/"+name_plot);
+    name_plot=name+"_Linear"+formatb;
+    if(log) name_plot=name+"_Log"+formatb;
+//     canvas->SaveAs(dir4plots+"/"+name_plot);
+    name_plot=name+"_Linear"+formatc;
+    if(log) name_plot=name+"_Log"+formatc;
+//     canvas->SaveAs(dir4plots+"/"+name_plot);
 
 }
