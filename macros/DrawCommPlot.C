@@ -41,8 +41,23 @@ using namespace std;
 // TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
 // TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root";
 
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_ptReweightedV2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
 TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V3_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
 
 TString filename_ext="" ;
@@ -55,15 +70,23 @@ TString filename_ext="" ;
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted_dataWithDATAJPcalib";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTDiJet170_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTDiJet170_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_27Feb2016_with1p27lightjetCorr_runBtoH_ptReweighted_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweighted_INCLUSIVE_PT_v2";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweightedV2_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V2_INCLUSIVE_PT";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT";
+TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
 // TString title1 = "36.8 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 // TString title1 = "35.9 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-TString title1 = "36 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
+// TString title1 = "36 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
+TString title1 = "36 fb^{-1} (13 TeV, 2016)";
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
@@ -125,7 +148,9 @@ void DrawCommPlot(bool Draw_track_plots=false,
 //   else            histoTag = "SoftDropSubJet" ;
 //   DrawAll(Draw_track_plots, Draw_Nminus1_plots, Draw_sv_plots, Draw_muons_plots, Draw_discriminator_plots, Draw_tagRate_plots, Draw_2D_plots, histoTag) ;
 
-  return ;
+//   return ;
+  
+  gApplication->Terminate();
 
 }
 
@@ -156,7 +181,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
       //DrawStacked(histoTag+"_massDrop_softdrop"    ,"Mass drop (soft drop AK8 jets) [GeV]"              ,logy ,dodata ,extNorm ,4 ,0 ,0. ,0.);
     //}
     //DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_DoubleB"      ,"DoubleB"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DoubleB"      ,"double-b discriminator"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 
     DrawStacked(histoTag+"_DoubleB_pt400to450"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
     DrawStacked(histoTag+"_DoubleB_pt450to500"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
@@ -168,7 +193,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
 
     //////added by rizki - start
 
-    DrawStacked(histoTag+"_z_ratio"           ,"z ratio"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    DrawStacked(histoTag+"_z_ratio"           ,"z variable"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
 
     int trackSip_rebin = 5;
     DrawStacked(histoTag+"_trackSip3dSig_0"  ,"IP Sig 1st track"                            ,logy ,dodata ,extNorm ,trackSip_rebin ,0 ,0. ,0.);
@@ -193,14 +218,14 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_tau2_trackEtaRel_1"  ,"EtaRel 2nd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
     DrawStacked(histoTag+"_tau2_trackEtaRel_2"  ,"EtaRel 3rd track for SV_{1}"                            ,logy ,dodata ,extNorm ,1 ,1 ,0. ,10.);
 
-    DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
+    DrawStacked(histoTag+"_tau1_vertexMass"  ,"SV_{0} mass [GeV]"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
     DrawStacked(histoTag+"_tau1_vertexEnergyRatio"  ,"SV_{0} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_tau1_vertexDeltaR"  ,"tau1_vertexDeltaR"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    DrawStacked(histoTag+"_tau1_flightDistance2dSig"  ,"SV_{0} 2D flight distance significance"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
 
-    DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} Mass"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
+    DrawStacked(histoTag+"_tau2_vertexMass"  ,"SV_{1} mass [GeV]"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,50.);
     DrawStacked(histoTag+"_tau2_vertexEnergyRatio"  ,"SV_{1} Energy ratio"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
-    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} flight distance Sig"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
+    DrawStacked(histoTag+"_tau2_flightDistance2dSig"  ,"SV_{1} 2D flight distance significance"                          ,logy ,dodata ,extNorm ,1 ,1 ,0. ,20.);
 
     DrawStacked(histoTag+"_jetNTracks"  ,"Number of tracks"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
@@ -574,7 +599,7 @@ void Draw(TString name, TString histotitle, bool log) {
   histo_ratio->SetMarkerSize(0.75);
   histo_ratio->SetLineWidth(2);
 
-  histo_ratio->GetYaxis()->SetTitle("Data/MC");
+  histo_ratio->GetYaxis()->SetTitle("data/MC");
   histo_ratio->SetTitleOffset(0.9,"X");
   histo_ratio->SetTitleOffset(0.31,"Y");
   histo_ratio->GetXaxis()->SetTitle(histotitle);
@@ -857,6 +882,14 @@ void DrawStacked(TString name,
   beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
   beautify(hist_l        , 4   ,1 , 1001    , 1) ;
   beautify(histo_tot     , 0   ,1 , 0       , 0) ;
+/* for B/W as BTV-15-002
+  beautify(hist_c        , kRed   ,1 , 1001    , 1) ;
+  beautify(hist_gsplit_c , kRed-9   ,1 , 1001    , 1) ;
+  beautify(hist_b        , kBlue   ,1 , 1001    , 1) ;
+  beautify(hist_gsplit   , 7   ,1 , 1001    , 1) ;
+  beautify(hist_l        , 3   ,1 , 1001    , 1) ;
+  beautify(histo_tot     , 0   ,1 , 0       , 0) ;
+*/
   if (inclTTbar) beautify(hist_ttbar , 6    , 1 , 1001    , 1) ;
   if (inclZjj)   beautify(hist_zjj   , 40   , 1 , 1001    , 1) ;
   if (doData)    beautify(hist_data  , 1    , 1 , 0       , 1) ;
@@ -873,11 +906,11 @@ void DrawStacked(TString name,
 
   if (histotitle=="number of selected tracks in the jets") {
     histotitle = "Number of selected tracks in the jets" ; 
-    yaxistitle="Jets" ; 
+    yaxistitle="jets" ; 
   }
   if (histotitle=="N(SV)") { 
     histotitle = "Number of SVs" ; 
-    yaxistitle="Jets" ; 
+    yaxistitle="jets" ; 
   }
   if (histotitle=="number of hits in the Pixel") {
     histotitle = "Number of pixel hits" ; 
@@ -885,53 +918,58 @@ void DrawStacked(TString name,
   }
   if (histotitle=="3D IP significance of tracks") {
     histotitle = "3D IP significance of tracks" ; 
-    yaxistitle="Tracks / 1" ; 
+    yaxistitle="Tracks / 1 units" ; 
   }
   if (histotitle=="Flight distance significance 3D") {
     histotitle = "SV 3D flight distance significance" ; 
-    yaxistitle="SVs / 5" ; 
+    yaxistitle="SVs / 5 units" ; 
   }
   if (histotitle=="CSVIVFv2") {
     histotitle = "CSVv2 Discriminator" ; 
-    yaxistitle="Jets / 0.02" ; 
+    yaxistitle="jets / 0.02 units" ; 
   }
   if (name.Contains("z_ratio") ){
-    yaxistitle="Jets / 1.2";
+//     yaxistitle="jets / 1.27 units";
+    yaxistitle="jets / 1.3 units";
   }
   if (name.Contains("trackSip") && !name.Contains("BDTG")){
-    yaxistitle="Tracks / 8";
+    yaxistitle="Tracks / 8 units";
   }
-  if (name.Contains("trackEtaRel") || name.Contains("vertexMass")){
-    yaxistitle="SVs / 1";
+  if (name.Contains("trackEtaRel")){
+    yaxistitle="SVs / 1 units";
+  }
+  if (name.Contains("vertexMass")){
+    yaxistitle="SVs / 1 GeV";
   }
   if (name.Contains("vertexEnergyRatio")){
-    yaxistitle="SVs / 0.05";
+    yaxistitle="SVs / 0.05 units";
   }
   if (name.Contains("flightDistance2dSig")){
-    yaxistitle="SVs / 4";
+    yaxistitle="SVs / 0.4 units";
   }
   if (name.Contains("vertexDeltaR")){
-    yaxistitle="SVs / 0.02";
+    yaxistitle="SVs / 0.02 units";
   }
   if (name.Contains("jetNTracks")){
-    yaxistitle="Tracks / 1";
+    yaxistitle="Tracks / 1 units";
   }
   if (name.Contains("_nSV")){
-    yaxistitle="SVs / 1";
+    yaxistitle="SVs / 1 units";
   }
   if (name.Contains("vertexDeltaR")){
-    yaxistitle="Jets / 0.02";
+    yaxistitle="jets / 0.02 units";
   }
-  if (name.Contains("BDTG_SV")){
-    yaxistitle="Jets / 0.04";
+  if (name.Contains("BDTG_SV") || name.Contains("DoubleB")){
+    yaxistitle="jets / 0.04 units";
+	histotitle_ = "double-b discriminator" ; 
   }
 
 
 
   THStack *stack = new THStack("stack","");
   if (inclTTbar) stack->Add(hist_ttbar);
-  stack->Add(hist_b);
   stack->Add(hist_gsplit);
+  stack->Add(hist_b);
   stack->Add(hist_gsplit_c);
   stack->Add(hist_c);
   stack->Add(hist_l);
@@ -966,8 +1004,8 @@ void DrawStacked(TString name,
   }
 
   if( doData && name.Contains("FatJet_phi") && nRebin==40 )
-    cout << "Data/MC ratio:       " << histo_ratio->GetBinContent(1) << endl
-      << "Data/MC ratio error: " << histo_ratio->GetBinError(1) << endl;
+    cout << "data/MC ratio:       " << histo_ratio->GetBinContent(1) << endl
+      << "data/MC ratio error: " << histo_ratio->GetBinError(1) << endl;
 
   setTDRStyle();
   gStyle->SetErrorX(0.);
@@ -1002,6 +1040,7 @@ void DrawStacked(TString name,
   pad0->SetBorderSize(2);
   pad0->SetFrameBorderMode(0);
   pad0->SetTopMargin(0.080);
+  pad0->SetLeftMargin(0.1); //reduce left white space - rizki
 
   pad0->SetLogy(log);
 
@@ -1013,7 +1052,12 @@ void DrawStacked(TString name,
     if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*50000000 : histo_tot->GetMaximum()*50000000) ;
     else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3000000 : histo_tot->GetMaximum()*3000000) ;
     else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ; 
-    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ;
+    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ; 
+    else if ( name.Contains("_DoubleB") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+    else if ( name.Contains("_tau1_flightDistance2dSig") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ; 
+    else if ( name.Contains("_tau2_vertexMass") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10 : histo_tot->GetMaximum()*10) ; 
+    else if ( name.Contains("_z_ratio") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10 : histo_tot->GetMaximum()*10) ; 
+    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ;
 
   }
   if (doData) {
@@ -1080,11 +1124,11 @@ void DrawStacked(TString name,
   leg->SetTextSize( (dodata? 0.05:0.035) ); //added by rizki
 
   if (doData) leg->AddEntry(hist_data,     datacaption,     "e1p");
-  leg->AddEntry(hist_b,        "b"           ,         "f");
-  leg->AddEntry(hist_c,        "c"           ,         "f");
   leg->AddEntry(hist_l,        "udsg"     ,    "f");
-  if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
+  leg->AddEntry(hist_c,        "c"           ,         "f");
   if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit_c,  "c from gluon splitting"     ,"f");
+  leg->AddEntry(hist_b,        "b"           ,         "f");
+  if(name.Contains("FatJet"))  leg->AddEntry(hist_gsplit,   "b from gluon splitting"     ,"f");
   if (inclTTbar) leg->AddEntry(hist_ttbar,    "t#bar{t}"               ,    "f");
   if (inclZjj) leg->AddEntry(hist_zjj,    "Z#rightarrowq#bar{q}"       ,    "f");
 
@@ -1100,18 +1144,18 @@ void DrawStacked(TString name,
     else if (filename.Contains("InclusiveJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of AK8 jets}" ;
     else if (filename.Contains("InclusiveJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of AK8 jets}" ;
 
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuEnrichedJet") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{Muon-tagged AK8 jets}" ;
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
-    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
+    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon enriched multijet events}{Muon-tagged AK8 jets}" ;
+    else if (filename.Contains("MuTaggedFatJet")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuEnrichedJet") && name.Contains("FatJet")) sample += "#splitline{Muon enriched multijet events}{Muon-tagged AK8 jets}" ;
+    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Soft drop subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
+    else if (filename.Contains("MuonTaggedFatJets")&& !filename.Contains("DoubleMuonTaggedFatJets") && filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Pruned subjets}{of Muon-tagged AK8 jets}}" ; adjustheight = 0.08;}
 
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("FatJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Double-muon-tagged AK8 jets}" ;  
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Soft drop subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
-    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon Enriched Multijet sample}{#splitline{Pruned subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
+    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("FatJet") ) sample += "#splitline{Muon enriched multijet events}{Double-muon-tagged AK8 jets}" ;  
+    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Soft drop subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
+    else if (filename.Contains("DoubleMuonTaggedFatJets")&& filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ){ sample += "#splitline{Muon enriched multijet events}{#splitline{Pruned subjets}{of Double-muon-tagged AK8 jets}}" ;adjustheight = 0.08;}
 
-    else if (filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon Enriched Multijet sample}{AK8 jets}" ;
-    else if (filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Soft drop subjets of AK8 jets}" ;
-    else if (filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Muon Enriched Multijet sample}{Pruned subjets of AK8 jets}" ;
+    else if (filename.Contains("MuonEnrichedJets") && name.Contains("FatJet")) sample += "#splitline{Muon enriched multijet events}{AK8 jets}" ;
+    else if (filename.Contains("MuonEnrichedJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Muon enriched multijet events}{Soft drop subjets of AK8 jets}" ;
+    else if (filename.Contains("MuonEnrichedJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Muon enriched multijet events}{Pruned subjets of AK8 jets}" ;
 
     else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{Double-muon-tagged AK8 jets}" ;  
     else if (filename.Contains("DoubleMuonTaggedFatJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of Double-muon-tagged AK8 jets}" ;
@@ -1130,7 +1174,8 @@ void DrawStacked(TString name,
       std::cout << " >>>> Error:Check filename = " << filename << " or name = " << name << "\n" ;
     }
 
-    TLatex *tex1 = new TLatex(0.20,0.72,sample);
+//     TLatex *tex1 = new TLatex(0.20,0.72,sample);
+    TLatex *tex1 = new TLatex(0.20,0.72+0.08,sample); //adjust for BTV-16-002 updateStyle_06222017
     tex1->SetNDC();
     tex1->SetTextAlign(13);
     tex1->SetTextFont(42);
@@ -1153,7 +1198,8 @@ void DrawStacked(TString name,
 
     TString jetpt=ptcut ; 
 
-    TLatex *tex3 = new TLatex(0.20,0.53-adjustheight,jetpt);
+//     TLatex *tex3 = new TLatex(0.20,0.53-adjustheight,jetpt);
+    TLatex *tex3 = new TLatex(0.20,0.53-adjustheight+0.14,jetpt); //adjust for BTV-16-002 updateStyle_06222017
     tex3->SetNDC();
     tex3->SetTextAlign(13);
     tex3->SetTextFont(42);
@@ -1177,12 +1223,13 @@ void DrawStacked(TString name,
     pad1->SetGridy();
     pad1->SetBottomMargin(0.31);
     pad1->SetFrameBorderMode(0);
+    pad1->SetLeftMargin(0.1); //reduce left white space - rizki
 
     histo_ratio->SetMarkerStyle(20);
     histo_ratio->SetMarkerSize(0.75);
     histo_ratio->SetLineWidth(2);
 
-    histo_ratio->GetYaxis()->SetTitle("Data/MC");
+    histo_ratio->GetYaxis()->SetTitle("data/MC");
     histo_ratio->SetTitleOffset(0.9,"X");
     histo_ratio->SetTitleOffset(0.31,"Y");
     histo_ratio->GetXaxis()->SetTitle(histotitle_);
@@ -1442,7 +1489,7 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
     histo_ratio->SetMarkerSize(0.75);
     histo_ratio->SetLineWidth(2);
 
-    histo_ratio->GetYaxis()->SetTitle("Data/MC");
+    histo_ratio->GetYaxis()->SetTitle("data/MC");
     histo_ratio->GetXaxis()->SetTitle(histotitle);
     histo_ratio->GetYaxis()->SetNdivisions( 505 );
 
