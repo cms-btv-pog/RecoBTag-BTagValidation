@@ -863,8 +863,8 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   //AddHisto(histoTag+"_track_IPerr1tr"   ,";3D IP error of the first track;;",        100,0,0.1);
   //AddHisto(histoTag+"_track_IP2Derr2tr" ,";2D IP error of the second track;;",       100,0,0.1);
   //AddHisto(histoTag+"_track_IPerr2tr"   ,";3D IP error of the second track;;",       100,0,0.1);
-  //AddHisto(histoTag+"_track_IP2Derr"    ,";2D IP error;;",                           100,0,0.1);
-  //AddHisto(histoTag+"_track_IPerr"      ,";3D IP error;;",                           100,0,0.1);
+  AddHisto(histoTag+"_track_IP2Derr"    ,";2D IP error;;",                           100,0,0.1);
+  AddHisto(histoTag+"_track_IPerr"      ,";3D IP error;;",                           100,0,0.1);
   //AddHisto(histoTag+"_track_IPs3tr"     ,";3D IP significance of the third track;;", 200,-50.,50.);
   //AddHisto(histoTag+"_track_IP3tr"      ,";3D IP of the third track;;",              200,-0.2,0.2);
   //AddHisto(histoTag+"_track_IPerr3tr"   ,";3D IP error of the third track;;",        100,0,0.1);
@@ -1036,8 +1036,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     int run = EvtInfo.Run ; 
     int lumi = EvtInfo.LumiBlock ; 
-    if((iEntry%reportEvery_) == 0) edm::LogInfo("EventNumber") << ">>>>> Processing event with run no. " << run << " and lumisection " << lumi
-    << " entry "  << iEntry << " of " << nEntries;
 
     if(run < 0) {
       isData = false;
@@ -1051,6 +1049,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if (lastRun_ > 0 && run > lastRun_) continue;
 
     }
+
+    if((iEntry%reportEvery_) == 0) edm::LogInfo("EventNumber") << ">>>>> Processing event with run no. " << run << " and lumisection " << lumi
+    << " entry "  << iEntry << " of " << nEntries;
 
     if ( doPUReweightingOfficial_ && !isData ) {
       wtPU = LumiWeights_.weight(EvtInfo.nPUtrue);
@@ -1066,7 +1067,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
-    if( !passTrigger() ) continue; //// apply trigger selection
+    if( !passTrigger() ) {
+      continue; //// apply trigger selection
+    }
 
     h1_CutFlow->Fill(3.,wtPU); //// count events passing trigger selection
     h1_CutFlow_unw->Fill(3.);
@@ -1107,6 +1110,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float tau21 = (tau1!=0 ? tau2/tau1 : 0.);
       if ( tau21 > fatJetTau21Max_ ||tau21 < fatJetTau21Min_ ) continue ; ////apply jet substructure tau21 cut.
       //added by rizki - end
+      //
 
       int idxFirstMuon = -1;
       int nselmuon = 0;
@@ -2201,13 +2205,13 @@ bool BTagValidation::passTrigger() {
           int triggerIdx = ( it - triggerPathNames_.begin() );
           int bitIdx = int(triggerIdx/32);
           if ( EvtInfo.BitTrigger[bitIdx] & ( 1 << (triggerIdx - bitIdx*32) ) ) {
-            //std::cout << " fired trigger " << *it << std::endl;
             triggerBits.at(i) = true;
-            break;
+            break; 
           }
         }
       }
     }
+
     bool isOR = triggerLogicIsOR_; 
 
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
@@ -2227,6 +2231,8 @@ bool BTagValidation::passTrigger() {
         break;
       } 
     }
+
+
   }
 
   return ret;
