@@ -314,6 +314,10 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               jecUncPayloadName_;
     const bool                      doNewJEC_;
     const bool                      doJECUncert_;
+    const bool                      produceDoubleBSFtemplates_;
+    const bool                      useRunRange_;
+    const int                      runRangeMin_;
+    const int                      runRangeMax_;
 
     boost::shared_ptr<JetCorrectionUncertainty> ptr_jecUnc_ ; 
     boost::shared_ptr<FactorizedJetCorrector> ptr_newJEC_  ;
@@ -443,6 +447,10 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   jecUncPayloadName_(iConfig.getParameter<std::string>("jecUncPayloadName")),
   doNewJEC_(iConfig.getParameter<bool>("doNewJEC")), 
   doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), 
+  produceDoubleBSFtemplates_(iConfig.getParameter<bool>("produceDoubleBSFtemplates")), 
+  useRunRange_(iConfig.getParameter<bool>("useRunRange")), 
+  runRangeMin_(iConfig.getParameter<int>("runRangeMin")), 
+  runRangeMax_(iConfig.getParameter<int>("runRangeMax")), 
   calib("csvv2", btagCSVFile_),  
   reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
   //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_),
@@ -478,6 +486,9 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   if (doCDFrag_)  std::cout << "ATTENTION: CDFrag weighting enabled. " << std::endl;
   if (doCFrag_)  std::cout << "ATTENTION: CFrag weighting enabled. " << std::endl;
   if (doK0L_)  std::cout << "ATTENTION: K0L weighting enabled. " << std::endl;
+
+  if(!produceDoubleBSFtemplates_) std::cout << "ATTENTION: NOT creating DoubleB SF templates (JP plots)." << std::endl;
+  if(produceDoubleBSFtemplates_) std::cout << "ATTENTION: Creating DoubleB SF templates (JP plots)." << std::endl;
 
 // Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
@@ -590,11 +601,14 @@ void BTagValidation::beginJob() {
 
     f->Close();
   }
-
-
+  
+  if(DEBUG_) std::cout << "Attempting to read EvtInfo trees" << std::endl;		
   EvtInfo.ReadTree(JetTreeEvtInfo);
-  //EvtInfo.ReadPatMuonTree(JetTree); //commented by rizki
+  if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadTree" << std::endl;		
+  //EvtInfo.ReadPatMuonTree(JetTree); //was commented by rizki
+  if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadPatMuon" << std::endl;		
 
+  if(DEBUG_) std::cout << "Attempting to read FatJetInfo trees" << std::endl;		
   FatJetInfo.ReadTree(JetTree,"FatJetInfo");
   FatJetInfo.ReadFatJetSpecificTree(JetTree,"FatJetInfo",true);
   FatJetInfo.ReadCSVTagVarTree(JetTree, "FatJetInfo");
@@ -603,8 +617,10 @@ void BTagValidation::beginJob() {
     EvtInfo.ReadJetTrackTree(JetTreeEvtInfo);
     FatJetInfo.ReadJetTrackTree(JetTree,"FatJetInfo");
   }
+  if(DEBUG_) std::cout << "	Done reading FatJetInfo trees" << std::endl;		
 
   if (usePrunedSubjets_) {
+  	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - Pruned" << std::endl;		
     SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
     SubJets.ReadTree(JetTree,"PrunedSubJetInfo") ;
     SubJets.ReadSubJetSpecificTree(JetTree,"PrunedSubJetInfo") ;
@@ -615,18 +631,21 @@ void BTagValidation::beginJob() {
       SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
       SubJets.ReadJetTrackTree(JetTree,"PrunedSubJetInfo");
     }
+  	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - Pruned" << std::endl;		
   }
   else if (useSoftDropSubjets_) {
-    SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDrop");
-    SubJets.ReadTree(JetTree,"SoftDropSubJetInfo") ;
-    SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropSubJetInfo") ;
-    SubJets.ReadCSVTagVarTree(JetTree, "SoftDropSubJetInfo");
-    SubJets.ReadJetSVTree(JetTree, "SoftDropSubJetInfo"); 
+  	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - SoftDropPuppi" << std::endl;		
+    SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
+    SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.ReadCSVTagVarTree(JetTree, "SoftDropPuppiSubJetInfo");
+    SubJets.ReadJetSVTree(JetTree, "SoftDropPuppiSubJetInfo"); 
 
     if (useJetProbaTree_) {
-      SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDrop");
-      SubJets.ReadJetTrackTree(JetTree,"SoftDropSubJetInfo");
+      SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
+      SubJets.ReadJetTrackTree(JetTree,"SoftDropPuppiSubJetInfo");
     }
+  	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - SoftDropPuppi" << std::endl;		
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
 
@@ -712,7 +731,7 @@ void BTagValidation::beginJob() {
   createJetHistos_DoubleB();
 
   ///Create histos for DoubleB SF calculation/templates
-  createJetHistos_SF("FatJet");
+  if(produceDoubleBSFtemplates_) createJetHistos_SF("FatJet");
 
 
 }
@@ -1073,14 +1092,22 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     int run = EvtInfo.Run ; 
     int lumi = EvtInfo.LumiBlock ; 
-    if((iEntry%reportEvery_) == 0) edm::LogInfo("EventNumber") << ">>>>> Processing event with run no. " << run << " and lumisection " << lumi
-      << iEntry << " of " << nEntries;
+    if((iEntry%reportEvery_) == 0) edm::LogInfo("EventNumber") << ">>>>> Processing event with run no. " << run << " and lumisection " << lumi << iEntry << " of " << nEntries;
 
     if(run < 0) {
       isData = false;
       if ( iEntry == 0) edm::LogInfo("IsMC") << ">>>>> Running on simulation\n" ;
     }
     else if( iEntry == 0 ) edm::LogInfo("IsData") << ">>>>> Running on data\n" ;
+
+	if(isData && useRunRange_){
+		if(DEBUG_) std::cout << "Restricting by run range. Run:" << run <<std::endl;
+		if( run < runRangeMin_ || run > runRangeMax_ ){
+			if (DEBUG_) std::cout <<	"Run is outside range (" << runRangeMin_ <<" - "<< runRangeMax_ <<" ). Skipping run." << std::endl;
+			continue;
+		}
+	}
+
     double wtPU = 1.;
     if ( doPUReweightingOfficial_ && !isData )
       wtPU *= LumiWeights_.weight(EvtInfo.nPUtrue);
@@ -1683,18 +1710,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   		fillJetHistos_DoubleB(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, muon1_v, muon2_v, dimuon_v, idxMuon_inFirstSubjet, idxMuon_inSecondSubjet, subjet1_p4, subjet2_p4, wtPU*wtFatJet);
 
 		//fill histo for DoubleB SF calculation / templates: 
-		fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
-
-		//for signal proxy study, for subjet pt balance reweight. - start    
-		float subjets_pT_balance = SubJets.Jet_pt[iSubJet1] / (SubJets.Jet_pt[iSubJet1] + SubJets.Jet_pt[iSubJet2]); 
-		if (usePrunedSubjets_){
-		  FillHisto("FatJet_prunedsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
-		}
-		else if (useSoftDropSubjets_){
-		  FillHisto("FatJet_softdropsubjet_ptBalance" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjets_pT_balance ,wtPU*wtFatJet);
-		}
-		//for signal proxy study, for subjet pt balance reweight. - end
-
+		if(produceDoubleBSFtemplates_) fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
 
 		/* Uncomment below as needed.
 		//// ------- start process subjets --------------
