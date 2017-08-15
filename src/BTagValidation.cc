@@ -201,6 +201,8 @@ class BTagValidation : public edm::EDAnalyzer {
     edm::LumiReWeighting LumiWeightsHigh_;
 
     //// Configurables
+    const int                       firstRun_;
+    const int                       lastRun_;
     const int                       maxEvents_;
     const int                       reportEvery_;
     const bool                      makeSlimmedTree_;
@@ -303,6 +305,8 @@ class BTagValidation : public edm::EDAnalyzer {
 // constructors and destructor
 //
 BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
+  firstRun_(iConfig.getParameter<int>("firstRun")),
+  lastRun_(iConfig.getParameter<int>("lastRun")),
   maxEvents_(iConfig.getParameter<int>("MaxEvents")),
   reportEvery_(iConfig.getParameter<int>("ReportEvery")),
   makeSlimmedTree_(iConfig.getParameter<bool>("makeSlimmedTree")),
@@ -548,15 +552,15 @@ void BTagValidation::beginJob() {
     }
   }
   else if (useSoftDropSubjets_) {
-    SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDrop");
-    SubJets.ReadTree(JetTree,"SoftDropSubJetInfo") ;
-    SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropSubJetInfo") ;
-    SubJets.ReadCSVTagVarTree(JetTree, "SoftDropSubJetInfo");
-    SubJets.ReadJetSVTree(JetTree, "SoftDropSubJetInfo"); 
+    SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
+    SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.ReadCSVTagVarTree(JetTree, "SoftDropPuppiSubJetInfo");
+    SubJets.ReadJetSVTree(JetTree, "SoftDropPuppiSubJetInfo"); 
 
     if (useJetProbaTree_) {
-      SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDrop");
-      SubJets.ReadJetTrackTree(JetTree,"SoftDropSubJetInfo");
+      SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
+      SubJets.ReadJetTrackTree(JetTree,"SoftDropPuppiSubJetInfo");
     }
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
@@ -1039,7 +1043,15 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       isData = false;
       if ( iEntry == 0) edm::LogInfo("IsMC") << ">>>>> Running on simulation\n" ;
     }
-    else if( iEntry == 0 ) edm::LogInfo("IsData") << ">>>>> Running on data\n" ;
+    else { 
+      
+      if( iEntry == 0 ) edm::LogInfo("IsData") << ">>>>> Running on data\n" ;
+
+      if (firstRun_ > 0 && run < firstRun_) continue;
+      if (lastRun_ > 0 && run > lastRun_) continue;
+
+    }
+
     if ( doPUReweightingOfficial_ && !isData ) {
       wtPU = LumiWeights_.weight(EvtInfo.nPUtrue);
       wtPULow = LumiWeightsLow_.weight(EvtInfo.nPUtrue) ;

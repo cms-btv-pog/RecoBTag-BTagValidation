@@ -14,7 +14,17 @@ options.register('outFilename', 'bTagValPlots.root',
     VarParsing.varType.string,
     "Output file name"
     )
-options.register('makeSlimmedTree', True,
+options.register('firstRun', -1,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "First run to process (for data): -1 means process from the first available"
+    )
+options.register('lastRun', -1,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "Last run to process (for data): -1 means process till the last available"
+    )
+options.register('makeSlimmedTree', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Make slimmed trees for SF measurements"
@@ -79,32 +89,32 @@ options.register('useSoftDropSubjets', False,
     VarParsing.varType.bool,
     "Process soft drop subjets"
     )
-options.register('doBFrag', True,
+options.register('doBFrag', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do b fragmentation reweighting'
     )
-options.register('doBFragUp', True,
+options.register('doBFragUp', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do b fragmentation reweighting up'
     )
-options.register('doBFragDown', True,
+options.register('doBFragDown', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do b fragmentation reweighting down'
     )
-options.register('doCDFrag', True,
+options.register('doCDFrag', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do c->D fragmentation reweighting'
     )
-options.register('doCFrag', True,
+options.register('doCFrag', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do c fragmentation reweighting'
     )
-options.register('doK0L', True,
+options.register('doK0L', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     'Do K0 and lambda reweighting'
@@ -144,7 +154,7 @@ options.register('fatJetAbsEtaMax', 2.4,
     VarParsing.varType.float,
     "Maximum abs(eta)"
     )
-options.register('fatJetPtMin', 250.,
+options.register('fatJetPtMin', 350.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet Pt"
@@ -325,6 +335,8 @@ from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
 print bTagAnalyzerCommon.TriggerPathNames 
 
 process.btagval = cms.EDAnalyzer('BTagValidation',
+    firstRun               = cms.int32(options.firstRun),
+    lastRun                = cms.int32(options.lastRun),
     MaxEvents              = cms.int32(options.maxEvents),
     ReportEvery            = cms.int32(options.reportEvery),
     makeSlimmedTree        = cms.bool(options.makeSlimmedTree), 
