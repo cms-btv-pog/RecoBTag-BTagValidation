@@ -879,11 +879,11 @@ void BTagValidation::createJetHistos_DoubleB() {
   AddHisto("FatJet_tau1_vertexEnergyRatio"      ,";tau1_vertexEnergyRatio;;",100,-1,4);
   AddHisto("FatJet_tau1_vertexEnergyRatio_unw"      ,";tau1_vertexEnergyRatio (unweighted);;",100,-1,4);
   AddHisto("FatJet_tau1_vertexDeltaR"    	   ,";tau1_vertexDeltaR;;",100,-1,1);
-  AddHisto("FatJet_tau1_flightDistance2dSig"    ,";tau1_flightDistance2dSig;;",100,-20,20);
+  AddHisto("FatJet_tau1_flightDistance2dSig"    ,";tau1_flightDistance2dSig;;",500,-100,100);
 
   AddHisto("FatJet_tau2_vertexMass"    	       ,";tau2_vertexMass;;",500,0.,500);
   AddHisto("FatJet_tau2_vertexEnergyRatio"      ,";tau2_vertexEnergyRatio;;",100,-1,4);
-  AddHisto("FatJet_tau2_flightDistance2dSig"    ,";tau2_flightDistance2dSig;;",100,-20,20);
+  AddHisto("FatJet_tau2_flightDistance2dSig"    ,";tau2_flightDistance2dSig;;",500,-100,100);
 
   AddHisto("FatJet_jetNTracks"     	       ,";jetNTracks;;",40,0,40);
   AddHisto("FatJet_jetNTracks_unw"     	       ,";jetNTracks (unweighted);;",40,0,40);
