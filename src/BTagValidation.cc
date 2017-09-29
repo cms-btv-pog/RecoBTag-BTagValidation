@@ -479,16 +479,22 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
   
-  //checks for weights
-  if (doFatJetPtReweighting_) std::cout << "ATTENTION: pT reweighting enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
-  if (doNtracksReweighting_)  std::cout << "ATTENTION: nTracks reweighting enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
-  if (doBFrag_)  std::cout << "ATTENTION: BFrag weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
-  if (doCDFrag_)  std::cout << "ATTENTION: CDFrag weighting enabled. " << std::endl;
-  if (doCFrag_)  std::cout << "ATTENTION: CFrag weighting enabled. " << std::endl;
-  if (doK0L_)  std::cout << "ATTENTION: K0L weighting enabled. " << std::endl;
+  //checks: for weights
+  if (doFatJetPtReweighting_) std::cout << "ATTENTION	: pT reweighting enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
+  if (doNtracksReweighting_)  std::cout << "ATTENTION	: nTracks reweighting enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
+  if (doBFrag_)  std::cout << "ATTENTION	: BFrag weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doCDFrag_)  std::cout << "ATTENTION	: CDFrag weighting enabled. " << std::endl;
+  if (doCFrag_)  std::cout << "ATTENTION	: CFrag weighting enabled. " << std::endl;
+  if (doK0L_)  std::cout << "ATTENTION	: K0L weighting enabled. " << std::endl;
 
-  if(!produceDoubleBSFtemplates_) std::cout << "ATTENTION: NOT creating DoubleB SF templates (JP plots)." << std::endl;
-  if(produceDoubleBSFtemplates_) std::cout << "ATTENTION: Creating DoubleB SF templates (JP plots)." << std::endl;
+  if(!produceDoubleBSFtemplates_) std::cout << "ATTENTION	: NOT creating DoubleB SF templates (JP plots)." << std::endl;
+  if(produceDoubleBSFtemplates_) std::cout << "ATTENTION	: Creating DoubleB SF templates (JP plots)." << std::endl;
+
+  if(DEBUG_ && triggerSelection_.size()>1){
+	std::cout << "ATTENTION	: Multiple triggers entered. Will perform the following logic: ";
+	if(!triggerLogicIsOR_) std::cout << " AND " << std::endl; 
+	else std::cout << " OR " << std::endl;
+  }
 
 // Pt bins for SFb
   double PtBins[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
@@ -648,7 +654,7 @@ void BTagValidation::beginJob() {
   	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - SoftDropPuppi" << std::endl;		
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
-
+  
   double PtMax = 5000.;
 
   h1_CutFlow        = fs->make<TH1D>("h1_CutFlow",       "h1_CutFlow",        4,-0.5,3.5);
