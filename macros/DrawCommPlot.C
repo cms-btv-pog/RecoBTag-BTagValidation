@@ -56,8 +56,14 @@ using namespace std;
 // TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
 // TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
-TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V3_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V3_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+
+// TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
+// TString filename    ="/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Oct25-2017_CommSF_BenjaminsCode/CMSSW_9_2_7_patch1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017CD_QCDMuEnriched_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval.root";
+
+TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
+TString filename    ="/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Oct25-2017_CommSF_BenjaminsCode/CMSSW_9_2_7_patch1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017CD_QCDMuEnriched_Pt350_singleMuTag_Final_MuonTaggedFatJets_histograms_btagval.root";
 
 
 TString filename_ext="" ;
@@ -78,7 +84,11 @@ TString filename_ext="" ;
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweightedV2_INCLUSIVE_PT";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V2_INCLUSIVE_PT";
 // TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT";
-TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
+
+// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_Oct30-2017_runCtoD_pt350";
+// TString dir4plots   = "Comm_SingleMuTag_BTagMuQCDMuEnr_Nov8-2017_runCtoD_pt350";
+TString dir4plots   = "Comm_SingleMuTag_BTagMuQCDMuEnr_Nov8-2017_runCtoD_pt350_TESSSST";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -86,7 +96,10 @@ TString filename_uncDown="" ;
 // TString title1 = "36.8 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 // TString title1 = "35.9 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
 // TString title1 = "36 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-TString title1 = "36 fb^{-1} (13 TeV, 2016)";
+// TString title1 = "36 fb^{-1} (13 TeV, 2016)";
+
+TString title1 = "~10 fb^{-1} (13 TeV, 2017)";
+
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
 TString formata=".pdf";
@@ -99,8 +112,8 @@ bool prunedjets= 0;
 bool logy      = 1;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
-double norm_lightjets = 1.27 ; // used only for QCD MuEnriched.
-// double norm_lightjets = 1.0 ; // used for QCDincl.
+// double norm_lightjets = 1.27 ; // used only for QCD MuEnriched. //used for 2016
+double norm_lightjets = 1.0; 
 
 bool inclTTbar = 0;
 bool inclZjj   = 0;
@@ -183,13 +196,13 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     //DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_DoubleB"      ,"double-b discriminator"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 
-    DrawStacked(histoTag+"_DoubleB_pt400to450"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt450to500"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt500to600"      ,"DoubleB (500<p_T<600)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt600to2000"      ,"DoubleB (600<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt400to500"      ,"DoubleB (400<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt300to400"      ,"DoubleB (300<p_T<400)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
-    DrawStacked(histoTag+"_DoubleB_pt500to2000"      ,"DoubleB (500<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt400to450"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt450to500"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt500to600"      ,"DoubleB (500<p_T<600)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt600to2000"      ,"DoubleB (600<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt400to500"      ,"DoubleB (400<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt300to400"      ,"DoubleB (300<p_T<400)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+//     DrawStacked(histoTag+"_DoubleB_pt500to2000"      ,"DoubleB (500<p_T<2000)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 
     //////added by rizki - start
 
@@ -413,7 +426,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_muon_Sip2d",     "Muon 2D IP significance"        ,logy ,dodata ,extNorm ,0. ,0.);
     DrawStacked(histoTag+"_muon_DeltaR",    "Muon1 #Delta R"                 ,logy ,dodata ,extNorm ,0. ,0.);
     DrawStacked(histoTag+"_muon_ptRatio", "(p_{T}(#mu_{1})/p_{T}(jet)" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_muComb_ptRatio", "(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet)" ,logy ,dodata ,extNorm ,0. ,0.);
+//     DrawStacked(histoTag+"_muComb_ptRatio", "(p_{T}(#mu_{1})+p_{T}(#mu_{2}))/p_{T}(jet)" ,logy ,dodata ,extNorm ,0. ,0.);
 
   }
   if (Draw_Nminus1_plots){
@@ -839,6 +852,47 @@ void DrawStacked(TString name,
     }
   }
 
+  //overflow handling - added by rizki - start
+  if (setXRange) {
+    if (rangeXLow == rangeXHigh) std::cout << "Error: X-axis low and high ranges have same value\n" ;
+    else {      
+      int totalbin = hist_b->GetSize();
+      std::cout << " --> totalbin = " << totalbin << std::endl;
+      
+      if(xhigh!=totalbin-1){ //if xhigh is not modified from original	
+      
+		  std::cout << "setXRange: rangeXhigh is changed from original --> Performing overflow handing." << std::endl;
+
+		  float endBin_b = hist_b ->Integral(xhigh,totalbin);
+		  float endBin_c = hist_c ->Integral(xhigh,totalbin);
+		  float endBin_gsplit = hist_gsplit ->Integral(xhigh,totalbin);
+		  float endBin_gsplit_c = hist_gsplit_c ->Integral(xhigh,totalbin);
+		  float endBin_l = hist_l ->Integral(xhigh,totalbin);
+		  float endBin_data;if(doData)endBin_data = hist_data ->Integral(xhigh,totalbin);
+	  
+		  hist_b->SetBinContent(xhigh-1,hist_b->GetBinContent(xhigh)+endBin_b);
+		  hist_c->SetBinContent(xhigh-1,hist_c->GetBinContent(xhigh)+endBin_c);
+		  hist_gsplit->SetBinContent(xhigh-1,hist_gsplit->GetBinContent(xhigh)+endBin_gsplit);
+		  hist_gsplit_c->SetBinContent(xhigh-1,hist_gsplit_c->GetBinContent(xhigh)+endBin_gsplit_c);
+		  hist_l->SetBinContent(xhigh-1,hist_l->GetBinContent(xhigh)+endBin_l);
+		  if(doData)hist_data->SetBinContent(xhigh-1,hist_data->GetBinContent(xhigh)+endBin_data);
+	  
+		  for(int ibin=xhigh;ibin<totalbin;ibin++){
+			  hist_b->SetBinContent(ibin,0);
+			  hist_c->SetBinContent(ibin,0);
+			  hist_gsplit->SetBinContent(ibin,0);
+			  hist_gsplit_c->SetBinContent(ibin,0);
+			  hist_l->SetBinContent(ibin,0);
+			  if(doData)hist_data->SetBinContent(ibin,0);
+			  std::cout << "	ibin = " << ibin << ", SetBinContent = " << 0 << std::endl;
+		  }
+
+      }
+    }
+  }
+  //overflow handling - added by rizki - end
+
+
   TH1D* histo_tot = (TH1D*) hist_b->Clone();
   histo_tot ->Add(hist_c);
   histo_tot ->Add(hist_gsplit);
@@ -1057,6 +1111,7 @@ void DrawStacked(TString name,
     else if ( name.Contains("_tau1_flightDistance2dSig") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ; 
     else if ( name.Contains("_tau2_vertexMass") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10 : histo_tot->GetMaximum()*10) ; 
     else if ( name.Contains("_z_ratio") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10 : histo_tot->GetMaximum()*10) ; 
+    else if ( name.Contains("_eta") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000000 : histo_tot->GetMaximum()*10000000000) ; 
     else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ;
 
   }
