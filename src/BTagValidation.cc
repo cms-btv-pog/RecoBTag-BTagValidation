@@ -1864,7 +1864,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         bool passTrackIP2D=false;
 
         if (JetInfo.Track_nHitAll[iTrk]>=8)      passNhit=true;
-        if (JetInfo.Track_nHitPixel[iTrk]>=2)    passPix= true;
+        if (JetInfo.Track_nHitPixel[iTrk]>=1)    passPix= true;
         if (fabs(JetInfo.Track_dz[iTrk])<17)     passIPz=true;
         if (JetInfo.Track_pt[iTrk]>1)            passPt=true;
         if (JetInfo.Track_chi2[iTrk]<5)          passnormchi2=true;
