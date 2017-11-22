@@ -897,6 +897,7 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   //AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
+  AddHisto(histoTag+"_DeepCSV" ,";DoubleB;;",100,-1,1.);
 
   //AddHisto(histoTag+"_TCHE_extended1",";TCHE_extended1;;",70,-30.,30.); 
   //AddHisto(histoTag+"_TCHP_extended1",";TCHP_extended1;;",70,-30.,30.); 
@@ -1770,14 +1771,14 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
       bool passtrklen=false;
       bool passTrackIP2D=false;
 
-      if (JetInfo.Track_nHitAll[iTrk]>=8)      passNhit=true;
-      if (JetInfo.Track_nHitPixel[iTrk]>=2)    passPix= true;
-      if (fabs(JetInfo.Track_dz[iTrk])<17)     passIPz=true;
-      if (JetInfo.Track_pt[iTrk]>1)            passPt=true;
-      if (JetInfo.Track_chi2[iTrk]<5)          passnormchi2=true;
-      if (fabs(JetInfo.Track_dist[iTrk])<0.07) passtrkdist=true;
-      if (JetInfo.Track_length[iTrk]<5)        passtrklen=true;
-      if (fabs(JetInfo.Track_IP2D[iTrk])<0.2)  passTrackIP2D=true;
+      if (JetInfo.Track_nHitAll[iTrk]>=8)      passNhit=true; 
+      if (JetInfo.Track_nHitPixel[iTrk]>=1)    passPix= true; 
+      if (fabs(JetInfo.Track_dz[iTrk])<17)     passIPz=true; 
+      if (JetInfo.Track_pt[iTrk]>1)            passPt=true; 
+      if (JetInfo.Track_chi2[iTrk]<5)          passnormchi2=true; 
+      if (fabs(JetInfo.Track_dist[iTrk])<0.07) passtrkdist=true; 
+      if (JetInfo.Track_length[iTrk]<5)        passtrklen=true; 
+      if (fabs(JetInfo.Track_IP2D[iTrk])<0.2)  passTrackIP2D=true; 
 
       //DMif (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passTrackIP2D)
       //DM  FillHisto(histoTag+"_track_len_cut",          flav, isGSPbb ,isGSPcc ,JetInfo.Track_length[iTrk] , wt);
@@ -1972,6 +1973,7 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
   float csvivfv2  = JetInfo.Jet_CombIVF[iJet];
   //float cmvav2    = JetInfo.Jet_cMVAv2[iJet];
   float doubleb   = JetInfo.Jet_DoubleSV[iJet];
+  float deepcsv   = JetInfo.Jet_DeepCSVBDisc[iJet] ;
   float mass_TagVarCSV_sv = JetInfo.TagVarCSV_vertexMass[iJet];
 
   //FillHisto(histoTag+"_TCHE",     flav, isGSPbb, isGSPcc ,tche      ,wt);
@@ -1984,6 +1986,7 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
   FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
   //FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
   FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
+  FillHisto(histoTag+"_DeepCSV", flav, isGSPbb, isGSPcc ,deepcsv  ,wt);
   FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
   //FillHisto2D(histoTag+"_TagVarCSV_sv_mass_vs_jetpt"        ,flav,isGSPbb , isGSPcc, ptjet,mass_TagVarCSV_sv,wt);
 

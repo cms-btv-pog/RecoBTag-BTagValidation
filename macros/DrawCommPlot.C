@@ -28,24 +28,21 @@ using namespace std;
 
 TString ptcut = "450";
 
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July01-2016_commissioningPostApproval/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/rizki_commissioning_80x_DoubleMuonTag_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_histograms_btagval.root";
-TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/BATCH_JetHT_12p9fbinv_QCTPtHatBinnedWthTrig_AK8Pt450/Final_histograms_btagval.root";
+TString filename    ="/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_9_2_2/src/RecoBTag/BTagValidation/test/BATCH_CommissioningRun2017_22Oct2017/Final_histograms_btagval.root";
 
 TString filename_ext="" ;
 
-// TString dir4plots   = "Comm_DoubleMuTag_MuEnrQCD_13July2016";
-TString dir4plots   = "Comm_JetHT_12p9fbinv_QCTPtHatBinnedWthTrig_AK8Pt450_10Oct2016";
+TString dir4plots   = "Comm_2017CD_22Oct2017";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
-//TString title1 = "#sqrt{s} = 13 TeV (2016)";
-TString title1 = "12.9 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
+TString title1 = "";
+TString datacaption = "Data";
 
 TString formata=".pdf";
-TString formatb=".png";
-TString formatc=".C";
+//TString formatb=".png";
+//TString formatc=".C";
 
 bool bOverflow = 1;
 bool web       = 0;
@@ -113,7 +110,8 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
   //DrawStacked(histoTag+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,40 ,0 ,0. ,0.   );
   DrawStacked(histoTag+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
   DrawStacked(histoTag+"_mass"        ,"Mass [GeV/c^{2}]"             ,logy ,dodata ,extNorm ,4  ,0 ,0. ,400. );
-  DrawStacked(histoTag+"_CSV"         ,"CSV"                          ,logy ,dodata ,extNorm ,1  ,0 ,0  ,1.   );
+  //DrawStacked(histoTag+"_CSV"         ,"CSV"                          ,logy ,dodata ,extNorm ,1  ,0 ,0  ,1.   );
+  DrawStacked(histoTag+"_DeepCSV"     ,"DeepCSV Discriminator"        ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
   DrawStacked(histoTag+"_CSVIVFv2"    ,"CSVv2 Discriminator"          ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
   DrawStacked(histoTag+"_JP"          ,"JP Discriminator"             ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
   DrawStacked(histoTag+"_JBP"         ,"JBP Discriminator"            ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
@@ -293,28 +291,28 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_track_chi2"         ,"normalized #chi^{2} of the tracks"     ,logy ,dodata ,extNorm ,0. ,0.);
     DrawStacked(histoTag+"_track_dz"           ,"Track transverse IP"                   ,logy ,dodata ,extNorm ,0. ,0.);
     DrawStacked(histoTag+"_track_isfromSV"     ,"Track is from SV"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPs1tr"       ,"3D IP significance of the first track" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPs2tr"       ,"3D IP significance of the second track",logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPs3tr"       ,"3D IP significance of the third track" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP1tr"        ,"3D IP of the first track"              ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2tr"        ,"3D IP of the second track"             ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP3tr"        ,"3D IP of the third track"              ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Ds"        ,"2D IP significance of all tracks"      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Ds1tr"     ,"2D IP significance of the first track" ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Ds2tr"     ,"2D IP significance of the second track",logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Ds3tr"     ,"2D IP significance of the second track",logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2D"         ,"2D IP of all tracks"                   ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2D1tr"      ,"2D IP of the first track"              ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2D2tr"      ,"2D IP of the second track"             ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2D3tr"      ,"2D IP of the third track"              ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Derr"      ,"2D IP error of all tracks"             ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Derr1tr"   ,"2D IP error of the first track"        ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Derr2tr"   ,"2D IP error of the second track"       ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IP2Derr3tr"   ,"2D IP error of the third track"        ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPerr"        ,"3D IP error of all tracks"             ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPerr1tr"     ,"3D IP error of the first track"        ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPerr2tr"     ,"3D IP error of the second track"       ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_track_IPerr3tr"     ,"3D IP error of the third track"        ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPs1tr"       ,"3D IP significance of the first track" ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPs2tr"       ,"3D IP significance of the second track",logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPs3tr"       ,"3D IP significance of the third track" ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP1tr"        ,"3D IP of the first track"              ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2tr"        ,"3D IP of the second track"             ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP3tr"        ,"3D IP of the third track"              ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Ds"        ,"2D IP significance of all tracks"      ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Ds1tr"     ,"2D IP significance of the first track" ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Ds2tr"     ,"2D IP significance of the second track",logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Ds3tr"     ,"2D IP significance of the second track",logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2D"         ,"2D IP of all tracks"                   ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2D1tr"      ,"2D IP of the first track"              ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2D2tr"      ,"2D IP of the second track"             ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2D3tr"      ,"2D IP of the third track"              ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Derr"      ,"2D IP error of all tracks"             ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Derr1tr"   ,"2D IP error of the first track"        ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Derr2tr"   ,"2D IP error of the second track"       ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IP2Derr3tr"   ,"2D IP error of the third track"        ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPerr"        ,"3D IP error of all tracks"             ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPerr1tr"     ,"3D IP error of the first track"        ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPerr2tr"     ,"3D IP error of the second track"       ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_track_IPerr3tr"     ,"3D IP error of the third track"        ,logy ,dodata ,extNorm ,0. ,0.);
   }
   if (Draw_sv_plots){
     DrawStacked(histoTag+"_sv_multi_0"           ,"Nb. of secondary vertices"                         ,logy ,dodata ,extNorm ,1. ,0.);
@@ -326,20 +324,20 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_sv_en_ratio"          ,"SV energy ratio"                                   ,logy ,dodata ,extNorm ,2. ,0.);
     DrawStacked(histoTag+"_sv_pt"                ,"SV p_{T} [GeV/c]"                                  ,logy ,dodata ,extNorm ,5. ,0.);
     DrawStacked(histoTag+"_sv_flight3DSig"       ,"SV 3D flight distance significance"                ,logy ,dodata ,extNorm ,5. ,0.);
-    DrawStacked(histoTag+"_svnTrk_firstVxt"      ,"Number of tracks from the first SV"                ,logy ,dodata ,extNorm ,1. ,0.);
-    DrawStacked(histoTag+"_sv_multi"             ,"nr. of SV"                                         ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_mass_3trk"         ,"SV mass if #tracks@SV >=3"                         ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_chi2norm"          ,"SV norm. #chi^{2}"                                 ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_deltaR_sumJet"     ,"#DeltaR between the jet and the SV"                ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_deltaR_sumDir"     ,"#DeltaR between the jet direction and the SV"      ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_eta"               ,"SV #eta"                                           ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_phi"               ,"SV #phi"                                           ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_flight3D"          ,"SV 3D flight distance"                             ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_flight2D"          ,"SV 2D flight distance"                             ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_flightSig2D"       ,"SV 2D flight distance significance"                ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_flight3Derr"       ,"SV 3D flight distance error"                       ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_sv_flight2Derr"       ,"SV 2D flight distance error"                       ,logy ,dodata ,extNorm ,0. ,0.);
-    DrawStacked(histoTag+"_svnTrk"               ,"nr. of tracks from a SV"                           ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_svnTrk_firstVxt"      ,"Number of tracks from the first SV"                ,logy ,dodata ,extNorm ,1. ,0.);
+    //DrawStacked(histoTag+"_sv_multi"             ,"nr. of SV"                                         ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_mass_3trk"         ,"SV mass if #tracks@SV >=3"                         ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_chi2norm"          ,"SV norm. #chi^{2}"                                 ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_deltaR_sumJet"     ,"#DeltaR between the jet and the SV"                ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_deltaR_sumDir"     ,"#DeltaR between the jet direction and the SV"      ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_eta"               ,"SV #eta"                                           ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_phi"               ,"SV #phi"                                           ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_flight3D"          ,"SV 3D flight distance"                             ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_flight2D"          ,"SV 2D flight distance"                             ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_flightSig2D"       ,"SV 2D flight distance significance"                ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_flight3Derr"       ,"SV 3D flight distance error"                       ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_sv_flight2Derr"       ,"SV 2D flight distance error"                       ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_svnTrk"               ,"nr. of tracks from a SV"                           ,logy ,dodata ,extNorm ,0. ,0.);
     //DrawStacked(histoTag+"_sv_aboveC"            ,"IP2D of the first track above the charm threshold" ,logy ,dodata ,extNorm ,0. ,0.);
   }
   if (Draw_muons_plots){
@@ -432,15 +430,15 @@ void Draw(TString name, TString histotitle, bool log) {
 
   if (name=="h1_nPV") {
     hist_mc       = (TH1D*)myFile->Get("QCD__"+name+"_mc");
-    hist_data     = (TH1D*)myFile->Get("Data__"+name+"_data");
+    hist_data     = (TH1D*)myFile->Get("DATA__"+name+"_data");
   }
   else if (name=="h1_nPV_unw"){    
     hist_mc       = (TH1D*)myFile->Get("QCD__h1_nPV_mc_unw");
-    hist_data     = (TH1D*)myFile->Get("Data__h1_nPV_data");
+    hist_data     = (TH1D*)myFile->Get("DATA__h1_nPV_data");
   } 	
   else {
     hist_mc       = (TH1D*)myFile->Get("QCD__"+name);
-    hist_data     = (TH1D*)myFile->Get("Data__"+name);
+    hist_data     = (TH1D*)myFile->Get("DATA__"+name);
   }
   float scale_f = (hist_data->Integral())/(hist_mc->Integral());
   if (name=="h1_pt_hat" || "h1_pt_hat_sel") ;
@@ -566,11 +564,11 @@ void Draw(TString name, TString histotitle, bool log) {
   TString name_plot=name+"_Linear"+formata;
   if(log) name_plot=name+"_Log"+formata;
   c1->SaveAs(dir4plots+"/"+name_plot);
-  name_plot=name+"_Linear"+formatb;
-  if(log) name_plot=name+"_Log"+formatb;
-  c1->SaveAs(dir4plots+"/"+name_plot);
-  name_plot=name+"_Linear"+formatc;
-  if(log) name_plot=name+"_Log"+formatc;
+  //name_plot=name+"_Linear"+formatb;
+  //if(log) name_plot=name+"_Log"+formatb;
+  //c1->SaveAs(dir4plots+"/"+name_plot);
+  //name_plot=name+"_Linear"+formatc;
+  //if(log) name_plot=name+"_Log"+formatc;
   //c1->SaveAs(dir4plots+"/"+name_plot);
 
 }
@@ -606,7 +604,7 @@ void DrawStacked(TString name,
   hist_l        = (TH1D*)myFile->Get(fdir+name+"_l");
   if (inclTTbar) hist_ttbar = (TH1D*)myFile->Get("TTJets__"+name+"_mc");
   if (inclZjj)   hist_zjj   = (TH1D*)myFile->Get("ZJetsFullyHadronic__"+name+"_mc");
-  if (doData)    hist_data  = (TH1D*)myFile->Get("Data__"+name+"_data");
+  if (doData)    hist_data  = (TH1D*)myFile->Get("DATA__"+name+"_data");
 
   std::cout << " hist_b name = " << hist_b->GetName() << endl ;
 
@@ -661,7 +659,7 @@ void DrawStacked(TString name,
     hist_l_ext                = (TH1D*)myFile_ext->Get("QCD__"+name+"_l");
     if (inclTTbar) hist_ttbar_ext = (TH1D*)myFile_ext->Get("TTJets__"+name+"_mc");
     if (inclZjj)   hist_zjj_ext   = (TH1D*)myFile_ext->Get("ZJetsFullyHadronic__"+name+"_mc");
-    if (doData)    hist_data_ext  = (TH1D*)myFile_ext->Get("Data__"+name+"_data");
+    if (doData)    hist_data_ext  = (TH1D*)myFile_ext->Get("DATA__"+name+"_data");
 
     if (!name.Contains("sv_mass")) {
       fix(hist_b_ext);
@@ -1199,12 +1197,12 @@ void DrawStacked(TString name,
   TString name_plot=name+"_Linear"+formata;
   if(log) name_plot=name+"_Log"+formata;
   c1->SaveAs(dir4plots+"/"+name_plot);
-  name_plot=name+"_Linear"+formatb;
-  if(log) name_plot=name+"_Log"+formatb;
-  c1->SaveAs(dir4plots+"/"+name_plot);
-  name_plot=name+"_Linear"+formatc;
-  if(log) name_plot=name+"_Log"+formatc;
-  c1->SaveAs(dir4plots+"/"+name_plot);
+  //name_plot=name+"_Linear"+formatb;
+  //if(log) name_plot=name+"_Log"+formatb;
+  //c1->SaveAs(dir4plots+"/"+name_plot);
+  //name_plot=name+"_Linear"+formatc;
+  //if(log) name_plot=name+"_Log"+formatc;
+  //c1->SaveAs(dir4plots+"/"+name_plot);
 
   if (log && web) {  // save also _Linear for web
     pad0 ->cd();
@@ -1233,7 +1231,7 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
   hist_gsplit    = (TH1D*)myFile->Get("QCD__"+name+"_bfromg");
   hist_gsplit_c    = (TH1D*)myFile->Get("QCD__"+name+"_cfromg");
   hist_l         = (TH1D*)myFile->Get("QCD__"+name+"_l");
-  if (doData) hist_data      = (TH1D*)myFile->Get("Data__"+name+"_data");
+  if (doData) hist_data      = (TH1D*)myFile->Get("DATA__"+name+"_data");
 
   TH1D* histo_tot = (TH1D*) hist_b->Clone();
   //histo_tot->Sumw2();
@@ -1420,12 +1418,12 @@ void DrawTagRate(TString name, TString histotitle, bool log, bool doData){
   TString name_plot=name+"_Linear"+formata;
   if(log) name_plot=name+"_Log"+formata;
   c1->SaveAs(dir4plots+"/"+name_plot);
-  name_plot=name+"_Linear"+formatb;
-  if(log) name_plot=name+"_Log"+formatb;
-  c1->SaveAs(dir4plots+"/"+name_plot);
-  name_plot=name+"_Linear"+formatc;
-  if(log) name_plot=name+"_Log"+formatc;
-  c1->SaveAs(dir4plots+"/"+name_plot);
+  //name_plot=name+"_Linear"+formatb;
+  //if(log) name_plot=name+"_Log"+formatb;
+  //c1->SaveAs(dir4plots+"/"+name_plot);
+  //name_plot=name+"_Linear"+formatc;
+  //if(log) name_plot=name+"_Log"+formatc;
+  //c1->SaveAs(dir4plots+"/"+name_plot);
 
   if (log && web) {  // save also _Linear for web
     c1_1 ->cd();
@@ -1453,7 +1451,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   hist_gsplit    = (TH2D*)myFile->Get("QCD__"+name+"_bfromg");
   hist_gsplit_c    = (TH2D*)myFile->Get("QCD__"+name+"_cfromg");
   hist_l         = (TH2D*)myFile->Get("QCD__"+name+"_l");
-  hist_data      = (TH2D*)myFile->Get("Data__"+name+"_data");
+  hist_data      = (TH2D*)myFile->Get("DATA__"+name+"_data");
 
   //return ;
 
