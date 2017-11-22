@@ -14,7 +14,7 @@ options.register('reportEvery', 1000,
     VarParsing.varType.int,
     "Report every N events (default is N=1000)"
     )
-options.register('DEBUG', True,
+options.register('DEBUG', False,
    VarParsing.multiplicity.singleton,
    VarParsing.varType.bool,
    "Display debugging statements"
@@ -376,6 +376,26 @@ options.register('FileBFrag', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/
     VarParsing.varType.string,
     "File path for doBFrag systematics"
     )
+options.register('produceDoubleBSFtemplates', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DoubleB SF plots/templates"
+    )
+options.register('useRunRange', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Restrict by run ranges (only for data)"
+    )
+options.register('runRangeMin', 200000,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "Min Run number"
+    )
+options.register('runRangeMax', 499999,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.int,
+    "Max Run number"
+    )
 
 options.parseArguments()
 
@@ -518,6 +538,10 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     doNewJEC               = cms.bool(options.doNewJEC),
     doJECUncert            = cms.bool(options.doJECUncert),  
     File_BFrag				= cms.string(options.FileBFrag), 
+    produceDoubleBSFtemplates        = cms.bool(options.produceDoubleBSFtemplates),
+    useRunRange            = cms.bool(options.useRunRange),  
+    runRangeMin     = cms.int32(options.runRangeMin),
+    runRangeMax     = cms.int32(options.runRangeMax),
 )
 
 #process.btagvalsubjetmu = process.btagval.clone(
