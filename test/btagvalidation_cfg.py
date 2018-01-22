@@ -361,7 +361,7 @@ options.register('jecUncPayloadName',
     VarParsing.varType.string, 
     "JEC uncertainty payload name"
     ),
-options.register('doNewJEC', True,
+options.register('doNewJEC', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Apply new JECs"
