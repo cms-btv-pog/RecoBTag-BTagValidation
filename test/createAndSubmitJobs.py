@@ -6,7 +6,7 @@ from optparse import OptionParser
 
 def make_filenamelist(input_dir):
 
-    proc = subprocess.Popen( [ '/afs/cern.ch/project/eos/installation/cms/bin/eos.select', 'ls', input_dir ], stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+    proc = subprocess.Popen( [ '/usr/bin/eos', 'ls', input_dir ], stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
     output = proc.communicate()[0]
     if proc.returncode != 0:
         print output
