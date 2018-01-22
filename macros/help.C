@@ -5,6 +5,25 @@
 #include <TCanvas.h>
 #include <TMath.h>
 
+void fixupper(TH1* histo) {
+
+  Float_t val, errval;
+
+  Int_t highbin=histo->GetNbinsX();
+
+  val=histo->GetBinContent(highbin)+histo->GetBinContent(highbin+1);
+  errval=0;
+  if(histo->GetBinContent(highbin)!=0.)
+    errval+=TMath::Power(histo->GetBinError(highbin),2);
+  if(histo->GetBinContent(highbin+1)!=0.)
+    errval+=TMath::Power(histo->GetBinError(highbin+1),2);
+  errval=TMath::Sqrt(errval);
+  histo->SetBinContent(highbin,val);
+  histo->SetBinError(highbin,errval);
+  histo->SetBinContent(highbin+1,0);
+  histo->SetBinError(highbin+1,0);
+}
+
 void fix(TH1* histo) {
 
   Float_t val, errval;
