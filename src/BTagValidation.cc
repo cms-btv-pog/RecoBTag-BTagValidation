@@ -482,7 +482,9 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   //checks: for weights
   if (doFatJetPtReweighting_) std::cout << "ATTENTION	: pT reweighting enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
   if (doNtracksReweighting_)  std::cout << "ATTENTION	: nTracks reweighting enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
-  if (doBFrag_)  std::cout << "ATTENTION	: BFrag weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doBFrag_ && doBFragUp_)  std::cout << "ATTENTION	: BFrag (Up) weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doBFrag_ && doBFragDown_)  std::cout << "ATTENTION	: BFrag (Down) weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doBFrag_ && doBFragUp_ && doBFragDown_)  std::cout << "ATTENTION	: BFrag Up and Down weighting enabled!!!!! File path to be used: "<< file_BFrag_ << std::endl;
   if (doCDFrag_)  std::cout << "ATTENTION	: CDFrag weighting enabled. " << std::endl;
   if (doCFrag_)  std::cout << "ATTENTION	: CFrag weighting enabled. " << std::endl;
   if (doK0L_)  std::cout << "ATTENTION	: K0L weighting enabled. " << std::endl;
@@ -1066,7 +1068,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       }
       std::ifstream MnusCorrectionsFile;      
 //       MnusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt"); //Make sure files are in place and up-to-date!
-      MnusCorrectionsFile.open(file_BFrag_ + "EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt"); //Make sure files are in place and up-to-date!
+      MnusCorrectionsFile.open(file_BFrag_ + "/" + "EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt"); //Make sure files are in place and up-to-date!
       while( MnusCorrectionsFile )
       {
         float xBin, efcorr;
@@ -1074,11 +1076,13 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if ( efcorr > 4. ) efcorr = 1.;
         int ib = int(xBin/0.02);
         BTemplateCorrections[ib][ptb][0] = efcorr;
+        if(DEBUG_) std::cout << "Calculating BTemplateCorrections["<<ib<<"]["<<ptb<<"][0] (BFragDown)"<< BTemplateCorrections[ib][ptb][0] << std::endl;
+;
       }
 
       std::ifstream PlusCorrectionsFile; 
 //       PlusCorrectionsFile.open("/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt"); //Make sure files are in place and up-to-date!
-      PlusCorrectionsFile.open(file_BFrag_ + "EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt"); //Make sure files are in place and up-to-date!
+      PlusCorrectionsFile.open(file_BFrag_ + "/" + "EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt"); //Make sure files are in place and up-to-date!
       while( PlusCorrectionsFile )
       {
         float xBin, efcorr;
@@ -1086,6 +1090,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if ( efcorr > 4. ) efcorr = 1.;
         int ib = int(xBin/0.02);
         BTemplateCorrections[ib][ptb][1] = efcorr;
+        if(DEBUG_) std::cout << "Calculating BTemplateCorrections["<<ib<<"]["<<ptb<<"][1] (BFragUp)"<< BTemplateCorrections[ib][ptb][1] << std::endl;
       }
     }
   }
@@ -1489,7 +1494,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // -------For calculating b-fragmentation systematic
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 5){
         if (doBFrag_){
-          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for B Frag systematics.. " << std::endl; 
 
           //float sfbFrag = 1.;
           float drMin = 0.8;   
@@ -1541,6 +1545,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           }
 
           wtFatJet *= WeightBFrag;
+
+          if(DEBUG_ && doBFragUp_)std::cout << "SYSTEMATICS: Applying weights for B Frag Up systematics.. WeightBFrag = " << WeightBFrag  << std::endl; 
+          if(DEBUG_ && doBFragDown_)std::cout << "SYSTEMATICS: Applying weights for B Frag Up systematics.. WeightBFrag = " << WeightBFrag << std::endl; 
         }
       }  
 
@@ -1548,7 +1555,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 5 || abs(FatJetInfo.Jet_flavour[iJet]) == 4){
         if (doCDFrag_)
         {
-          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for cd Frag systematics.. " << std::endl; 
 
           float sfCD = 1.;
           float drMin = 0.8;   
@@ -1584,13 +1590,15 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           if( isDsubsMu ) sfCD *= 0.067 / 0.080;
 
           wtFatJet *= sfCD;
+
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for cd Frag systematics.. sfCD = " << sfCD <<std::endl; 
+
         }
       }
 
       //c fragmentation
       if (abs(FatJetInfo.Jet_flavour[iJet]) == 4){
         if (doCFrag_){
-          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for C Frag systematics.. " << std::endl; 
 
           float sfC = 1.;
           float drMin = 0.8;   
@@ -1630,6 +1638,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
             // 0.185072, 0.58923, 0.115961
           }
           wtFatJet *= sfC;
+
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for C Frag systematics.. sfC = " << sfC <<std::endl; 
         }    
       }
 
@@ -1638,7 +1648,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       {
         if (doK0L_)
         {
-          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for K0L systematics.. " << std::endl; 
 
           float sfK0L = 1.;
           float jeta = FatJetInfo.Jet_eta[iJet];
@@ -1658,6 +1667,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           if( nK0s > 0 )    sfK0L *= 1.3;
           if( nLambda > 0 ) sfK0L *= 1.5;
           wtFatJet *= sfK0L;
+
+          if(DEBUG_)std::cout << "SYSTEMATICS: Applying weights for K0L systematics.. sfK0L = " << sfK0L << std::endl; 
         }
       }
 
