@@ -10,14 +10,16 @@ def main(f,var,bins,xmin,xmax,isLog):
 	var_mc_noweight = ROOT.TH1D(var+"_mc_noweight",";pT(all jets);;",bins,xmin,xmax)
 	var_mc_reweight = ROOT.TH1D(var+"_mc_reweight",";pT(all jets);;",bins,xmin,xmax)
 	varweight_data_mc = ROOT.TH1D(var+"_weight_data_mc",";pT(all jets);;",bins,xmin,xmax)
+	
+	QCDstr = "QCDMuEnr";
 
 	fin = ROOT.TFile.Open(f, "READ")
 	h_data = fin.Get("DATA__"+var+"_data")
-	h_qcd_b  = fin.Get("QCD__"+var+"_b")
-	h_qcd_c  = fin.Get("QCD__"+var+"_c")
-	h_qcd_l  = fin.Get("QCD__"+var+"_l")
-	h_qcd_bfromg  = fin.Get("QCD__"+var+"_bfromg")
-	h_qcd_cfromg  = fin.Get("QCD__"+var+"_cfromg")
+	h_qcd_b  = fin.Get(QCDstr+"__"+var+"_b")
+	h_qcd_c  = fin.Get(QCDstr+"__"+var+"_c")
+	h_qcd_l  = fin.Get(QCDstr+"__"+var+"_l")
+	h_qcd_bfromg  = fin.Get(QCDstr+"__"+var+"_bfromg")
+	h_qcd_cfromg  = fin.Get(QCDstr+"__"+var+"_cfromg")
 	h_qcd = h_qcd_b.Clone("hqcd")
 	h_qcd.Add(h_qcd_c)
 	h_qcd.Add(h_qcd_l)
@@ -81,28 +83,33 @@ def main(f,var,bins,xmin,xmax,isLog):
 
 if __name__ == "__main__":
 
-	dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/"
+	dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final"
 
-# 	var = "FatJet_pt_all"
-# 	bins = 500
-# 	xmin = 0.
-# 	xmax = 5000.
-# 	isLog = False
-# 
-# 	fname = 'Mu_350'
-# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'	
-# 	main(f,var,bins,xmin,xmax,isLog)
-# 
-# 	fname = 'Mu_250'
-# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'	
-# 	main(f,var,bins,xmin,xmax,isLog)
-
-	var = "FatJet_track_multi"
-	bins = 80
-	xmin = -0.5
-	xmax = 79.5
+	var = "FatJet_pt_all"
+	bins = 500
+	xmin = 0.
+	xmax = 5000.
 	isLog = False
 
+	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v2'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8DiJet170orAK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2_v2'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+
+# 	var = "FatJet_track_multi"
+# 	bins = 80
+# 	xmin = -0.5
+# 	xmax = 79.5
+# 	isLog = False
+
 # 	fname = 'Mu_350'
 # 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
 # 	main(f,var,bins,xmin,xmax,isLog)
@@ -111,10 +118,10 @@ if __name__ == "__main__":
 # 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
 # 	main(f,var,bins,xmin,xmax,isLog)
 
-	fname = 'Mu_350_ptReweighted'
-	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
-	main(f,var,bins,xmin,xmax,isLog)
-
-	fname = 'Mu_250_ptReweighted'
-	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
-	main(f,var,bins,xmin,xmax,isLog)
+# 	fname = 'Mu_350_ptReweighted'
+# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Mu_250_ptReweighted'
+# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	main(f,var,bins,xmin,xmax,isLog)
