@@ -58,8 +58,10 @@ Implementation:
 #include <TF1.h>
 
 #include <string>
+#include <sstream>
 #include <map>
 #include <vector>
+#include <utility>
 
 #include <boost/algorithm/string.hpp>
 
@@ -211,6 +213,12 @@ class BTagValidation : public edm::EDAnalyzer {
     int nEventsAll;
     int nEventsStored;
 
+    static const std::vector<std::string> taggers_ ;
+    static const std::map<std::string, std::pair<int, int>> pts_ ;
+    static const std::vector<std::string> sels_ ;
+
+    static const double CSVv2L_;
+    static const double CSVv2M_;
     static const double DeepCSVL_;
     static const double DeepCSVM_;
 };
@@ -222,8 +230,20 @@ class BTagValidation : public edm::EDAnalyzer {
 //
 // static data member definitions
 //
-const double BTagValidation::DeepCSVL_ = 0.5426; 
-const double BTagValidation::DeepCSVM_ = 0.8484; 
+const std::vector<std::string> BTagValidation::taggers_ = {"CSVv2L", "CSVv2M", "DeepCSVL", "DeepCSVM"};
+const std::map<std::string, std::pair<int, int>> BTagValidation::pts_ = {
+  {"pt0"  , std::make_pair(0  , 30   ) } , 
+  {"pt1"  , std::make_pair(30 , 140  ) } , 
+  {"pt2"  , std::make_pair(140, 180  ) } , 
+  {"pt3"  , std::make_pair(180, 240  ) } , 
+  {"pt4"  , std::make_pair(240, 10000) } , 
+} ; 
+const std::vector<std::string> BTagValidation::sels_ = {"pass", "fail"}; 
+
+const double BTagValidation::CSVv2L_   = 0.5803; 
+const double BTagValidation::CSVv2M_   = 0.8838; 
+const double BTagValidation::DeepCSVL_ = 0.1522; 
+const double BTagValidation::DeepCSVM_ = 0.4941; 
 
 //
 // constructors and destructor
@@ -363,6 +383,7 @@ void BTagValidation::beginJob() {
 
   FatJetInfo.ReadTree(JetTree,"FatJetInfo");
   FatJetInfo.ReadFatJetSpecificTree(JetTree,"FatJetInfo",false);
+  FatJetInfo.ReadCSVTagVarTree(JetTree,"FatJetInfo") ;
   if (useJetProbaTree_) {
     EvtInfo.ReadJetTrackTree(JetTreeEvtInfo);
     FatJetInfo.ReadJetTrackTree(JetTree,"FatJetInfo");
@@ -372,6 +393,7 @@ void BTagValidation::beginJob() {
     SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
     SubJets.ReadTree(JetTree,"PrunedSubJetInfo") ;
     SubJets.ReadSubJetSpecificTree(JetTree,"PrunedSubJetInfo") ;
+    SubJets.ReadCSVTagVarTree(JetTree,"PrunedSubJetInfo") ;
 
     if (useJetProbaTree_) {
       SubJets.ReadJetTrackTree(JetTree,"PrunedSubJetInfo");
@@ -381,6 +403,7 @@ void BTagValidation::beginJob() {
     SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
     SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
     SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.ReadCSVTagVarTree(JetTree,"SoftDropPuppiSubJetInfo") ;
 
     if (useJetProbaTree_) {
       SubJets.ReadJetTrackTree(JetTree,"SoftDropPuppiSubJetInfo");
@@ -442,52 +465,27 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_JP"      ,";JP;;",50,0.,2.5);
   AddHisto(histoTag+"_JBP"     ,";JBP;;",50,0.,8.);
   AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
+  AddHisto(histoTag+"_DeepCSV" ,";DeepCSV;;",50,0.,1.);
   AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
 
   if ( histoTag.Contains("SubJet") ) { 
+
     AddHisto(histoTag+"_JP_all_pt0", ";JP_all_pt0;;", 50, 0., 2.5);
     AddHisto(histoTag+"_JP_all_pt1", ";JP_all_pt1;;", 50, 0., 2.5);
     AddHisto(histoTag+"_JP_all_pt2", ";JP_all_pt2;;", 50, 0., 2.5);
     AddHisto(histoTag+"_JP_all_pt3", ";JP_all_pt3;;", 50, 0., 2.5);
     AddHisto(histoTag+"_JP_all_pt4", ";JP_all_pt4;;", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_all_ptall", ";JP_all_ptall;;", 50, 0., 2.5);  
 
-    AddHisto(histoTag+"_JP_DeepCSVLpass_pt0", "JP_DeepCSVLpass_pt0", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVLfail_pt0", "JP_DeepCSVLfail_pt0", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVLpass_pt1", "JP_DeepCSVLpass_pt1", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVLfail_pt1", "JP_DeepCSVLfail_pt1", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVLpass_pt2", "JP_DeepCSVLpass_pt2", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVLfail_pt2", "JP_DeepCSVLfail_pt2", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVLpass_pt3", "JP_DeepCSVLpass_pt3", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVLfail_pt3", "JP_DeepCSVLfail_pt3", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVLpass_pt4", "JP_DeepCSVLpass_pt4", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVLfail_pt4", "JP_DeepCSVLfail_pt4", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVLpass_ptall", "JP_DeepCSVLpass_ptall", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVLfail_ptall", "JP_DeepCSVLfail_ptall", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVMpass_pt0", "JP_DeepCSVMpass_pt0", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVMfail_pt0", "JP_DeepCSVMfail_pt0", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVMpass_pt1", "JP_DeepCSVMpass_pt1", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVMfail_pt1", "JP_DeepCSVMfail_pt1", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVMpass_pt2", "JP_DeepCSVMpass_pt2", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVMfail_pt2", "JP_DeepCSVMfail_pt2", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVMpass_pt3", "JP_DeepCSVMpass_pt3", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVMfail_pt3", "JP_DeepCSVMfail_pt3", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVMpass_pt4", "JP_DeepCSVMpass_pt4", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVMfail_pt4", "JP_DeepCSVMfail_pt4", 50, 0., 2.5);
-
-    AddHisto(histoTag+"_JP_DeepCSVMpass_ptall", "JP_DeepCSVMpass_ptall", 50, 0., 2.5);
-    AddHisto(histoTag+"_JP_DeepCSVMfail_ptall", "JP_DeepCSVMfail_ptall", 50, 0., 2.5);
+    for (std::string tagger : taggers_) {
+      for (auto const pt : pts_) {
+        for (std::string sel : sels_) {
+          std::stringstream hname ;
+          hname << histoTag << "_JP_" << tagger << sel << "_" << pt.first ; 
+          AddHisto((hname.str()).c_str(), "; JP; Events;", 50, 0., 2.5);
+        }
+      }
+    }
 
   }
 
@@ -520,7 +518,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         BTemplateCorrections[ib][ptb][1] = 1.;
       }
       std::ifstream MnusCorrectionsFile;      
-      MnusCorrectionsFile.open("/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt");
+      MnusCorrectionsFile.open("/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_m5.txt");
       while( MnusCorrectionsFile ) {
         double xBin, efcorr;
         MnusCorrectionsFile >> xBin >> efcorr;
@@ -530,7 +528,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       }
 
       std::ifstream PlusCorrectionsFile; 
-      PlusCorrectionsFile.open("/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt");
+      PlusCorrectionsFile.open("/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PtRelFall12/EnergyFraction_" + PtRelPtBin[ptb] + "_p5.txt");
       while( PlusCorrectionsFile ) {
         double xBin, efcorr;
         PlusCorrectionsFile >> xBin >> efcorr;
@@ -559,11 +557,11 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     }
     else if( iEntry == 0 ) edm::LogInfo("IsData") << ">>>>> Running on data\n" ;
 
-	  if(isData && useRunRange_){
-	  	if( run < runRangeMin_ || run > runRangeMax_ ){
-	  		continue;
-	  	}
-	  }
+    if(isData && useRunRange_){
+      if( run < runRangeMin_ || run > runRangeMax_ ){
+        continue;
+      }
+    }
 
     double wtPU = 1.;
     if ( doPUReweightingOfficial_ && !isData )
@@ -598,6 +596,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     //---------------------------- Start fat jet loop ---------------------------------------//
     for (int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
 
+      double jetptuncorr(FatJetInfo.Jet_uncorrpt [iJet]) ;
       double jetpt(FatJetInfo.Jet_pt [iJet]) ;
       double jetabseta(fabs(FatJetInfo.Jet_eta[iJet])) ;
       double jetmass(FatJetInfo.Jet_massPruned[iJet]);
@@ -719,6 +718,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           double sjabsflav (abs(SubJets.Jet_flavour[iSubJet])) ; 
           double sjcsvv2   (SubJets.Jet_CombIVF[iSubJet]) ; 
           double sjjp      (SubJets.Jet_Proba[iSubJet]) ;
+          double sjdeepcsv (SubJets.Jet_DeepCSVBDisc[iSubJet]) ;
           bool   sjIsGSPbb (false) ; 
           bool   sjIsGSPcc (false) ; 
 
@@ -933,20 +933,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           } //// KOs Lambda systematics
 
           //// Templates for LT method
-          double ptbinsLow[5] ; 
-          double ptbinsHigh[5] ; 
-
-          ptbinsLow[0] = 0.; 
-          ptbinsLow[1] = 30.; 
-          ptbinsLow[2] = 140.; 
-          ptbinsLow[3] = 180.; 
-          ptbinsLow[4] = 240.;
-
-          ptbinsHigh[0] = 30.;  
-          ptbinsHigh[1] = 140.; 
-          ptbinsHigh[2] = 180.; 
-          ptbinsHigh[3] = 240.; 
-          ptbinsHigh[4] = 10000;
 
           TString histoTag = "SoftDropSubJet";
           if( usePrunedSubjets_ ) histoTag = "PrunedSubJet";
@@ -955,55 +941,53 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           FillHisto(histoTag+"_nJets", sjabsflav, 0 , 0, nSubJet , wtPU*wtSubJet) ;
           fillJetHistos(SubJets, iSubJet, 0, 0 ,histoTag, nmuSubJet, nselmuonSubJet, idxFirstMuon, wtPU*wtSubJet);
 
-          if ( sjpt > ptbinsLow[0] && sjpt <= ptbinsHigh[0] )      FillHisto(histoTag+"_JP_all_pt0", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-          else if ( sjpt > ptbinsLow[1] && sjpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_all_pt1", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-          else if ( sjpt > ptbinsLow[2] && sjpt <= ptbinsHigh[2] ) FillHisto(histoTag+"_JP_all_pt2", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-          else if ( sjpt > ptbinsLow[3] && sjpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_all_pt3", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-          else if ( sjpt > ptbinsLow[4] ) FillHisto(histoTag+"_JP_all_pt4", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);  
-          FillHisto(histoTag+"_JP_all_ptall", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+          for (auto const pt : pts_) {
 
-          if ( sjcsvv2 >= DeepCSVL_  ) {
-            if ( sjpt > ptbinsLow[0] && sjpt <= ptbinsHigh[0] ){
-              FillHisto(histoTag+"_JP_DeepCSVLpass_pt0", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);}
-            else if ( sjpt > ptbinsLow[1] && sjpt <= ptbinsHigh[1] ){
-              FillHisto(histoTag+"_JP_DeepCSVLpass_pt1", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);}
-            else if ( sjpt > ptbinsLow[2] && sjpt <= ptbinsHigh[2] ){
-              FillHisto(histoTag+"_JP_DeepCSVLpass_pt2", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);}
-            else if ( sjpt > ptbinsLow[3] && sjpt <= ptbinsHigh[3] ){
-              FillHisto(histoTag+"_JP_DeepCSVLpass_pt3", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); }
-            else if ( sjpt > ptbinsLow[4] ){
-              FillHisto(histoTag+"_JP_DeepCSVLpass_pt4", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); }
-            FillHisto(histoTag+"_JP_DeepCSVLpass_ptall", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-          }
-          else if ( sjcsvv2 < DeepCSVL_  ) {
-            if ( sjpt > ptbinsLow[0] && sjpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DeepCSVLfail_pt0", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-            else if ( sjpt > ptbinsLow[1] && sjpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DeepCSVLfail_pt1", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-            else if ( sjpt > ptbinsLow[2] && sjpt <= ptbinsHigh[2] ) FillHisto(histoTag+"_JP_DeepCSVLfail_pt2", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-            else if ( sjpt > ptbinsLow[3] && sjpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DeepCSVLfail_pt3", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-            else if ( sjpt > ptbinsLow[4] ) FillHisto(histoTag+"_JP_DeepCSVLfail_pt4", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-            FillHisto(histoTag+"_JP_DeepCSVLfail_ptall", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-          }
+            if (sjpt >= pt.second.first && sjpt < pt.second.second) {
 
-          if ( sjcsvv2 >= DeepCSVM_  ) {
-            if ( sjpt > ptbinsLow[0] && sjpt <= ptbinsHigh[0] ){
-              FillHisto(histoTag+"_JP_DeepCSVMpass_pt0", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);}
-            else if ( sjpt > ptbinsLow[1] && sjpt <= ptbinsHigh[1] ){
-              FillHisto(histoTag+"_JP_DeepCSVMpass_pt1", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);}
-            else if ( sjpt > ptbinsLow[2] && sjpt <= ptbinsHigh[2] ){
-              FillHisto(histoTag+"_JP_DeepCSVMpass_pt2", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);}
-            else if ( sjpt > ptbinsLow[3] && sjpt <= ptbinsHigh[3] ){
-              FillHisto(histoTag+"_JP_DeepCSVMpass_pt3", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); }
-            else if ( sjpt > ptbinsLow[4] ){
-              FillHisto(histoTag+"_JP_DeepCSVMpass_pt4", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); }
-            FillHisto(histoTag+"_JP_DeepCSVMpass_ptall", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-          }
-          else if ( sjcsvv2 < DeepCSVM_  ) {
-            if ( sjpt > ptbinsLow[0] && sjpt <= ptbinsHigh[0] ) FillHisto(histoTag+"_JP_DeepCSVMfail_pt0", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-            else if ( sjpt > ptbinsLow[1] && sjpt <= ptbinsHigh[1] ) FillHisto(histoTag+"_JP_DeepCSVMfail_pt1", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-            else if ( sjpt > ptbinsLow[2] && sjpt <= ptbinsHigh[2] ) FillHisto(histoTag+"_JP_DeepCSVMfail_pt2", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet); 
-            else if ( sjpt > ptbinsLow[3] && sjpt <= ptbinsHigh[3] ) FillHisto(histoTag+"_JP_DeepCSVMfail_pt3", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-            else if ( sjpt > ptbinsLow[4] ) FillHisto(histoTag+"_JP_DeepCSVMfail_pt4", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
-            FillHisto(histoTag+"_JP_DeepCSVMfail_ptall", sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+              std::string sjptbin = pt.first;
+              std::stringstream hname;
+              hname << histoTag << "_JP_all_" << sjptbin ;
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjcsvv2 >= CSVv2L_  ) {
+                hname << histoTag << "_JP_CSVv2Lpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_CSVv2Lfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjcsvv2 >= CSVv2M_  ) {
+                hname << histoTag << "_JP_CSVv2Mpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_CSVv2Mfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjdeepcsv >= DeepCSVL_  ) {
+                hname << histoTag << "_JP_DeepCSVLpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_DeepCSVLfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjdeepcsv >= DeepCSVM_  ) {
+                hname << histoTag << "_JP_DeepCSVMpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_DeepCSVMfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+            }
+
           }
 
         } //// process first two subjets
@@ -1097,13 +1081,17 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
   double jetproba (JetInfo.Jet_Proba[iJet]);
   double jetbproba(JetInfo.Jet_Bprob[iJet]);
   double csvivfv2 (JetInfo.Jet_CombIVF[iJet]);
+  double deepcsv  (JetInfo.Jet_DeepCSVBDisc[iJet]);
   double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
   double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
-  float mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
+  double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
+
+  std::cout << mass_TagVarCSV_sv << std::endl;
 
   FillHisto(histoTag+"_JP",       flav, isGSPbb, isGSPcc ,jetproba  ,wt);
   FillHisto(histoTag+"_JBP",      flav, isGSPbb, isGSPcc ,jetbproba ,wt);
   FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
+  FillHisto(histoTag+"_DeepCSV",  flav, isGSPbb, isGSPcc ,deepcsv   ,wt);
   FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
   FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
   FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);

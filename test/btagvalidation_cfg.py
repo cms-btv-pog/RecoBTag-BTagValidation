@@ -55,7 +55,7 @@ options.register('usePrunedSubjets', False,
     VarParsing.varType.bool,
     "Process pruned subjets"
     )
-options.register('useSoftDropSubjets', False,
+options.register('useSoftDropSubjets', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Process soft drop subjets"
@@ -85,7 +85,7 @@ options.register('useRelaxedMuonID', True,
     VarParsing.varType.bool,
     "Use relaxed muon ID"
     )
-options.register('fatJetAbsEtaMax', 2.4,
+options.register('fatJetAbsEtaMax', 2.5,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum abs(eta)"
@@ -255,7 +255,7 @@ options.register('FileFatJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
-options.register('FileSubJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/jetpt_data_weight_fatJetPtMin_450_tau-0p5/subjetpt_DataRun2016Rereco_MC_RunIISummer16_25ns_MINIAOD.root",
+options.register('FileSubJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/SoftDropSubJetPt_data_mc_SubJetMuTagged_QCDMuEnriched_94XMiniAOD.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
@@ -297,7 +297,7 @@ options.register('runRangeMin', 200000,
     VarParsing.varType.int,
     "Min Run number"
     )
-options.register('runRangeMax', 499999,
+options.register('runRangeMax', 999999,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Max Run number"
@@ -369,14 +369,14 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetPrunedMassMin  = cms.double(options.fatJetPrunedMassMin),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string('hpvwt_data_mc'),
-    File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/PUDist/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root'),
+    File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PUDist/PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root'),
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/PUDist/RunII2016Rereco_25ns_PUXsec69000nb.root'),
+    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PUDist/RunII2017BCDEF_17NovRereco_25ns_PUXsec69200nb.root'),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
     Hist_FatJetPtWt        = cms.string('fatjetptweight_mc_data'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
-    Hist_SubJetPtWt        = cms.string('subjetptweight_mc_data'),
+    Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
     FatJetPrunedMassMax    = cms.double(options.fatJetPrunedMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
