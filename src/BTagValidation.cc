@@ -477,12 +477,22 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
     AddHisto(histoTag+"_JP_all_pt3", ";JP_all_pt3;;", 50, 0., 2.5);
     AddHisto(histoTag+"_JP_all_pt4", ";JP_all_pt4;;", 50, 0., 2.5);
 
+    AddHisto(histoTag+"_SVmass_all_pt0", ";SVmass_all_pt0;;", 75, 0., 15.);
+    AddHisto(histoTag+"_SVmass_all_pt1", ";SVmass_all_pt1;;", 75, 0., 15.);
+    AddHisto(histoTag+"_SVmass_all_pt2", ";SVmass_all_pt2;;", 75, 0., 15.);
+    AddHisto(histoTag+"_SVmass_all_pt3", ";SVmass_all_pt3;;", 75, 0., 15.);
+    AddHisto(histoTag+"_SVmass_all_pt4", ";SVmass_all_pt4;;", 75, 0., 15.);
+
     for (std::string tagger : taggers_) {
       for (auto const pt : pts_) {
         for (std::string sel : sels_) {
           std::stringstream hname ;
           hname << histoTag << "_JP_" << tagger << sel << "_" << pt.first ; 
-          AddHisto((hname.str()).c_str(), "; JP; Events;", 50, 0., 2.5);
+          AddHisto((hname.str()).c_str(), "; JP; Events;", 75, 0., 15.);
+
+          hname.str(std::string());
+          hname << histoTag << "_SVmass_" << tagger << sel << "_" << pt.first ; 
+          AddHisto((hname.str()).c_str(), "; SVmass; Events;", 75, 0., 15.);
         }
       }
     }
@@ -718,6 +728,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           double sjabsflav (abs(SubJets.Jet_flavour[iSubJet])) ; 
           double sjcsvv2   (SubJets.Jet_CombIVF[iSubJet]) ; 
           double sjjp      (SubJets.Jet_Proba[iSubJet]) ;
+          double sjsvmass  (SubJets.TagVarCSV_vertexMass[iSubJet]);
           double sjdeepcsv (SubJets.Jet_DeepCSVBDisc[iSubJet]) ;
           bool   sjIsGSPbb (false) ; 
           bool   sjIsGSPcc (false) ; 
@@ -947,6 +958,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
               std::string sjptbin = pt.first;
               std::stringstream hname;
+
+              hname.str(std::string());
               hname << histoTag << "_JP_all_" << sjptbin ;
               FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
 
@@ -985,6 +998,46 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
                 hname << histoTag << "_JP_DeepCSVMfail_" << sjptbin ;
               }
               FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              hname << histoTag << "_SVmass_all_" << sjptbin ;
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjsvmass  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjcsvv2 >= CSVv2L_  ) {
+                hname << histoTag << "_SVmass_CSVv2Lpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_SVmass_CSVv2Lfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjsvmass  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjcsvv2 >= CSVv2M_  ) {
+                hname << histoTag << "_SVmass_CSVv2Mpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_SVmass_CSVv2Mfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjsvmass  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjdeepcsv >= DeepCSVL_  ) {
+                hname << histoTag << "_SVmass_DeepCSVLpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_SVmass_DeepCSVLfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjsvmass  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjdeepcsv >= DeepCSVM_  ) {
+                hname << histoTag << "_SVmass_DeepCSVMpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_SVmass_DeepCSVMfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjsvmass  ,wtSubJet);
 
             }
 
@@ -1085,8 +1138,6 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
   double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
   double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
   double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
-
-  std::cout << mass_TagVarCSV_sv << std::endl;
 
   FillHisto(histoTag+"_JP",       flav, isGSPbb, isGSPcc ,jetproba  ,wt);
   FillHisto(histoTag+"_JBP",      flav, isGSPbb, isGSPcc ,jetbproba ,wt);
