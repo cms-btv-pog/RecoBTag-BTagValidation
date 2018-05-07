@@ -26,79 +26,38 @@
 
 using namespace std;
 
-// TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
 
-// TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_noSlimmedTrees_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root";
 
-// TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
+//TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1.root";
 
-// TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut= "p_{T} (AK8 jets) > 350 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_350_dataJPcalib_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithDATAJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_ptReweighted_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_ptReweightedV2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V2_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 250 GeV";
-// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/Mu_250and350_V3_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root";
-
-// TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
-// TString filename    ="/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Oct25-2017_CommSF_BenjaminsCode/CMSSW_9_2_7_patch1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017CD_QCDMuEnriched_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval.root";
-
-TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
-TString filename    ="/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Oct25-2017_CommSF_BenjaminsCode/CMSSW_9_2_7_patch1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017CD_QCDMuEnriched_Pt350_singleMuTag_Final_MuonTaggedFatJets_histograms_btagval.root";
-
+// TString ptcut = "250 GeV < p_{T} (AK8 jets) < 350 GeV";
+// //TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1.root";
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final//Run2017BCDEF_ReReco_QCDMuonEnriched_AK8DiJet170orAK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2.root";
 
 TString filename_ext="" ;
 
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_14Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p46_18Jan2016_PUxsec69000_BTagMuHLTAK8Jet300_with1p27lightjetCorr";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_1Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_dataWithDATAJPcalib";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_6Feb2016_BTagMuHLTAK8Jet300_with1p27lightjetCorr_MoriondJEC_dataWithMCJPcalib";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p8_10Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted_dataWithDATAJPcalib";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTDiJet170_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_15Feb2016_BTagMuHLTAK8Jet300_OR_BTagMuHLTJet300_with1p27lightjetCorr_MoriondJEC_runBtoH_ptReweighted";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_27Feb2016_with1p27lightjetCorr_runBtoH_ptReweighted_INCLUSIVE_PT";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweighted_INCLUSIVE_PT_v2";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_INCLUSIVE_PT";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_ptReweightedV2_INCLUSIVE_PT";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V2_INCLUSIVE_PT";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT";
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_36p0_28Feb2016_with1p27lightjetCorr_runBtoH_V3_INCLUSIVE_PT_updateColorStyle";
 
-// TString dir4plots   = "Comm_DoubleMuTag_BTagMuQCDMuEnr_Oct30-2017_runCtoD_pt350";
-// TString dir4plots   = "Comm_SingleMuTag_BTagMuQCDMuEnr_Nov8-2017_runCtoD_pt350";
-TString dir4plots   = "Comm_SingleMuTag_BTagMuQCDMuEnr_Nov8-2017_runCtoD_pt350_TESSSST";
+// TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
+// // TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2.root"; //dataset BCDEF all valid. new PU reweight.
+// // TString dir4plots   = "Comm_DoubleMuTag_Pt350_BTagMu_RunBtoF_ReReco_QCDMuEnr_w1p27corr_Feb13-2018"; //activating muons plots //
+// TString filename    ="/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2_ptReweighted.root"; //dataset BCDEF all valid. new PU reweight.
+// TString dir4plots   = "Comm_DoubleMuTag_Pt350_BTagMu_RunBtoF_ReReco_QCDMuEnr_w1p27corr_ptReweighted_Feb15-2018"; //
+
+
+TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
+TString filename    ="/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v4_SVmass_ptReweighted.root"; //dataset BCDEF all valid. SV mass 
+TString dir4plots   = "Comm_DoubleMuTag_Pt350_BTagMu_RunBtoF_ReReco_QCDMuEnr_w1p27corr_ptReweighted_v4_SVmassLT_Mar16-2018"; //
+
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
 
-// TString title1 = "36.8 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-// TString title1 = "35.9 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-// TString title1 = "36 fb^{-1}, #sqrt{s} = 13 TeV, 2016";
-// TString title1 = "36 fb^{-1} (13 TeV, 2016)";
+// TString title1 = "18.5 fb^{-1} (13 TeV, 2017)";//B+C+D=4.77+9.46+4.23=18.5
 
-TString title1 = "~10 fb^{-1} (13 TeV, 2017)";
+//TString title1 = "32.7 fb^{-1} (13 TeV, 2017)";//B+C+D+E+F=4.77+9.46+4.23+10.2+4.0=32.7
+
+TString title1 = "41.3 fb^{-1} (13 TeV, 2017)";//B+C+D+E+F=4.77+9.58+4.22+9.26+13.46 (full valid).
 
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
@@ -112,8 +71,8 @@ bool prunedjets= 0;
 bool logy      = 1;
 bool dodata    = 1;
 bool extNorm   = 0; // used only for double-muon- and double-b-tagged fat jets
-// double norm_lightjets = 1.27 ; // used only for QCD MuEnriched. //used for 2016
-double norm_lightjets = 1.0; 
+double norm_lightjets = 1.27 ; // used only for QCD MuEnriched. //used for 2016
+//double norm_lightjets = 1.0; 
 
 bool inclTTbar = 0;
 bool inclZjj   = 0;
@@ -132,7 +91,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 void DrawCommPlot(bool Draw_track_plots=false,
     bool Draw_Nminus1_plots=false,
     bool Draw_sv_plots=false,
-    bool Draw_muons_plots=true,
+    bool Draw_muons_plots=false,
     bool Draw_discriminator_plots=false,
     bool Draw_tagRate_plots=false,
     bool Draw_2D_plots=false) {
@@ -244,6 +203,36 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     DrawStacked(histoTag+"_nSV"  ,"Number of SV"                          ,logy ,dodata ,extNorm ,1 ,0 ,0. ,0.);
 
     ////DrawStacked(histoTag+"_BDTG_SV"           ,"Boosted bb tagger Discriminator"                                   ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
+    
+    //(double)tagged muon plots
+
+    //DrawStacked(histoTag+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,4. ,0.);
+    DrawStacked(histoTag+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,1, 0, 1.);
+    DrawStacked(histoTag+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,1, 0, 1.);
+
+    //DrawStacked(histoTag+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
+    //DrawStacked(histoTag+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,4. ,0.);
+    DrawStacked(histoTag+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,1, 0, 1.);
+    DrawStacked(histoTag+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,1, 0, 1.);
+
+    DrawStacked(histoTag+"_dimuon_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,4. ,0.);
+    DrawStacked(histoTag+"_dimuon_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_dimuon_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    DrawStacked(histoTag+"_dimuon_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    DrawStacked(histoTag+"_dimuon_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,1, 0, 1.);
+
+    DrawStacked("Subjet1_dR",       "#DeltaR (Subjet_{1}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,1, 0, 1.);
+    DrawStacked("Subjet2_dR",       "#DeltaR (Subjet_{2}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,1, 0, 1.);
+
+    Draw2DPlot(histoTag+"_JP_DoubleB","JP vs DoubleB","JP" ,"DoubleB", logy ,1 ,0.);
+    Draw2DPlot(histoTag+"_TagVarCSV_sv_mass_DoubleB","M(sv from TagVarCSV) vs DoubleB","M(sv from TagVarCSV)", "DoubleB" ,logy ,1 ,0.);
 
     //////debug - start - rizki
 
@@ -277,11 +266,11 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     ////DrawStacked(hTag1+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
     ////DrawStacked(hTag1+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-    ////DrawStacked(hTag1+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(hTag1+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(hTag1+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(hTag1+"_muComb_ptRatio",    "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(hTag1+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_dimuon_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_dimuon_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_dimuon_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag1+"_dimuon_ptRatio",    "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag1+"_dimuon_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
 
     //////other selected Region
     ////TString hTag2 = histoTag+"_otherSelectedRegion";
@@ -313,37 +302,11 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     ////DrawStacked(hTag2+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
     ////DrawStacked(hTag2+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
 
-    ////DrawStacked(hTag2+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(hTag2+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(hTag2+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(hTag2+"_muComb_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(hTag2+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-
-    //////all region
-    ////DrawStacked(histoTag+"_mu1_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{0})" ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_mu1_chi2",        "Norm. #chi^{2} of the muon (#mu_{0})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muon1_Pt",        "Muon p_{T} [GeV/c] (#mu_{0})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(histoTag+"_muon1_eta",       "Muon #eta (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muon1_phi",       "Muon #phi (#mu_{0})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muon1_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(histoTag+"_muon1_sj1_dR",       "Muon #DeltaR (#mu, SubJet1) (#mu_{0})"       ,logy ,dodata ,extNorm ,2. ,0.);
-
-    ////DrawStacked(histoTag+"_mu2_ptrel",       "p_{T} rel. of the muon [GeV/c] (#mu_{1})" ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_mu2_chi2",        "Norm. #chi^{2} of the muon (#mu_{1})"     ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muon2_Pt",        "Muon p_{T} [GeV/c] (#mu_{1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(histoTag+"_muon2_eta",       "Muon #eta (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muon2_phi",       "Muon #phi (#mu_{1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muon2_dR",       "Muon #DeltaR (#mu, AK8Jet) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(histoTag+"_muon2_sj2_dR",       "Muon #DeltaR (#mu, SubJet2) (#mu_{1})"       ,logy ,dodata ,extNorm ,2. ,0.);
-
-    ////DrawStacked(histoTag+"_muonComb_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(histoTag+"_muonComb_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muonComb_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-    ////DrawStacked(histoTag+"_muComb_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked(histoTag+"_muonComb_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
-
-    ////DrawStacked("Subjet1_dR",       "#DeltaR (Subjet_{1}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,0.);
-    ////DrawStacked("Subjet2_dR",       "#DeltaR (Subjet_{2}, AK8Jet)"       ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_dimuon_Pt",        "Muon p_{T} [GeV/c] (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_dimuon_eta",       "Muon #eta (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_dimuon_phi",       "Muon #phi (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
+    ////DrawStacked(hTag2+"_dimuon_ptRatio",        "Muon p_{T} / AK8Jet p_{T}  (#mu_{0,1})"             ,logy ,dodata ,extNorm ,2. ,0.);
+    ////DrawStacked(hTag2+"_dimuon_dR",       "Muon #DeltaR (#mu, AK8jet) (#mu_{0,1})"                      ,logy ,dodata ,extNorm ,0. ,0.);
 
     //////debug - end - rizki
 
@@ -501,16 +464,20 @@ void Draw(TString name, TString histotitle, bool log) {
   TH1D* hist_mc;
   TH1D* hist_data;
 
+  //TString fdir = "QCD__" ;
+  //TString fdir = "QCDMu+__" ;
+  TString fdir = "QCDMuEnr__" ;
+
   if (name=="h1_nPV") {
-    hist_mc       = (TH1D*)myFile->Get("QCD__"+name+"_mc");
+    hist_mc       = (TH1D*)myFile->Get(fdir+name+"_mc");
     hist_data     = (TH1D*)myFile->Get("DATA__"+name+"_data");
   }
   else if (name=="h1_nPV_unw"){    
-    hist_mc       = (TH1D*)myFile->Get("QCD__h1_nPV_mc_unw");
+    hist_mc       = (TH1D*)myFile->Get(fdir+"h1_nPV_mc_unw");
     hist_data     = (TH1D*)myFile->Get("DATA__h1_nPV_data");
   } 	
   else {
-    hist_mc       = (TH1D*)myFile->Get("QCD__"+name);
+    hist_mc       = (TH1D*)myFile->Get(fdir+name);
     hist_data     = (TH1D*)myFile->Get("DATA__"+name);
   }
   float scale_f = (hist_data->Integral())/(hist_mc->Integral());
@@ -563,9 +530,17 @@ void Draw(TString name, TString histotitle, bool log) {
   hist_mc->GetYaxis()->SetLabelSize( 0.05 );
   hist_mc->GetYaxis()->SetTitleSize( 0.06 );
 
+  if(log)hist_mc->SetMaximum(hist_mc->GetMaximum()*1e3);
+
   hist_data->Draw("E1"); //quick fix to set y-axis according to data.
   hist_mc->Draw("SAMEhist");
   hist_data->Draw("SAMEE1"); //quick fix to have data in front of mc
+  
+  if(name.Contains("pt_hat")){
+	  hist_mc->Draw("histE1");
+	  hist_mc->GetXaxis()->SetRangeUser(0,4000);
+	  histo_ratio->GetXaxis()->SetRangeUser(0,4000);
+  }
 
   TLegend* leg = new TLegend(0.56,0.60,0.86,0.85,NULL,"brNDC");
   leg->SetBorderSize(1);
@@ -668,7 +643,9 @@ void DrawStacked(TString name,
 
   TFile *myFile  = TFile::Open(filename,"READ") ;
   myFile->cd();
-  TString fdir = "QCD__" ;
+  //TString fdir = "QCD__" ;
+  //TString fdir = "QCDMu+__" ;
+  TString fdir = "QCDMuEnr__" ;
 
   hist_b        = (TH1D*)myFile->Get(fdir+name+"_b");
   hist_c        = (TH1D*)myFile->Get(fdir+name+"_c");
@@ -679,7 +656,7 @@ void DrawStacked(TString name,
   if (inclZjj)   hist_zjj   = (TH1D*)myFile->Get("ZJetsFullyHadronic__"+name+"_mc");
   if (doData)    hist_data  = (TH1D*)myFile->Get("DATA__"+name+"_data");
 
-  std::cout << " hist_b name = " << hist_b->GetName() << " integral = " << hist_b->Integral() << endl ;
+//   std::cout << " hist_b name = " << hist_b->GetName() << " integral = " << hist_b->Integral() << endl ;
 //   std::cout << " hist_c name = " << hist_c->GetName() << " integral = " << hist_c->Integral() << endl ;
 //   std::cout << " hist_gsplit name = " << hist_gsplit->GetName() << " integral = " << hist_gsplit->Integral() << endl ;
 //   std::cout << " hist_gsplit_c name = " << hist_gsplit_c->GetName() << " integral =  " << hist_gsplit_c->Integral() << endl ;
@@ -818,17 +795,26 @@ void DrawStacked(TString name,
   int xlow = hist_data->GetXaxis()->FindBin(rangeXLow);
   int xhigh = hist_data->GetXaxis()->FindBin(rangeXHigh);
 
-  hist_l->Scale(norm_lightjets);
+  std::cout << "" << std::endl; //just to organize printout.
+
+  hist_l->Scale(norm_lightjets); //check what value should apply!
+  if(norm_lightjets!=1.00)std::cout << "ATTENTION: factor of " << norm_lightjets << " is applied to light jets! " << std::endl;
 
   if (doData) {
+    std::cout << "====================== Histogram title: "<< histotitle << std::endl;
+    std::cout << "hist_data->Integral() 	= "<< hist_data->Integral() << std::endl;
   	float int_qcd_total = hist_b->Integral() + hist_c->Integral() + hist_gsplit->Integral() + hist_gsplit_c->Integral() + hist_l->Integral();
-    std::cout << "hist_data->Integral() = "<< hist_data->Integral() << ", hist_b->Integral() = " << hist_b->Integral() << ", hist_c->Integral() = " << hist_c->Integral() << ", hist_gsplit->Integral() = " << hist_gsplit->Integral() << ", hist_gsplit_c->Integral() = "<<  hist_gsplit_c->Integral() << ", hist_l->Integral() =" << hist_l->Integral() << std::endl;
-    std::cout << "int_qcd_total = "<< int_qcd_total << std::endl;
+    std::cout << "int_qcd_total 		= "<< int_qcd_total << std::endl;
     float scale_f = ( hist_data->Integral() - (inclTTbar ? hist_ttbar->Integral() : 0) - (inclZjj ? hist_zjj->Integral() : 0) )/( hist_b->Integral() + hist_c->Integral() + hist_gsplit->Integral() + hist_gsplit_c->Integral() + hist_l->Integral() ) ;
     if (fExtNorm) scale_f = ( hist_data_ext->Integral() - (inclTTbar ? hist_ttbar_ext->Integral() : 0) - (inclZjj ? hist_zjj_ext->Integral() : 0) )/( hist_b_ext->Integral() + hist_c_ext->Integral() + hist_gsplit_ext->Integral() + hist_gsplit_c_ext->Integral() + hist_l_ext->Integral() ) ;
     //float scale_f = ( hist_data->Integral(xlow,xhigh) - (inclTTbar ? hist_ttbar->Integral(xlow,xhigh) : 0) - (inclZjj ? hist_zjj->Integral(xlow,xhigh) : 0) )/( hist_b->Integral(xlow,xhigh) + hist_c->Integral(xlow,xhigh) + hist_gsplit->Integral(xlow,xhigh) + hist_gsplit_c->Integral(xlow,xhigh) + hist_l->Integral(xlow,xhigh) ) ;
     //if (fExtNorm) scale_f = ( hist_data_ext->Integral(xlow,xhigh) - (inclTTbar ? hist_ttbar_ext->Integral(xlow,xhigh) : 0) - (inclZjj ? hist_zjj_ext->Integral(xlow,xhigh) : 0) )/( hist_b_ext->Integral(xlow,xhigh) + hist_c_ext->Integral(xlow,xhigh) + hist_gsplit_ext->Integral(xlow,xhigh) + hist_gsplit_c_ext->Integral(xlow,xhigh) + hist_l_ext->Integral(xlow,xhigh) ) ;
-    cout << "scale_f = " << scale_f << endl;
+    std::cout << "scale_f 		= " << scale_f << endl;
+    std::cout << "		hist_b->Integral() 		= " << hist_b->Integral() << std::endl;
+    std::cout << "		hist_c->Integral() 		= " << hist_c->Integral() << std::endl;
+    std::cout << "		hist_gsplit->Integral() 	= " << hist_gsplit->Integral() << std::endl;
+    std::cout << "		hist_gsplit_c->Integral() 	= "<<  hist_gsplit_c->Integral() << std::endl;
+    std::cout << "		hist_l->Integral() 		= " << hist_l->Integral() << std::endl;
 
     hist_b        -> Scale(scale_f);
     hist_c        -> Scale(scale_f);
@@ -1065,7 +1051,7 @@ void DrawStacked(TString name,
   gStyle->SetErrorX(0.);
 
   int iPeriod = 5;    // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV 
-  int iPos = 11 ;
+  int iPos = 1; //11 ;
   int W = 800;
   int H = 600;
   int H_ref = 600;
@@ -1106,13 +1092,17 @@ void DrawStacked(TString name,
     if (name.Contains("track_nHit") || name.Contains("track_HPix")) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*50000000 : histo_tot->GetMaximum()*50000000) ;
     else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3000000 : histo_tot->GetMaximum()*3000000) ;
     else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ; 
-    else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ; 
     else if ( name.Contains("_DoubleB") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
-    else if ( name.Contains("_tau1_flightDistance2dSig") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ; 
-    else if ( name.Contains("_tau2_vertexMass") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10 : histo_tot->GetMaximum()*10) ; 
-    else if ( name.Contains("_z_ratio") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10 : histo_tot->GetMaximum()*10) ; 
-    else if ( name.Contains("_eta") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000000000 : histo_tot->GetMaximum()*10000000000) ; 
-    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ;
+    else if ( name.Contains("_tau1_flightDistance2dSig") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000 : histo_tot->GetMaximum()*1000) ; 
+    else if ( name.Contains("_tau2_vertexMass") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ; 
+//     else if ( name.Contains("_z_ratio") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+//     else if ( name.Contains("_eta") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+//     else if ( name.Contains("_phi") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+//     else if ( name.Contains("_pt_all") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+//     else if ( name.Contains("_jetNTracks") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+//     else if ( name.Contains("_JP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+//     else if ( name.Contains("_nSV") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+    else histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ;
 
   }
   if (doData) {
@@ -1195,7 +1185,9 @@ void DrawStacked(TString name,
 
   if (setSampleName) {
     TString sample = "";
-    if (filename.Contains("InclusiveJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{AK8 jets}" ;  
+    if (filename.Contains("QCDMuonEnriched") && filename.Contains("DoubleMuonTaggedFatJets") ) sample += "#splitline{Muon enriched multijet events}{Double-muon-tagged AK8 jets}" ; 
+
+    else if (filename.Contains("InclusiveJets") && name.Contains("FatJet") ) sample += "#splitline{Multijet sample}{AK8 jets}" ;  
     else if (filename.Contains("InclusiveJets") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Soft drop subjets of AK8 jets}" ;
     else if (filename.Contains("InclusiveJets") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of AK8 jets}" ;
 
@@ -1225,6 +1217,7 @@ void DrawStacked(TString name,
     else if (filename.Contains("MuTaggedFatJet") && !filename.Contains("DoubleMuTaggedFatJet") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Pruned subjets of Muon-tagged AK8 jets}" ;
     else if (filename.Contains("MuTaggedSJ") && name.Contains("SoftDropSubJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 soft drop subjets}" ; 
     else if (filename.Contains("MuTaggedSJ") && name.Contains("PrunedSubJet") ) sample += "#splitline{Multijet sample}{Muon-tagged AK8 pruned subjets}" ; 
+
     else {
       std::cout << " >>>> Error:Check filename = " << filename << " or name = " << name << "\n" ;
     }
@@ -1588,12 +1581,13 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
   TFile *myFile     = TFile::Open(filename,"READ");
   myFile->cd();
+  TString fdir = "QCDMuEnr__" ;
 
-  hist_b         = (TH2D*)myFile->Get("QCD__"+name+"_b");
-  hist_c         = (TH2D*)myFile->Get("QCD__"+name+"_c");
-  hist_gsplit    = (TH2D*)myFile->Get("QCD__"+name+"_bfromg");
-  hist_gsplit_c    = (TH2D*)myFile->Get("QCD__"+name+"_cfromg");
-  hist_l         = (TH2D*)myFile->Get("QCD__"+name+"_l");
+  hist_b         = (TH2D*)myFile->Get(fdir+name+"_b");
+  hist_c         = (TH2D*)myFile->Get(fdir+name+"_c");
+  hist_gsplit    = (TH2D*)myFile->Get(fdir+name+"_bfromg");
+  hist_gsplit_c  = (TH2D*)myFile->Get(fdir+name+"_cfromg");
+  hist_l         = (TH2D*)myFile->Get(fdir+name+"_l");
   hist_data      = (TH2D*)myFile->Get("DATA__"+name+"_data");
 
   //return ;
@@ -1608,14 +1602,14 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
   float scale_f = (hist_data->Integral())/(hist_b->Integral() + hist_c ->Integral()+ hist_gsplit->Integral() + hist_gsplit_c->Integral() + hist_l->Integral());
 
-  if (doData) {
+//   if (doData) {
     hist_b       ->Scale(scale_f);
     hist_c       ->Scale(scale_f);
     hist_gsplit  ->Scale(scale_f);
     hist_gsplit_c  ->Scale(scale_f);
     hist_l       ->Scale(scale_f);
     histo_tot    ->Scale(scale_f);
-  }
+//   }
 
   //   histo_tot->RebinX(10) ;
   //   histo_tot->RebinY(50) ;
@@ -1760,20 +1754,23 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
     pro_data->Draw("e,same");
   }
 
-  TCanvas *canvas = new TCanvas("c1", "c1",10,32,782,552);
+  TCanvas *canvas = new TCanvas("cData", "cData",10,32,782,552);
   canvas->cd();
   canvas->SetRightMargin(0.08) ;
+
+  TCanvas *canvasMC = new TCanvas("cMC", "cMC",10,32,782,552);
+  canvasMC->SetRightMargin(0.08) ;
 
   hist_data->SetMarkerStyle(kOpenCircle) ;
   histo_tot->SetMarkerStyle(kOpenCircle) ;
   hist_data->SetMarkerColor(kBlack) ;
   histo_tot->SetMarkerColor(kBlue) ;
 
-  histo_tot->SetMinimum(0) ;
-  histo_tot->SetMaximum(10) ;
+//   histo_tot->SetMinimum(0) ;
+//   histo_tot->SetMaximum(10) ;
 
-  TAxis* ax = histo_tot->GetXaxis() ;
-  TAxis* ay = histo_tot->GetYaxis() ;
+  TAxis* ax = hist_data->GetXaxis() ;
+  TAxis* ay = hist_data->GetYaxis() ;
   ax->SetTitle(titleX) ;
   ay->SetTitle(titleY) ;
   ax->SetNoExponent(kTRUE) ;
@@ -1781,11 +1778,37 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
   beautifyAxis(ax) ;
   beautifyAxis(ay) ;
 
-  histo_tot->Draw("");
-  hist_data->Draw("SAME");
+  TAxis* axMC = histo_tot->GetXaxis() ;
+  TAxis* ayMC = histo_tot->GetYaxis() ;
+  axMC->SetTitle(titleX) ;
+  ayMC->SetTitle(titleY) ;
+  axMC->SetNoExponent(kTRUE) ;
+  ayMC->SetNoExponent(kTRUE) ;
+  beautifyAxis(axMC) ;
+  beautifyAxis(ayMC) ;
+  
+  if(doData){
+	  canvasMC->cd();
+	  histo_tot->Draw("COLZ");
+	  canvas->cd();
+	  hist_data->Draw("COLZ");
+  }
+  else{
+	  canvasMC->cd();
+	  histo_tot->Draw("COLZ");
+  }
 
   TLegend* leg = 0;
   leg =  new TLegend(0.7,0.82,0.9,.94);
+  leg->SetBorderSize(2);
+  leg->SetFillColor(0);
+
+
+  TLegend* legMC = 0;
+  legMC =  new TLegend(0.7,0.82,0.9,.94);
+  legMC->SetBorderSize(2);
+  legMC->SetFillColor(0);
+
   if (doProfile) {
     leg =  new TLegend(0.6,0.73,0.95,1.);
     leg->AddEntry(pro_data,        datacaption              ,"p") ;
@@ -1797,16 +1820,29 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
     leg->AddEntry(pro_mc_udsg,     "udsg"     ,"l") ;
   }
   else {
-    leg->AddEntry(hist_data,  datacaption ,"p") ;
-    leg->AddEntry(histo_tot,  "QCD MC"    ,"p") ;
+	if(doData){
+	  	canvasMC->cd();
+  		legMC->Draw();
+		legMC->AddEntry(histo_tot,  "QCD MC"    ,"p") ;
+
+	  	canvas->cd();
+  		leg->Draw();
+		leg->AddEntry(hist_data,  datacaption ,"p") ;
+	}
+	else{
+	  	canvasMC->cd();
+		leg->AddEntry(histo_tot,  "QCD MC"    ,"p") ;
+	}
   }
-  leg->SetBorderSize(2);
-  leg->SetFillColor(0);
-  leg->Draw();
 
   TString name_plot=name+"_Linear"+formata;
   if(log) name_plot=name+"_Log"+formata;
+
+  TString name_plotMC=name+"_MC_Linear"+formata;
+  if(log) name_plotMC=name+"_MC_Log"+formata;
+
   canvas->SaveAs(dir4plots+"/"+name_plot);
+  canvasMC->SaveAs(dir4plots+"/"+name_plotMC);
   //   name_plot=name+"_Linear"+formatb;
   //   if(log) name_plot=name+"_Log"+formatb;
   //   canvas->SaveAs(dir4plots+"/"+name_plot);
