@@ -85,43 +85,103 @@ if __name__ == "__main__":
 
 	dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final"
 
-	var = "FatJet_pt_all"
-	bins = 500
-	xmin = 0.
-	xmax = 5000.
+# 	var = "FatJet_pt_all"
+# 	bins = 500
+# 	xmin = 0.
+# 	xmax = 5000.
+# 	isLog = False
+# 
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017B_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017B_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017CDE_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017CDE_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017EF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017EF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+
+
+# 
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v2'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+# 
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8DiJet170orAK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2_v2'
+# 	f = dir+'/'+fname+'.root'	
+# 	main(f,var,bins,xmin,xmax,isLog)
+
+
+	var = "FatJet_track_multi"
+	bins = 80
+	xmin = -0.5
+	xmax = 79.5
 	isLog = False
 
-	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2'
-	f = dir+'/'+fname+'.root'	
-	main(f,var,bins,xmin,xmax,isLog)
 
-	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v2'
-	f = dir+'/'+fname+'.root'	
-	main(f,var,bins,xmin,xmax,isLog)
-
-	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8DiJet170orAK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2_v2'
-	f = dir+'/'+fname+'.root'	
-	main(f,var,bins,xmin,xmax,isLog)
-
-
-# 	var = "FatJet_track_multi"
-# 	bins = 80
-# 	xmin = -0.5
-# 	xmax = 79.5
-# 	isLog = False
-
-# 	fname = 'Mu_350'
-# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3_ptReweighted'
+# 	f = dir+'/'+fname+'.root'	
 # 	main(f,var,bins,xmin,xmax,isLog)
 # 
-# 	fname = 'Mu_250'
-# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3_ptReweighted'
+# 	f = dir+'/'+fname+'.root'	
 # 	main(f,var,bins,xmin,xmax,isLog)
 
-# 	fname = 'Mu_350_ptReweighted'
-# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+	fname = 'Run2017B_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3_ptReweighted'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017B_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3_ptReweighted'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017CDE_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3_ptReweighted'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017CDE_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3_ptReweighted'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017EF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3_ptReweighted'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+	fname = 'Run2017EF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v3_ptReweighted'
+	f = dir+'/'+fname+'.root'	
+	main(f,var,bins,xmin,xmax,isLog)
+
+
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v2_ptReweighted'
+# 	f = dir+'/'+fname+'.root'	
 # 	main(f,var,bins,xmin,xmax,isLog)
 # 
-# 	fname = 'Mu_250_ptReweighted'
-# 	f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+# 	fname = 'Run2017BCDEF_ReReco_QCDMuonEnriched_AK4DiJet170_Pt250_Final_DoubleMuonTaggedFatJets_histograms_btagval_v1_v2_ptReweighted'
+# 	f = dir+'/'+fname+'.root'	
 # 	main(f,var,bins,xmin,xmax,isLog)
