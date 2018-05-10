@@ -209,7 +209,12 @@ options.register('doPUReweightingOfficial', False,
     VarParsing.varType.bool,
     "Do pileup reweighting"
     )
-options.register('FilePUDistData', '/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/RunII2016Rereco_25ns_PUXsec69000nb.root',
+options.register('FilePUDistData', '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/RunII2017Rereco_RunBCDEF_v1v2topUp_25ns_PUXsec69200nb_Feb8-2018.root',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "File for data/MC weights for PU reweight (official)"
+    )
+options.register('FilePUDistMC', '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File for data/MC weights for PU reweight (official)"
@@ -319,44 +324,43 @@ options.register('btagSFType', "central",
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('FileFatJetPtWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/dataMC_weight_calc/FatJet_pt_all_data_mc_weight_Mu_350.root",
+options.register('FileFatJetPtWt', '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/dataMC_weight_calc/FatJet_pt_all_data_mc_weight_Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v3.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
-options.register('FileNtracksWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/dataMC_weight_calc/FatJet_track_multi_data_mc_weight_Mu_350.root",
+options.register('FileNtracksWt', '/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/dataMC_weight_calc/FatJet_track_multi_data_mc_weight_Mu_350.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for fat jet ntracks reweighting"
     )
-options.register('FileSubJetPtWt', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_test/BTagValidation/test/SoftDropSubJetPt_data_mc_DoubleMuonTagged_QCDMuEnriched_76XMiniAODv2.root",
+options.register('FileSubJetPtWt', "",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
     )
-options.register('FileSV1EnergyRatioWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Mar21-2016_reproduceCommPlotsForPreApproval/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/SV1EnergyRatio_Hbb_QCDbb_pt425_Double_JetTight_weight.root",
+options.register('FileSV1EnergyRatioWt', "",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for SV1EnergyRatio reweighting"
     )
-options.register('FileIPSig1stAboveBWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Feb06-2016_SubjetPtReweight/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/IPSig1stAboveB_Hbb_QCDbb_pt425_weight.root",
+options.register('FileIPSig1stAboveBWt', "",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for IPSig1stAboveB reweighting"
     )
-options.register('FileZratioWt', "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Mar21-2016_reproduceCommPlotsForPreApproval/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/rizki_signalMC_GluGLu/ZratioRatio_Hbb_QCDbb_pt425_Double_JetTight_weight.root",
+options.register('FileZratioWt', "",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for Zratio reweighting"
     )
-options.register('newJECPayloadNames',  
-    "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_L1FastJet_AK8PFchs.txt,/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt,/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt", 
+options.register('newJECPayloadNames',"", 
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     "New JEC payload names"
     ),
 options.register('jecUncPayloadName', 
-    "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/JECfiles/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt",
+    "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string, 
     "JEC uncertainty payload name"
@@ -371,7 +375,7 @@ options.register('doJECUncert', False,
     VarParsing.varType.bool,
     "Do JEC uncertainty"
     )
-options.register('FileBFrag', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/src/RecoBTag/BTagValidation/test/PtRelFall12/",
+options.register('FileBFrag', "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/PtRelFall12/",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File path for doBFrag systematics"
@@ -379,7 +383,22 @@ options.register('FileBFrag', "/afs/cern.ch/work/a/asady/rizki_test/CMSSW_7_6_3/
 options.register('produceDoubleBSFtemplates', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
-    "Produce DoubleB SF plots/templates"
+    "Produce DoubleB SF plots/templates (JP)"
+    )
+options.register('produceDoubleBSFtemplatesV2', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DoubleB SF plots/templates (SVmass)"
+    )
+options.register('produceDoubleBSFtemplatesJPhasSV', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DoubleB SF plots/templates (JPhasSV)"
+    )
+options.register('produceDoubleBSFtemplatesJPnoSV', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DoubleB SF plots/templates (JPnoSV)"
     )
 options.register('useRunRange', False,
     VarParsing.multiplicity.singleton,
@@ -473,12 +492,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root'), 
+    File_PUDistMC          = cms.string(options.FilePUDistMC), 
     Hist_PUDistMC          = cms.string('pileup'),
-#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V2_Xsec69200nb.root'), #some lumi sections were missing?
-#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec69200nb.root'), #devdatta's file
-#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V3_Xsec69200nb.root'), #reproduce again, the missing lumis are not missing anymore?
-#     File_PUDistData        = cms.string('/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/July27-2016_SFMeasurement/CMSSW_8_0_12/src/RecoBTag/BTagValidation/test/RunII2016_25ns_PUSpring16V1_Xsec62000nb.root'), #use different minbias xsec.
     File_PUDistData        = cms.string(options.FilePUDistData),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
@@ -533,12 +548,15 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),
     btagMeasurementType    = cms.string(options.btagMeasurementType),
     btagSFType             = cms.string(options.btagSFType), 
-    newJECPayloadNames     = cms.vstring(options.newJECPayloadNames), 
+    newJECPayloadNames     = cms.vstring('/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_L1FastJet_AK8PFchs.txt','/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt','/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt'), 
     jecUncPayloadName      = cms.string(options.jecUncPayloadName), 
     doNewJEC               = cms.bool(options.doNewJEC),
     doJECUncert            = cms.bool(options.doJECUncert),  
     File_BFrag				= cms.string(options.FileBFrag), 
     produceDoubleBSFtemplates        = cms.bool(options.produceDoubleBSFtemplates),
+    produceDoubleBSFtemplatesV2        = cms.bool(options.produceDoubleBSFtemplatesV2),
+    produceDoubleBSFtemplates_JPhasSV        = cms.bool(options.produceDoubleBSFtemplatesJPhasSV),
+    produceDoubleBSFtemplates_JPnoSV        = cms.bool(options.produceDoubleBSFtemplatesJPnoSV),
     useRunRange            = cms.bool(options.useRunRange),  
     runRangeMin     = cms.int32(options.runRangeMin),
     runRangeMax     = cms.int32(options.runRangeMax),
