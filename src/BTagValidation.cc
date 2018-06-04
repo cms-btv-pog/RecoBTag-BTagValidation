@@ -230,7 +230,7 @@ class BTagValidation : public edm::EDAnalyzer {
 //
 // static data member definitions
 //
-const std::vector<std::string> BTagValidation::taggers_ = {"CSVv2L", "CSVv2M", "DeepCSVL", "DeepCSVM"};
+const std::vector<std::string> BTagValidation::taggers_ = {"SV", "CSVv2L", "CSVv2M", "DeepCSVL", "DeepCSVM", "CSVv2L_SV", "CSVv2M_SV", "DeepCSVL_SV", "DeepCSVM_SV"};
 const std::map<std::string, std::pair<int, int>> BTagValidation::pts_ = {
   {"pt0"  , std::make_pair(0  , 30   ) } , 
   {"pt1"  , std::make_pair(30 , 140  ) } , 
@@ -404,6 +404,7 @@ void BTagValidation::beginJob() {
     SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
     SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
     SubJets.ReadCSVTagVarTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.RegisterTagVarTree(JetTree,"SoftDropPuppiSubJetInfo") ;
 
     if (useJetProbaTree_) {
       SubJets.ReadJetTrackTree(JetTree,"SoftDropPuppiSubJetInfo");
@@ -488,7 +489,9 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
         for (std::string sel : sels_) {
           std::stringstream hname ;
           hname << histoTag << "_JP_" << tagger << sel << "_" << pt.first ; 
-          AddHisto((hname.str()).c_str(), "; JP; Events;", 75, 0., 15.);
+          AddHisto((hname.str()).c_str(), "; JP; Events;", 50, 0., 2.5);
+
+          if (tagger.compare(std::string("SV")) == 0) continue;
 
           hname.str(std::string());
           hname << histoTag << "_SVmass_" << tagger << sel << "_" << pt.first ; 
@@ -726,6 +729,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           //double sjabseta  (fabs(SubJets.Jet_eta[iSubJet])) ;
           double sjphi     (SubJets.Jet_phi[iSubJet]) ;
           double sjabsflav (abs(SubJets.Jet_flavour[iSubJet])) ; 
+          int    sjnsv     (SubJets.Jet_SV_multi[iSubJet]);
           double sjcsvv2   (SubJets.Jet_CombIVF[iSubJet]) ; 
           double sjjp      (SubJets.Jet_Proba[iSubJet]) ;
           double sjsvmass  (SubJets.TagVarCSV_vertexMass[iSubJet]);
@@ -954,50 +958,61 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
           for (auto const pt : pts_) {
 
-            if (sjpt >= pt.second.first && sjpt < pt.second.second) {
+            if (sjpt < pt.second.first || sjpt >= pt.second.second) continue;
 
-              std::string sjptbin = pt.first;
-              std::stringstream hname;
+            std::string sjptbin = pt.first;
+            std::stringstream hname;
 
-              hname.str(std::string());
-              hname << histoTag << "_JP_all_" << sjptbin ;
-              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+            hname.str(std::string());
+            hname << histoTag << "_JP_all_" << sjptbin ;
+            FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
 
-              hname.str(std::string());
-              if ( sjcsvv2 >= CSVv2L_  ) {
-                hname << histoTag << "_JP_CSVv2Lpass_" << sjptbin ;
-              }
-              else {
-                hname << histoTag << "_JP_CSVv2Lfail_" << sjptbin ;
-              }
-              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+            hname.str(std::string());
+            if ( sjnsv > 0  ) {
+              hname << histoTag << "_JP_SVpass_" << sjptbin ;
+            }
+            else {
+              hname << histoTag << "_JP_SVfail_" << sjptbin ;
+            }
+            FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
 
-              hname.str(std::string());
-              if ( sjcsvv2 >= CSVv2M_  ) {
-                hname << histoTag << "_JP_CSVv2Mpass_" << sjptbin ;
-              }
-              else {
-                hname << histoTag << "_JP_CSVv2Mfail_" << sjptbin ;
-              }
-              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+            hname.str(std::string());
+            if ( sjcsvv2 >= CSVv2L_  ) {
+              hname << histoTag << "_JP_CSVv2Lpass_" << sjptbin ;
+            }
+            else {
+              hname << histoTag << "_JP_CSVv2Lfail_" << sjptbin ;
+            }
+            FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
 
-              hname.str(std::string());
-              if ( sjdeepcsv >= DeepCSVL_  ) {
-                hname << histoTag << "_JP_DeepCSVLpass_" << sjptbin ;
-              }
-              else {
-                hname << histoTag << "_JP_DeepCSVLfail_" << sjptbin ;
-              }
-              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+            hname.str(std::string());
+            if ( sjcsvv2 >= CSVv2M_  ) {
+              hname << histoTag << "_JP_CSVv2Mpass_" << sjptbin ;
+            }
+            else {
+              hname << histoTag << "_JP_CSVv2Mfail_" << sjptbin ;
+            }
+            FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
 
-              hname.str(std::string());
-              if ( sjdeepcsv >= DeepCSVM_  ) {
-                hname << histoTag << "_JP_DeepCSVMpass_" << sjptbin ;
-              }
-              else {
-                hname << histoTag << "_JP_DeepCSVMfail_" << sjptbin ;
-              }
-              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+            hname.str(std::string());
+            if ( sjdeepcsv >= DeepCSVL_  ) {
+              hname << histoTag << "_JP_DeepCSVLpass_" << sjptbin ;
+            }
+            else {
+              hname << histoTag << "_JP_DeepCSVLfail_" << sjptbin ;
+            }
+            FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+            hname.str(std::string());
+            if ( sjdeepcsv >= DeepCSVM_  ) {
+              hname << histoTag << "_JP_DeepCSVMpass_" << sjptbin ;
+            }
+            else {
+              hname << histoTag << "_JP_DeepCSVMfail_" << sjptbin ;
+            }
+            FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+            if (sjnsv > 0) {
 
               hname.str(std::string());
               hname << histoTag << "_SVmass_all_" << sjptbin ;
@@ -1039,9 +1054,45 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               }
               FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjsvmass  ,wtSubJet);
 
-            }
+              hname.str(std::string());
+              if ( sjcsvv2 >= CSVv2L_  ) {
+                hname << histoTag << "_JP_CSVv2L_SVpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_CSVv2L_SVfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
 
-          }
+              hname.str(std::string());
+              if ( sjcsvv2 >= CSVv2M_  ) {
+                hname << histoTag << "_JP_CSVv2M_SVpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_CSVv2M_SVfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjdeepcsv >= DeepCSVL_  ) {
+                hname << histoTag << "_JP_DeepCSVL_SVpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_DeepCSVL_SVfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+              hname.str(std::string());
+              if ( sjdeepcsv >= DeepCSVM_  ) {
+                hname << histoTag << "_JP_DeepCSVM_SVpass_" << sjptbin ;
+              }
+              else {
+                hname << histoTag << "_JP_DeepCSVM_SVfail_" << sjptbin ;
+              }
+              FillHisto(hname.str(), sjabsflav, sjIsGSPbb, sjIsGSPcc ,sjjp  ,wtSubJet);
+
+            } //// Filling histos for nSV > 0
+
+          } //// Looping over pT bins 
 
         } //// process first two subjets
 
