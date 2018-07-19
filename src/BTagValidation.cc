@@ -632,14 +632,18 @@ void BTagValidation::beginJob() {
   
   if(DEBUG_) std::cout << "Attempting to read EvtInfo trees" << std::endl;		
   EvtInfo.ReadTree(JetTreeEvtInfo);
+  EvtInfo.ReadQuarkTree(JetTreeEvtInfo);
+  EvtInfo.ReadHadronTree(JetTreeEvtInfo);
   if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadTree" << std::endl;		
   //EvtInfo.ReadPatMuonTree(JetTree); //was commented by rizki
-  if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadPatMuon" << std::endl;		
+  //if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadPatMuon" << std::endl;		
 
   if(DEBUG_) std::cout << "Attempting to read FatJetInfo trees" << std::endl;		
   FatJetInfo.ReadTree(JetTree,"FatJetInfo");
   FatJetInfo.ReadFatJetSpecificTree(JetTree,"FatJetInfo",true);
+  FatJetInfo.ReadPFMuonTree(JetTree, "FatJetInfo");
   FatJetInfo.ReadCSVTagVarTree(JetTree, "FatJetInfo");
+  FatJetInfo.ReadCSVTagTrackVarTree(JetTree, "FatJetInfo");
   FatJetInfo.ReadJetSVTree(JetTree, "FatJetInfo"); 
   if (useJetProbaTree_) {
     EvtInfo.ReadJetTrackTree(JetTreeEvtInfo);
@@ -652,7 +656,9 @@ void BTagValidation::beginJob() {
     SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
     SubJets.ReadTree(JetTree,"PrunedSubJetInfo") ;
     SubJets.ReadSubJetSpecificTree(JetTree,"PrunedSubJetInfo") ;
+    SubJets.ReadPFMuonTree(JetTree, "PrunedSubJetInfo");
     SubJets.ReadCSVTagVarTree(JetTree, "PrunedSubJetInfo");
+    SubJets.ReadCSVTagTrackVarTree(JetTree, "PrunedSubJetInfo");
     SubJets.ReadJetSVTree(JetTree, "PrunedSubJetInfo"); 
 
     if (useJetProbaTree_) {
@@ -666,7 +672,9 @@ void BTagValidation::beginJob() {
     SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
     SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
     SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
+    SubJets.ReadPFMuonTree(JetTree, "SoftDropPuppiSubJetInfo");
     SubJets.ReadCSVTagVarTree(JetTree, "SoftDropPuppiSubJetInfo");
+    SubJets.ReadCSVTagTrackVarTree(JetTree, "SoftDropPuppiSubJetInfo");
     SubJets.ReadJetSVTree(JetTree, "SoftDropPuppiSubJetInfo"); 
 
     if (useJetProbaTree_) {
@@ -873,7 +881,6 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_JBP"     ,";JBP;;",50,0.,8.);
   AddHisto(histoTag+"_SSV"     ,";SSVHE;;",70,0.,7.);
   AddHisto(histoTag+"_SSVHP"   ,";SSVHP;;",70,0.,7.);
-  AddHisto(histoTag+"_CSV"     ,";CSV;;",50,0.,1.);
   AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
@@ -948,14 +955,14 @@ void BTagValidation::createJetHistos_DoubleB() {
   AddHisto("FatJet_jetNTracks_unw"     	       ,";jetNTracks (unweighted);;",40,0,40);
   AddHisto("FatJet_nSV"  ,";nSV;;",10,0,10);
 
-  AddHisto("FatJet_BDTG_SV"   	,";BDTG SV;;",100,-1.,1.);
+  AddHisto("FatJet_DoubleB"   	,";DoubleB;;",100,-1.,1.);
 
-  AddHisto2D("FatJet_BDTGSV_trackSip3dSig_0"           ,";BDTG SV ;IP Sig 1st Track;",100,-1.,1.,100,-20,20);
-  AddHisto2D("FatJet_BDTGSV_trackSip3dSig_1"           ,";BDTG SV ;IP Sig 2nd Track;",100,-1.,1.,100,-20,20);
-  AddHisto2D("FatJet_BDTGSV_trackSip3dSig_2"           ,";BDTG SV ;IP Sig 3rd Track;",100,-1.,1.,100,-20,20);
-  AddHisto2D("FatJet_BDTGSV_trackSip3dSig_3"           ,";BDTG SV ;IP Sig 4th Track;",100,-1.,1.,100,-20,20);
+  AddHisto2D("FatJet_DoubleB_trackSip3dSig_0"           ,";DoubleB ;IP Sig 1st Track;",100,-1.,1.,100,-20,20);
+  AddHisto2D("FatJet_DoubleB_trackSip3dSig_1"           ,";DoubleB ;IP Sig 2nd Track;",100,-1.,1.,100,-20,20);
+  AddHisto2D("FatJet_DoubleB_trackSip3dSig_2"           ,";DoubleB ;IP Sig 3rd Track;",100,-1.,1.,100,-20,20);
+  AddHisto2D("FatJet_DoubleB_trackSip3dSig_3"           ,";DoubleB ;IP Sig 4th Track;",100,-1.,1.,100,-20,20);
 
-  AddHisto2D("FatJet_BDTGSV_jetNTracks"           ,";BDTG SV ;Number of tracks;",100,-1.,1.,40,0,40);
+  AddHisto2D("FatJet_DoubleB_jetNTracks"           ,";DoubleB ;Number of tracks;",100,-1.,1.,40,0,40);
 
   AddHisto2D("FatJet_jetNTracks_trackSip3dSig_0"           ,";Number of tracks ;IP Sig 1st Track ;",40,0,40,100,-20,20);
 
@@ -2314,7 +2321,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float jetbproba = JetInfo.Jet_Bprob[iJet];
     float ssvhe     = JetInfo.Jet_Svx[iJet] ;
     float ssvhp     = JetInfo.Jet_SvxHP[iJet];
-    float csv       = JetInfo.Jet_CombSvx[iJet];
     float csvivfv2  = JetInfo.Jet_CombIVF[iJet];
     float cmvav2    = JetInfo.Jet_cMVAv2[iJet];
     float doubleb   = JetInfo.Jet_DoubleSV[iJet];
@@ -2327,7 +2333,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     FillHisto(histoTag+"_JBP",      flav, isGSPbb, isGSPcc ,jetbproba ,wt);
     FillHisto(histoTag+"_SSV",      flav, isGSPbb, isGSPcc ,ssvhe     ,wt);
     FillHisto(histoTag+"_SSVHP",    flav, isGSPbb, isGSPcc ,ssvhp     ,wt);
-    FillHisto(histoTag+"_CSV",      flav, isGSPbb, isGSPcc ,csv       ,wt);
     FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
     FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
     FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
@@ -2423,7 +2428,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float jetNTracks  = JetInfo.TagVarCSV_jetNTracks[iJet];
       float nSV = JetInfo.Jet_nSV_fat[iJet];
 
-      float BDTG_SV = JetInfo.Jet_BDTG_SV[iJet];
+      float DoubleB = JetInfo.Jet_DoubleSV[iJet];
 
       // debug - start - rizki
 
@@ -2498,14 +2503,14 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		FillHisto("FatJet_jetNTracks"		,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, jetNTracks ,   wt);
 		FillHisto("FatJet_nSV"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, nSV ,   wt);
 
-		FillHisto("FatJet_BDTG_SV",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, BDTG_SV  ,   wt);
+		FillHisto("FatJet_DoubleB",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DoubleB  ,   wt);
 
-		FillHisto2D("FatJet_BDTGSV_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,trackSip3dSig_0 ,wt);
-		FillHisto2D("FatJet_BDTGSV_trackSip3dSig_1" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,trackSip3dSig_1 ,wt);
-		FillHisto2D("FatJet_BDTGSV_trackSip3dSig_2" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,trackSip3dSig_2 ,wt);
-		FillHisto2D("FatJet_BDTGSV_trackSip3dSig_3" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,trackSip3dSig_3 ,wt);
+		FillHisto2D("FatJet_DoubleB_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_0 ,wt);
+		FillHisto2D("FatJet_DoubleB_trackSip3dSig_1" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_1 ,wt);
+		FillHisto2D("FatJet_DoubleB_trackSip3dSig_2" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_2 ,wt);
+		FillHisto2D("FatJet_DoubleB_trackSip3dSig_3" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_3 ,wt);
 
-		FillHisto2D("FatJet_BDTGSV_jetNTracks" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,BDTG_SV ,jetNTracks ,wt);
+		FillHisto2D("FatJet_DoubleB_jetNTracks" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,jetNTracks ,wt);
 		FillHisto2D("FatJet_jetNTracks_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,jetNTracks ,trackSip3dSig_0 , wt);
 
 		// ------------------------------------------------
