@@ -12,7 +12,7 @@ After setting up the PerformanceMeasurements package:
 cd CMSSW_9_X_X/src      
 (Replace X's with the release number you are using)
 
-git clone -b boostedbb_SFComm_9xx_Jan10-2018 git://github.com/cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
+git clone -b boostedbb_SFComm_9xx_DeepDoubleB git://github.com/cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
 
 scram b -j8
 
