@@ -46,9 +46,8 @@ TString filename_ext="" ;
 
 
 TString ptcut = "p_{T} (AK8 jets) > 350 GeV";
-TString filename    ="/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/results/plots_final/Run2017BCDEF_ReReco_QCDMuonEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval_v4_SVmass_ptReweighted.root"; //dataset BCDEF all valid. SV mass 
-TString dir4plots   = "Comm_DoubleMuTag_Pt350_BTagMu_RunBtoF_ReReco_QCDMuEnr_w1p27corr_ptReweighted_v4_SVmassLT_Mar16-2018"; //
-
+TString filename    ="../BTV/results/plots_final/Run2017BCDEF_QCDMuEnriched_Pt350.root";
+TString dir4plots   = "Run2017BCDEF_QCDMuEnriched_Pt350";
 
 TString filename_uncUp  ="" ;
 TString filename_uncDown="" ;
@@ -57,7 +56,7 @@ TString filename_uncDown="" ;
 
 //TString title1 = "32.7 fb^{-1} (13 TeV, 2017)";//B+C+D+E+F=4.77+9.46+4.23+10.2+4.0=32.7
 
-TString title1 = "41.3 fb^{-1} (13 TeV, 2017)";//B+C+D+E+F=4.77+9.58+4.22+9.26+13.46 (full valid).
+TString title1 = "38.65 fb^{-1} (13 TeV, 2017)";
 
 TString datacaption = "Data";//"HLT_PFJet320, jet p_{T}>400 GeV";
 
@@ -134,7 +133,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
   //DrawStacked(histoTag+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,40 ,0 ,0. ,0.   );
   DrawStacked(histoTag+"_phi"         ,"#phi"                         ,logy ,dodata ,extNorm ,2  ,0 ,0. ,0.   );
   DrawStacked(histoTag+"_mass"        ,"Mass [GeV/c^{2}]"             ,logy ,dodata ,extNorm ,4  ,0 ,0. ,400. );
-  DrawStacked(histoTag+"_CSV"         ,"CSV"                          ,logy ,dodata ,extNorm ,1  ,0 ,0  ,1.   );
+  //DrawStacked(histoTag+"_CSV"         ,"CSV"                          ,logy ,dodata ,extNorm ,1  ,0 ,0  ,1.   );
   DrawStacked(histoTag+"_CSVIVFv2"    ,"CSVv2 Discriminator"          ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
   DrawStacked(histoTag+"_JP"          ,"JP Discriminator"             ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
   DrawStacked(histoTag+"_JBP"         ,"JBP Discriminator"            ,logy ,dodata ,extNorm ,1  ,0 ,0. ,1.   );
@@ -154,6 +153,7 @@ void DrawAll(bool Draw_track_plots, bool Draw_Nminus1_plots, bool Draw_sv_plots,
     //}
     //DrawStacked(histoTag+"_nsubjettiness","#tau_{2}/#tau_{1}"                                 ,logy ,dodata ,extNorm ,2 ,0 ,0. ,0.);
     DrawStacked(histoTag+"_DoubleB"      ,"double-b discriminator"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
+    DrawStacked(histoTag+"_DeepDoubleB"      ,"deep double-b discriminator"                                           ,logy ,dodata ,extNorm ,2 ,1 ,0 ,1.);
 
 //     DrawStacked(histoTag+"_DoubleB_pt400to450"      ,"DoubleB (400<p_T<450)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
 //     DrawStacked(histoTag+"_DoubleB_pt450to500"      ,"DoubleB (450<p_T<500)"                                           ,logy ,dodata ,extNorm ,2 ,0 ,-1 ,1.);
@@ -466,7 +466,7 @@ void Draw(TString name, TString histotitle, bool log) {
 
   //TString fdir = "QCD__" ;
   //TString fdir = "QCDMu+__" ;
-  TString fdir = "QCDMuEnr__" ;
+  TString fdir = "QCDMu+__" ;
 
   if (name=="h1_nPV") {
     hist_mc       = (TH1D*)myFile->Get(fdir+name+"_mc");
@@ -632,6 +632,7 @@ void DrawStacked(TString name,
     double rangeXLow,
     double rangeXHigh) {
 
+
   TH1D* hist_b;
   TH1D* hist_c;
   TH1D* hist_gsplit;
@@ -645,7 +646,7 @@ void DrawStacked(TString name,
   myFile->cd();
   //TString fdir = "QCD__" ;
   //TString fdir = "QCDMu+__" ;
-  TString fdir = "QCDMuEnr__" ;
+  TString fdir = "QCDMu+__" ;
 
   hist_b        = (TH1D*)myFile->Get(fdir+name+"_b");
   hist_c        = (TH1D*)myFile->Get(fdir+name+"_c");
@@ -1001,7 +1002,11 @@ void DrawStacked(TString name,
   }
   if (name.Contains("BDTG_SV") || name.Contains("DoubleB")){
     yaxistitle="jets / 0.04 units";
-	histotitle_ = "double-b discriminator" ; 
+  histotitle_ = "double-b discriminator" ;
+  }
+  if (name.Contains("DeepDoubleB")){
+    yaxistitle="jets / 0.04 units";
+    histotitle_ = "deep double-b discriminator" ;
   }
 
 
@@ -1093,6 +1098,7 @@ void DrawStacked(TString name,
     else if ( name.Contains("_sv_flight3DSig") || name.Contains("_sv_mass") || name.Contains("_track_IP") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*3000000 : histo_tot->GetMaximum()*3000000) ;
     else if ( name.Contains("sv_multi_0") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000000 : histo_tot->GetMaximum()*10000000) ; 
     else if ( name.Contains("_DoubleB") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
+    else if ( name.Contains("_DeepDoubleB") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ;
     else if ( name.Contains("_tau1_flightDistance2dSig") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*1000 : histo_tot->GetMaximum()*1000) ; 
     else if ( name.Contains("_tau2_vertexMass") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*100 : histo_tot->GetMaximum()*100) ; 
 //     else if ( name.Contains("_z_ratio") ) histo_tot->SetMaximum( doData ? hist_data->GetMaximum()*10000 : histo_tot->GetMaximum()*10000) ; 
@@ -1581,7 +1587,7 @@ void Draw2DPlot(TString name, TString histotitle, TString titleX, TString titleY
 
   TFile *myFile     = TFile::Open(filename,"READ");
   myFile->cd();
-  TString fdir = "QCDMuEnr__" ;
+  TString fdir = "QCDMu+__" ;
 
   hist_b         = (TH2D*)myFile->Get(fdir+name+"_b");
   hist_c         = (TH2D*)myFile->Get(fdir+name+"_c");
