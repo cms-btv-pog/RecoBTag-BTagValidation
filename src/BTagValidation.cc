@@ -47,6 +47,7 @@ Implementation:
 
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
+#include "RecoBTag/PerformanceMeasurements/interface/VariableParser.h"
 
 #include <TString.h>
 #include <TChain.h>
@@ -149,6 +150,7 @@ class BTagValidation : public edm::EDAnalyzer {
     std::map<TString, TH1D*> HistoBtag_map;
     std::map<TString, TH2D*> HistoBtag2D_map;
 
+
     edm::Service<TFileService> fs;
 
     TH1D *h1_CutFlow;
@@ -223,6 +225,8 @@ class BTagValidation : public edm::EDAnalyzer {
 
     //// Lumi reweighting object
     edm::LumiReWeighting LumiWeights_;
+
+    VariableParser varParser;
 
     //// Configurables
     const bool                      DEBUG_;
@@ -327,6 +331,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      useRunRange_;
     const int                      runRangeMin_;
     const int                      runRangeMax_;
+    const bool                      runOnData;
 
     boost::shared_ptr<JetCorrectionUncertainty> ptr_jecUnc_ ; 
     boost::shared_ptr<FactorizedJetCorrector> ptr_newJEC_  ;
@@ -462,16 +467,24 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   produceDoubleBSFtemplates_JPnoSV_(iConfig.getParameter<bool>("produceDoubleBSFtemplates_JPnoSV")), 
   useRunRange_(iConfig.getParameter<bool>("useRunRange")), 
   runRangeMin_(iConfig.getParameter<int>("runRangeMin")), 
-  runRangeMax_(iConfig.getParameter<int>("runRangeMax")), 
+  runRangeMax_(iConfig.getParameter<int>("runRangeMax")),
+  runOnData(iConfig.getParameter<bool>("runOnData")), 
   calib("csvv2", btagCSVFile_),  
   reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
   //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_),
   //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_),
 {
   //now do what ever initialization is needed
+
   isData = true;
   nEventsAll = 0;
   nEventsStored = 0;
+
+  std::vector<edm::ParameterSet> groupSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("groups");
+  std::vector<edm::ParameterSet> variableSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("variables");
+  std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
+  varParser = VariableParser(!runOnData);
+  variables = varParser.parseGroupsAndVariables(groupSet, variableSet);
 
   if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
     std::vector<JetCorrectorParameters> vPar;  
@@ -611,6 +624,7 @@ BTagValidation::~BTagValidation() {
 // ------------ method called once each job just before starting event loop  ------------
 void BTagValidation::beginJob() {
 
+
   JetTreeEvtInfo = new TChain(inputTTreeEvtInfo_.c_str());
   JetTree = new TChain(inputTTree_.c_str());
 
@@ -631,56 +645,26 @@ void BTagValidation::beginJob() {
   }
   
   if(DEBUG_) std::cout << "Attempting to read EvtInfo trees" << std::endl;		
-  EvtInfo.ReadTree(JetTreeEvtInfo);
-  EvtInfo.ReadQuarkTree(JetTreeEvtInfo);
-  EvtInfo.ReadHadronTree(JetTreeEvtInfo);
+  EvtInfo.ReadBranches(JetTreeEvtInfo,varParser);
   if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadTree" << std::endl;		
-  //EvtInfo.ReadPatMuonTree(JetTree); //was commented by rizki
-  //if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadPatMuon" << std::endl;		
+;		
 
   if(DEBUG_) std::cout << "Attempting to read FatJetInfo trees" << std::endl;		
-  FatJetInfo.ReadTree(JetTree,"FatJetInfo");
-  FatJetInfo.ReadFatJetSpecificTree(JetTree,"FatJetInfo",true);
-  FatJetInfo.ReadPFMuonTree(JetTree, "FatJetInfo");
-  FatJetInfo.ReadCSVTagVarTree(JetTree, "FatJetInfo");
-  FatJetInfo.ReadCSVTagTrackVarTree(JetTree, "FatJetInfo");
-  FatJetInfo.ReadJetSVTree(JetTree, "FatJetInfo"); 
-  if (useJetProbaTree_) {
-    EvtInfo.ReadJetTrackTree(JetTreeEvtInfo);
-    FatJetInfo.ReadJetTrackTree(JetTree,"FatJetInfo");
-  }
+  FatJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo");
   if(DEBUG_) std::cout << "	Done reading FatJetInfo trees" << std::endl;		
 
   if (usePrunedSubjets_) {
   	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - Pruned" << std::endl;		
-    SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
-    SubJets.ReadTree(JetTree,"PrunedSubJetInfo") ;
-    SubJets.ReadSubJetSpecificTree(JetTree,"PrunedSubJetInfo") ;
-    SubJets.ReadPFMuonTree(JetTree, "PrunedSubJetInfo");
-    SubJets.ReadCSVTagVarTree(JetTree, "PrunedSubJetInfo");
-    SubJets.ReadCSVTagTrackVarTree(JetTree, "PrunedSubJetInfo");
-    SubJets.ReadJetSVTree(JetTree, "PrunedSubJetInfo"); 
-
-    if (useJetProbaTree_) {
-      SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
-      SubJets.ReadJetTrackTree(JetTree,"PrunedSubJetInfo");
-    }
+    SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","Pruned");
+    SubJets.ReadBranches(JetTree,varParser,"PrunedSubJetInfo") ;
   	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - Pruned" << std::endl;		
   }
+
+
   else if (useSoftDropSubjets_) {
   	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - SoftDropPuppi" << std::endl;		
-    SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
-    SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
-    SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
-    SubJets.ReadPFMuonTree(JetTree, "SoftDropPuppiSubJetInfo");
-    SubJets.ReadCSVTagVarTree(JetTree, "SoftDropPuppiSubJetInfo");
-    SubJets.ReadCSVTagTrackVarTree(JetTree, "SoftDropPuppiSubJetInfo");
-    SubJets.ReadJetSVTree(JetTree, "SoftDropPuppiSubJetInfo"); 
-
-    if (useJetProbaTree_) {
-      SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
-      SubJets.ReadJetTrackTree(JetTree,"SoftDropPuppiSubJetInfo");
-    }
+    SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","SoftDropPuppi");
+    SubJets.ReadBranches(JetTree,varParser,"SoftDropPuppiSubJetInfo") ;
   	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - SoftDropPuppi" << std::endl;		
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;

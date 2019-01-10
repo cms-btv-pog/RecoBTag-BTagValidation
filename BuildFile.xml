@@ -8,5 +8,6 @@
 <use name="CondFormats/JetMETObjects"/>
 <use name="PhysicsTools/UtilAlgos"/>
 <use name="PhysicsTools/Utilities"/>
+<use name="RecoBTag/PerformanceMeasurements"/>
 <flags CXXFLAGS="-Wno-delete-non-virtual-dtor -Wno-error=unused-but-set-variable -Wno-error=unused-variable -O0 -g -fno-inline"/>
 <flags EDM_PLUGIN="1"/>

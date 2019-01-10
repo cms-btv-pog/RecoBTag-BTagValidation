@@ -415,6 +415,15 @@ options.register('runRangeMax', 499999,
     VarParsing.varType.int,
     "Max Run number"
     )
+options.register('runOnData', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Is running on data"
+    )
+options.register('groups', [],
+    VarParsing.multiplicity.list,
+    VarParsing.varType.string,
+    'variable groups to be stored')
 
 options.parseArguments()
 
@@ -452,9 +461,25 @@ process.TFileService = cms.Service("TFileService",
 
 from inputFiles_cfi import *
 from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
+from RecoBTag.PerformanceMeasurements.variables_cfi import *
+from RecoBTag.PerformanceMeasurements.varGroups_cfi import * 
 #print bTagAnalyzerCommon.TriggerPathNames 
+groupSet_ = groupSet.clone()
+
+for requiredGroup in options.groups:
+  #print(requiredGroup)
+  found=False
+  for existingGroup in groupSet_.groups:
+    if(requiredGroup==existingGroup.group):
+      existingGroup.store=True
+      found=True
+      break
+  if(not found):
+    print('WARNING: The group ' + requiredGroup + ' was not found')
 
 process.btagval = cms.EDAnalyzer('BTagValidation',
+    variableSet,
+    groupSet_,
     DEBUG    = cms.bool(options.DEBUG),
     DEBUGlevel    = cms.int32(options.DEBUGlevel),
     MaxEvents              = cms.int32(options.maxEvents),
@@ -560,6 +585,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     useRunRange            = cms.bool(options.useRunRange),  
     runRangeMin     = cms.int32(options.runRangeMin),
     runRangeMax     = cms.int32(options.runRangeMax),
+    runOnData     = cms.bool(options.runOnData)
 )
 
 #process.btagvalsubjetmu = process.btagval.clone(
