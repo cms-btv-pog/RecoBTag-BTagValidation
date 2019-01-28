@@ -630,6 +630,7 @@ void BTagValidation::beginJob() {
 
   for(unsigned i=0; i<inputFiles_.size(); ++i)
   {
+    std::cout << inputFiles_.at(i).c_str() << std::endl;
     JetTreeEvtInfo->Add(inputFiles_.at(i).c_str());
     JetTree->Add(inputFiles_.at(i).c_str());
 
@@ -868,7 +869,7 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
-  AddHisto(histoTag+"_DeepDoubleB" ,";DeepDoubleB;;",100,-1.,1.);
+  AddHisto(histoTag+"_DeepDoubleBvLQCD" ,";DeepDoubleBvLQCD;;",100,-1.,1.);
   AddHisto2D(histoTag+"_JP_DoubleB",";JP vs DoubleB;;", 50, 0., 2.5, 100,-1,1.);  
   AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DoubleB",";M(sv from TagVarCSV) vs DoubleB;;", 100,0,50, 100,-1,1.);  
   
@@ -941,7 +942,7 @@ void BTagValidation::createJetHistos_DoubleB() {
   AddHisto("FatJet_nSV"  ,";nSV;;",10,0,10);
 
   AddHisto("FatJet_DoubleB"    ,";DoubleB;;",100,-1.,1.);
-  AddHisto("FatJet_DeepDoubleB"     ,";DeepDoubleB;;",100,-1.,1.);
+  AddHisto("FatJet_DeepDoubleBvLQCD"     ,";DeepDoubleBvLQCD;;",100,-1.,1.);
 
   AddHisto2D("FatJet_DoubleB_trackSip3dSig_0"           ,";DoubleB ;IP Sig 1st Track;",100,-1.,1.,100,-20,20);
   AddHisto2D("FatJet_DoubleB_trackSip3dSig_1"           ,";DoubleB ;IP Sig 2nd Track;",100,-1.,1.,100,-20,20);
@@ -1017,8 +1018,8 @@ void BTagValidation::createJetHistos_SF(const TString& histoTag) {
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	DoubleB "  << std::endl;
         AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleBvLQCD "  << std::endl;
+        AddHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt) ,";DeepDoubleBvLQCD_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	JP notag "  << std::endl;
 		AddHisto(histoTag+"_JP_all_"+ptStr.at(ipt), ";JP_all_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
@@ -1084,9 +1085,9 @@ void BTagValidation::createJetHistos_SF_JPhasSV(const TString& histoTag) {
 
         AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleBvLQCD "  << std::endl;
 
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+        AddHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt) ,";DeepDoubleBvLQCD_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	JPhasSV notag "  << std::endl;
 		AddHisto(histoTag+"_JPhasSV_all_"+ptStr.at(ipt), ";JPhasSV_all_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
@@ -1152,9 +1153,9 @@ void BTagValidation::createJetHistos_SF_JPnoSV(const TString& histoTag) {
 
 		AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1,1.);
 
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleBvLQCD "  << std::endl;
 
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+        AddHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt) ,";DeepDoubleBvLQCD_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	JPnoSV notag "  << std::endl;
 		AddHisto(histoTag+"_JPnoSV_all_"+ptStr.at(ipt), ";JPnoSV_all_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
@@ -1220,9 +1221,9 @@ void BTagValidation::createJetHistos_SF_SVmass(const TString& histoTag) {
 
 		AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1,1.);
 
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleBvLQCD "  << std::endl;
 
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+        AddHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt) ,";DeepDoubleBvLQCD_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	tau1VertexMassCorr notag "  << std::endl;
 		AddHisto(histoTag+"_tau1VertexMassCorr_all_"+ptStr.at(ipt), ";tau1VertexMassCorr_all_"+ptStr.at(ipt)+";;", 100, 0., 50.);
@@ -2324,7 +2325,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float csvivfv2          = JetInfo.Jet_CombIVF[iJet];
     float cmvav2            = JetInfo.Jet_cMVAv2[iJet];
     float doubleb           = JetInfo.Jet_DoubleSV[iJet];
-    float deepDoubleb       = JetInfo.Jet_DeepDoubleB[iJet];
+    float deepDoubleb       = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
     float mass_TagVarCSV_sv = JetInfo.TagVarCSV_vertexMass[iJet];
 
     if(DEBUG_)std::cout << "got to FillHisto_JP" << std::endl;
@@ -2337,7 +2338,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
     FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
     FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
-    FillHisto(histoTag+"_DeepDoubleB",  flav, isGSPbb, isGSPcc ,deepDoubleb   ,wt);
+    FillHisto(histoTag+"_DeepDoubleBvLQCD",  flav, isGSPbb, isGSPcc ,deepDoubleb   ,wt);
     FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
     FillHisto2D(histoTag+"_TagVarCSV_sv_mass_vs_jetpt"        ,flav,isGSPbb , isGSPcc, ptjet,mass_TagVarCSV_sv,wt);
     FillHisto2D(histoTag+"_JP_DoubleB", flav,isGSPbb , isGSPcc, jetproba, doubleb, wt);
@@ -2431,7 +2432,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float nSV = JetInfo.Jet_nSV_fat[iJet];
 
       float DoubleB = JetInfo.Jet_DoubleSV[iJet];
-      float DeepDoubleB = JetInfo.Jet_DeepDoubleB[iJet];
+      float DeepDoubleBvLQCD = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
       // debug - start - rizki
 
 
@@ -2506,7 +2507,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		FillHisto("FatJet_nSV"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, nSV ,   wt);
 
         FillHisto("FatJet_DoubleB",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DoubleB  ,   wt);
-        FillHisto("FatJet_DeepDoubleB",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DeepDoubleB  ,   wt);
+        FillHisto("FatJet_DeepDoubleBvLQCD",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DeepDoubleBvLQCD  ,   wt);
 
 		FillHisto2D("FatJet_DoubleB_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_0 ,wt);
 		FillHisto2D("FatJet_DoubleB_trackSip3dSig_1" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_1 ,wt);
@@ -2529,7 +2530,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float jeteta     = JetInfo.Jet_eta[iJet];
     float jetproba  = JetInfo.Jet_Proba[iJet];
     float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
+    float deepdoubleb   = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
 
     int   flav       = JetInfo.Jet_flavour[iJet];
 
@@ -2606,7 +2607,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
         if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
+        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
 	}
 	//new - DoubleB  -end
 
@@ -2698,7 +2699,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float jeteta     = JetInfo.Jet_eta[iJet];
     float jetproba  = JetInfo.Jet_Proba[iJet];
     float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
+    float deepdoubleb   = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
 
     int   flav       = JetInfo.Jet_flavour[iJet];
 
@@ -2775,7 +2776,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
         if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
+        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
 	}
 	//new - DoubleB  -end
 
@@ -2867,7 +2868,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float jeteta     = JetInfo.Jet_eta[iJet];
     float jetproba  = JetInfo.Jet_Proba[iJet];
     float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
+    float deepdoubleb   = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
 
     int   flav       = JetInfo.Jet_flavour[iJet];
 
@@ -2944,7 +2945,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
     	if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
+        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
 
 	}
 	//new - DoubleB  -end
@@ -3037,7 +3038,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float jeteta     = JetInfo.Jet_eta[iJet];
     float tau1VertexMassCorr  = JetInfo.Jet_tau1_vertexMass_corrected[iJet];
     float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
+    float deepdoubleb   = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
 
     int   flav       = JetInfo.Jet_flavour[iJet];
 
@@ -3114,7 +3115,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
 		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
     	if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
+        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleBvLQCD_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
 	}
 	//new - DoubleB  -end
 
