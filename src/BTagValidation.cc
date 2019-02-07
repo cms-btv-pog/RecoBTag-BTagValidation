@@ -45,6 +45,7 @@ Implementation:
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
+#include "RecoBTag/PerformanceMeasurements/interface/VariableParser.h"
 #include "RecoBTag/PerformanceMeasurements/interface/JetInfoBranches.h"
 #include "RecoBTag/PerformanceMeasurements/interface/EventInfoBranches.h"
 
@@ -140,6 +141,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      useSoftDropSubjets_ ;
     const bool                      useFlavorCategories_;
     const bool                      useRelaxedMuonID_;
+    bool                            runEventInfo_;
+    bool                            runJetVariables_;
     const bool                      applyFatJetMuonTagging_;
     const bool                      fatJetDoubleTagging_;
     const bool                      applyFatJetBTagging_;
@@ -156,8 +159,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const double                    fatJetPtMin_;
     const double                    fatJetPtMax_;
     const double                    fatJetAbsEtaMax_;
-    const double                    fatJetPrunedMassMin_;
-    const double                    fatJetPrunedMassMax_;
+    const double                    fatJetSoftDropMassMin_;
+    const double                    fatJetSoftDropMassMax_;
     const double		                fatJetTau21Min_;
     const double		                fatJetTau21Max_;
     const double                    SFbShift_;
@@ -207,6 +210,10 @@ class BTagValidation : public edm::EDAnalyzer {
 
     const BTagCalibration calib; 
     const BTagCalibrationReader reader; 
+
+    std::vector<edm::ParameterSet> groupSet, variableSet;
+    std::unordered_set<std::string> variables;
+    VariableParser variableParser;
 
     //// Event variables
     bool isData;
@@ -259,6 +266,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   useSoftDropSubjets_(iConfig.getParameter<bool>("UseSoftDropSubjets")), 
   useFlavorCategories_(iConfig.getParameter<bool>("UseFlavorCategories")),
   useRelaxedMuonID_(iConfig.getParameter<bool>("UseRelaxedMuonID")),
+  runEventInfo_(iConfig.getParameter<bool>("runEventInfo")),
+  runJetVariables_(iConfig.getParameter<bool>("runJetVariables")),
   applyFatJetMuonTagging_(iConfig.getParameter<bool>("ApplyFatJetMuonTagging")),
   fatJetDoubleTagging_(iConfig.getParameter<bool>("FatJetDoubleTagging")),
   applyFatJetBTagging_(iConfig.getParameter<bool>("ApplyFatJetBTagging")),
@@ -275,8 +284,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   fatJetPtMin_(iConfig.getParameter<double>("FatJetPtMin")),
   fatJetPtMax_(iConfig.getParameter<double>("FatJetPtMax")),
   fatJetAbsEtaMax_(iConfig.getParameter<double>("FatJetAbsEtaMax")),
-  fatJetPrunedMassMin_(iConfig.getParameter<double>("FatJetPrunedMassMin")),
-  fatJetPrunedMassMax_(iConfig.getParameter<double>("FatJetPrunedMassMax")),
+  fatJetSoftDropMassMin_(iConfig.getParameter<double>("FatJetSoftDropMassMin")),
+  fatJetSoftDropMassMax_(iConfig.getParameter<double>("FatJetSoftDropMassMax")),
   fatJetTau21Min_(iConfig.getParameter<double>("FatJetTau21Min")),
   fatJetTau21Max_(iConfig.getParameter<double>("FatJetTau21Max")),
   SFbShift_(iConfig.getParameter<double>("SFbShift")),
@@ -321,10 +330,14 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   runRangeMin_(iConfig.getParameter<int>("runRangeMin")), 
   runRangeMax_(iConfig.getParameter<int>("runRangeMax")), 
   calib("csvv2", btagCSVFile_),  
-  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
+  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_),
+  groupSet(iConfig.getParameter<std::vector<edm::ParameterSet>>("groups")),
+  variableSet(iConfig.getParameter<std::vector<edm::ParameterSet>>("variables")),
+  variables(0),
+  variableParser(false)
 {
   //now do what ever initialization is needed
-  isData = true;
+  isData = false;
   nEventsAll = 0;
   nEventsStored = 0;
 
@@ -379,38 +392,15 @@ void BTagValidation::beginJob() {
     f->Close();
   }
 
-  EvtInfo.ReadTree(JetTreeEvtInfo);
+  variables = variableParser.parseGroupsAndVariables(groupSet, variableSet);
+  variableParser.saveStoredVariablesToFile();
 
-  FatJetInfo.ReadTree(JetTree,"FatJetInfo");
-  FatJetInfo.ReadFatJetSpecificTree(JetTree,"FatJetInfo",false);
-  FatJetInfo.ReadCSVTagVarTree(JetTree,"FatJetInfo") ;
-  if (useJetProbaTree_) {
-    EvtInfo.ReadJetTrackTree(JetTreeEvtInfo);
-    FatJetInfo.ReadJetTrackTree(JetTree,"FatJetInfo");
-  }
+  EvtInfo.ReadBranches(JetTree, variableParser);
 
-  if (usePrunedSubjets_) {
-    SubJetInfo.ReadTree(JetTree,"FatJetInfo","Pruned");
-    SubJets.ReadTree(JetTree,"PrunedSubJetInfo") ;
-    SubJets.ReadSubJetSpecificTree(JetTree,"PrunedSubJetInfo") ;
-    SubJets.ReadCSVTagVarTree(JetTree,"PrunedSubJetInfo") ;
+  FatJetInfo.ReadBranches(JetTree, variableParser, "FatJetInfo");
+  SubJetInfo.ReadBranches(JetTree, variableParser, "FatJetInfo", "SoftDropPuppi");
 
-    if (useJetProbaTree_) {
-      SubJets.ReadJetTrackTree(JetTree,"PrunedSubJetInfo");
-    }
-  }
-  else if (useSoftDropSubjets_) {
-    SubJetInfo.ReadTree(JetTree,"FatJetInfo","SoftDropPuppi");
-    SubJets.ReadTree(JetTree,"SoftDropPuppiSubJetInfo") ;
-    SubJets.ReadSubJetSpecificTree(JetTree,"SoftDropPuppiSubJetInfo") ;
-    SubJets.ReadCSVTagVarTree(JetTree,"SoftDropPuppiSubJetInfo") ;
-    SubJets.RegisterTagVarTree(JetTree,"SoftDropPuppiSubJetInfo") ;
-
-    if (useJetProbaTree_) {
-      SubJets.ReadJetTrackTree(JetTree,"SoftDropPuppiSubJetInfo");
-    }
-  }
-  else edm::LogError("Error") << ">>>> No subjet type specified\n" ;
+  SubJets.ReadBranches(JetTree, variableParser, "SoftDropPuppiSubJetInfo") ;
 
   h1_CutFlow        = fs->make<TH1D>("h1_CutFlow",       "h1_CutFlow",        4,-0.5,3.5);
   h1_CutFlow->Sumw2();
@@ -425,8 +415,7 @@ void BTagValidation::beginJob() {
   h1_pt_hat_sel     = fs->make<TH1D>("h1_pt_hat_sel",    ";#hat{p}_{T} after selection;;",         1400,0,7000);
 
   createJetHistos("FatJet");
-  if( usePrunedSubjets_ ) createJetHistos("PrunedSubJet");
-  else if( useSoftDropSubjets_ ) createJetHistos("SoftDropSubJet");
+  createJetHistos("SoftDropSubJet");
 
 }
 
@@ -587,7 +576,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     if( !isData ) h1_pt_hat->Fill(EvtInfo.pthat,wtPU);
 
-    if( !passTrigger() ) continue; //// apply trigger selection
+    if( !passTrigger() ) {
+      continue; //// apply trigger selection
+    }
 
     h1_CutFlow->Fill(3.,wtPU); //// count events passing trigger selection
     h1_CutFlow_unw->Fill(3.);
@@ -612,7 +603,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double jetptuncorr(FatJetInfo.Jet_uncorrpt [iJet]) ;
       double jetpt(FatJetInfo.Jet_pt [iJet]) ;
       double jetabseta(fabs(FatJetInfo.Jet_eta[iJet])) ;
-      double jetmass(FatJetInfo.Jet_massPruned[iJet]);
+      double jetmass(FatJetInfo.Jet_massSoftDrop[iJet]);
 
       double jesunc(0);
       if ( doJECUncert_ ) 
@@ -623,8 +614,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           jetpt >= fatJetPtMax_ )            continue; //// apply jet pT cut
       if ( jetabseta > fatJetAbsEtaMax_ )     continue; //// apply jet eta cut
       if ( FatJetInfo.Jet_tightID[iJet]==0 )  continue; //// apply tight jet ID
-      if ( jetmass < fatJetPrunedMassMin_ ||
-          jetmass > fatJetPrunedMassMax_ )   continue; //// apply pruned jet mass cut
+      if ( jetmass < fatJetSoftDropMassMin_ ||
+          jetmass > fatJetSoftDropMassMax_ )   continue; //// apply soft drop jet mass cut
 
       double tau1(FatJetInfo.Jet_tau1[iJet]);
       double tau2(FatJetInfo.Jet_tau2[iJet]);
@@ -755,6 +746,12 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               }
             }
           }
+
+          //std::cout << " fatjet pt = " << SubJets.Jet_pt [iJet] 
+          //  << " eta = " << fabs(SubJets.Jet_eta[iJet]) 
+          //  << " sj deepcsv = " << sjdeepcsv
+          //  << " nmu = " << SubJets.nPFMuon << " nselmu = " << nselmuonSubJet 
+          //  << std::endl;
 
           if (removeJP0_ && std::signbit(sjjp) ) { 
             continue;

@@ -2,6 +2,7 @@ import sys
 import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
+from pdb import set_trace
 
 options = VarParsing('python')
 
@@ -100,12 +101,12 @@ options.register('fatJetPtMax', 1.E6,
     VarParsing.varType.float,
     "Maximum fat jet Pt"
     )
-options.register('fatJetPrunedMassMin', 0.,
+options.register('fatJetSoftDropMassMin', 0.,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Minimum fat jet softdrop mass"
     )
-options.register('fatJetPrunedMassMax', 1.E6,
+options.register('fatJetSoftDropMassMax', 1.E6,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "Maximum fat jet softdrop mass"
@@ -302,6 +303,19 @@ options.register('runRangeMax', 999999,
     VarParsing.varType.int,
     "Max Run number"
     )
+options.register('groups', [],
+    VarParsing.multiplicity.list,
+    VarParsing.varType.string,
+    'variable groups to be stored')
+options.register('runJetVariables', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    'True if you want to run Jet Variables')
+options.register('runEventInfo', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run Event Info"
+    )
 
 
 options.parseArguments()
@@ -310,11 +324,11 @@ if options.doJECUncert and options.jecshift==0:
   sys.exit("!!!!ERROR: JEC uncertainty selected byt jecshift not set. Set jecshift either to -1 or 1\n")
 
 if options.usePrunedSubjets and options.useSoftDropSubjets:
-  print "Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed."
-  print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
+  print("Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed.")
+  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
 elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
-  print "!!!Warning: no subjets will be processed.!!!"
-  print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
+  print("!!!Warning: no subjets will be processed.!!!")
+  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
 
 # print options
 
@@ -336,7 +350,30 @@ process.TFileService = cms.Service("TFileService",
 from inputFiles_cfi import *
 from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
 
-print bTagAnalyzerCommon.TriggerPathNames 
+#print(bTagAnalyzerCommon.TriggerPathNames)
+from RecoBTag.PerformanceMeasurements.variables_cfi import *
+from RecoBTag.PerformanceMeasurements.varGroups_cfi import *
+
+print("!!!! Opening files {}".format(FileNames))
+
+varList = []
+for groupToRead in options.groups:
+  for groupExisting in groupSet.groups:
+    if groupToRead == groupExisting.group:
+      for varname in groupExisting.variables:
+        if "FatJetInfo." in varname:
+          shortvarname = varname.split(".")[1]
+          var = variableDict[shortvarname].clone()
+          var.variable = varname
+        elif "SubJetInfo." in varname:
+          shortvarname = varname.split(".")[1]
+          var = variableDict[shortvarname].clone()
+          var.variable = varname
+        else:
+          var = variableDict[varname].clone()
+        var.store = cms.bool(True)
+        varList.append(var)
+variableToRead = cms.VPSet(varList)
 
 process.btagval = cms.EDAnalyzer('BTagValidation',
     MaxEvents              = cms.int32(options.maxEvents),
@@ -349,6 +386,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     #InputFiles             = cms.vstring(FileNames_QCD_Pt_1000toInf),
     UseFlavorCategories    = cms.bool(options.useFlavorCategories),
     UseRelaxedMuonID       = cms.bool(options.useRelaxedMuonID),
+    runEventInfo           = cms.bool(True),
+    runJetVariables        = cms.bool(True),
     ApplyFatJetMuonTagging = cms.bool(options.applyFatJetMuonTagging),
     ApplyFatJetBTagging    = cms.bool(options.applyFatJetBTagging),
     FatJetDoubleTagging    = cms.bool(options.fatJetDoubleTagging),
@@ -366,7 +405,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     FatJetPtMin            = cms.double(options.fatJetPtMin),
     FatJetPtMax            = cms.double(options.fatJetPtMax),
-    FatJetPrunedMassMin  = cms.double(options.fatJetPrunedMassMin),
+    FatJetSoftDropMassMin  = cms.double(options.fatJetSoftDropMassMin),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string('hpvwt_data_mc'),
     File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PUDist/PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root'),
@@ -377,7 +416,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     Hist_FatJetPtWt        = cms.string('fatjetptweight_mc_data'),
     File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
-    FatJetPrunedMassMax    = cms.double(options.fatJetPrunedMassMax),
+    FatJetSoftDropMassMax  = cms.double(options.fatJetSoftDropMassMax),
     FatJetTau21Min         = cms.double(options.fatJetTau21Min), #added by rizki
     FatJetTau21Max         = cms.double(options.fatJetTau21Max), #added by rizki
     FatJetAbsEtaMax        = cms.double(options.fatJetAbsEtaMax), #added by rizki
@@ -422,8 +461,12 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     doJECUncert            = cms.bool(options.doJECUncert),  
     jecshift               = cms.int32(options.jecshift),  
     useRunRange            = cms.bool(options.useRunRange),  
-    runRangeMin     = cms.int32(options.runRangeMin),
-    runRangeMax     = cms.int32(options.runRangeMax),
+    runRangeMin            = cms.int32(options.runRangeMin),
+    runRangeMax            = cms.int32(options.runRangeMax),
+    variables              = variableToRead,
+    groups                 = groupSet.groups
 )
 
 process.p = cms.Path(process.btagval)
+
+open('dump.py', 'w').write(process.dumpPython())
