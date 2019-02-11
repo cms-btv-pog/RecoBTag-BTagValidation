@@ -485,6 +485,7 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
   varParser = VariableParser(!runOnData);
   variables = varParser.parseGroupsAndVariables(groupSet, variableSet);
+  varParser.saveStoredVariablesToFile();
 
   if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
     std::vector<JetCorrectorParameters> vPar;  
@@ -745,8 +746,8 @@ void BTagValidation::beginJob() {
 
   //// Common histograms for both fat jets and subjets
   createJetHistos("FatJet");
-  // if( usePrunedSubjets_ ) createJetHistos("PrunedSubJet");
-  //else if( useSoftDropSubjets_ ) createJetHistos("SoftDropSubJet");
+  if( usePrunedSubjets_ ) createJetHistos("PrunedSubJet");
+  else if( useSoftDropSubjets_ ) createJetHistos("SoftDropSubJet");
   
   ///Create DoubleB input vars
   createJetHistos_DoubleB();
@@ -1409,7 +1410,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
       if(DEBUG_)std::cout << "Fatjet selection: pass eta cut "<< std::endl;
 
-      if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply tight/loose jet ID
+      /////////if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply tight/loose jet ID
       if(DEBUG_)std::cout << "Fatjet selection: pass jet tight ID "<< std::endl;
 
       if (usePrunedMass_) {
@@ -1449,16 +1450,17 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       TLorentzVector jet_p4;
       jet_p4.SetPtEtaPhiM(FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_phi[iJet], FatJetInfo.Jet_mass[iJet]);
 
-      if ( SubJetInfo.Jet_nSubJets[iJet] != 2 ) continue ;
+      //if ( SubJetInfo.Jet_nSubJets[iJet] != 2 ) continue ;
+      if(DEBUG_)std::cout << "Fatjet selection: pass nsubjets ==2"<< std::endl;
 
       int iSubJet1 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]] ; //added by rizki
       int iSubJet2 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]+1] ; //added by rizki
 
 
       //// If  processing subjets, discard fat jet with any one subjet having pt = 0
-      if( (usePrunedSubjets_ || useSoftDropSubjets_)
-          && (SubJets.Jet_pt[iSubJet1]==0. || SubJets.Jet_pt[iSubJet2]==0.) ) continue;
-      if(DEBUG_)std::cout << "Fatjet selection: pass eta cut "<< std::endl;
+      //if( (usePrunedSubjets_ || useSoftDropSubjets_)
+      //    && (SubJets.Jet_pt[iSubJet1]==0. || SubJets.Jet_pt[iSubJet2]==0.) ) continue;
+      if(DEBUG_)std::cout << "Fatjet selection: subjets pt > 0"<< std::endl;
 
       TLorentzVector subjet1_p4, subjet2_p4;
       subjet1_p4.SetPtEtaPhiM(SubJets.Jet_pt[iSubJet1], SubJets.Jet_eta[iSubJet1], SubJets.Jet_phi[iSubJet1], SubJets.Jet_mass[iSubJet1]);
@@ -1476,9 +1478,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //if( (usePrunedSubjets_ || useSoftDropSubjets_)  && subjet_dR>fatJetCone ) continue;
 
       //// If processing subjets, skip infrared unsafe configurations
-      if( (usePrunedSubjets_ || useSoftDropSubjets_)
-          && subjet_dR < (FatJetInfo.Jet_mass[iJet]/FatJetInfo.Jet_pt[iJet]) ) continue;
-      if(DEBUG_)std::cout << "Fatjet selection: pass infrared unsafe config "<< std::endl;
+      ////////////////if( (usePrunedSubjets_ || useSoftDropSubjets_)
+      ///    && subjet_dR < (FatJetInfo.Jet_mass[iJet]/FatJetInfo.Jet_pt[iJet]) ) continue;
+      ///if(DEBUG_)std::cout << "Fatjet selection: pass infrared unsafe config "<< std::endl;
 
       bool isDoubleMuonTagged = false;
 

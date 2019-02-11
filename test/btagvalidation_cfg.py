@@ -74,7 +74,7 @@ options.register('usePrunedSubjets', False,
     VarParsing.varType.bool,
     "Process pruned subjets"
     )
-options.register('useSoftDropSubjets', True,
+options.register('useSoftDropSubjets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Process soft drop subjets"
@@ -365,7 +365,7 @@ options.register('jecUncPayloadName',
     VarParsing.varType.string,
     "JEC uncertainty payload name"
     ),
-options.register('doNewJEC', False,
+options.register('doNewJEC', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Apply new JECs"
@@ -428,11 +428,11 @@ options.register('groups', [],
 options.parseArguments()
 
 if options.usePrunedSubjets and options.useSoftDropSubjets:
-  print "Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed."
-  print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
+  print("Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed.")
+  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
 elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
-  print "!!!Warning: no subjets will be processed.!!!"
-  print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
+  print("!!!Warning: no subjets will be processed.!!!")
+  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
 
 # print options
 
@@ -476,6 +476,8 @@ for requiredGroup in options.groups:
       break
   if(not found):
     print('WARNING: The group ' + requiredGroup + ' was not found')
+
+print("!!!! Opening files {}".format(FileNames))
 
 process.btagval = cms.EDAnalyzer('BTagValidation',
     variableSet,
@@ -599,3 +601,5 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
 
 process.p = cms.Path(process.btagval)
 #process.p = cms.Path(process.btagval + process.btagvalsubjetmu + process.btagvalsubjetbtag)
+
+#open('dump.py', 'w').write(process.dumpPython())
