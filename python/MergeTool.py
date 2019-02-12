@@ -50,7 +50,7 @@ class MergeTool(object):
     # Main loop over list of campaigns which are defined in general.py
     for _c in self.campaigns:
 
-      _path_histograms = os.path.join( self.path_histograms, _c)
+      _path_histograms = make_directory(os.path.join( self.path_histograms, _c))
 
       # Loop over samples
       for _s in self.campaigns_info[_c]['samples']:

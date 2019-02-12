@@ -2096,7 +2096,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   		if(produceDoubleBCommissioning_) fillJetHistos_DoubleB(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, muon1_v, muon2_v, dimuon_v, idxMuon_inFirstSubjet, idxMuon_inSecondSubjet, subjet1_p4, subjet2_p4, wtPU*wtFatJet);
 
 		//fill histo for DeepDoubleX Commissioning Plots: 
-  		if(produceDoubleBCommissioning_) fillJetHistos_DeepDoubleX(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
+  		if(produceDeepDoubleXCommissioning_) fillJetHistos_DeepDoubleX(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
 
 		//fill histo for DoubleB SF calculation / templates: 
 		if(produceDoubleBSFtemplates_) fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);

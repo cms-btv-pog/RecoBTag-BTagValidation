@@ -4,19 +4,13 @@
 # campaigns       = ['caseA', 'caseB','caseC','caseD']
 campaigns       = [
                     'Run2017_QCDMuEnriched',
-					#'Run2017BCD_QCDMuEnriched_Pt350',
-					#'Run2017BCD_QCDMuEnriched_Pt250',
 					]
-# campaigns       = [
-# 					'Run2017BCD_QCDincl_Pt350',
-# 					'Run2017BCD_QCDincl_Pt250',
-# 					]
 
 btagAna_groups  = [ 'DoubleBCommissioning' ]
 
 
 # Choose True if you want to overwrite already existing files/results
-force_all       = False
+force_all       = True
 # If True all files are copied locally and used, else use files from original location
 work_locally    = False
 
