@@ -6,6 +6,11 @@ from pdb import set_trace
 
 options = VarParsing('python')
 
+options.register('FileNames', 'FileNames',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "Name of list of input files"
+    )
 options.register('outFilename', 'bTagValPlots.root',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -50,11 +55,6 @@ options.register('fatJetDoubleSVBTagging', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Require fat jets to be double-SV-b-tagged"
-    )
-options.register('usePrunedSubjets', False,
-    VarParsing.multiplicity.singleton,
-    VarParsing.varType.bool,
-    "Process pruned subjets"
     )
 options.register('useSoftDropSubjets', True,
     VarParsing.multiplicity.singleton,
@@ -121,7 +121,7 @@ options.register('fatJetTau21Max', 0.6,
     VarParsing.varType.float,
     "tau2/tau1 jet substructure max cut for fat jets"
     )
-options.register('fatJetBDiscrCut', 0.5426,
+options.register('fatJetBDiscrCut', 0.2217, ### Loose DeepCSV WP from BtagRecommendation2016Legacy
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "B discriminator cut for fat jets"
@@ -136,7 +136,7 @@ options.register('fatJetDoubleSVBDiscrMax', 1.0,
     VarParsing.varType.float,
     "Double SV b discriminator cut for fat jets"
     )
-options.register('subJetBDiscrMin', 0.5426,
+options.register('subJetBDiscrMin', 0.2217, ### Loose DeepCSV WP from BtagRecommendation2016Legacy 
     VarParsing.multiplicity.singleton,
     VarParsing.varType.float,
     "B discriminator min for subjets"
@@ -323,12 +323,9 @@ options.parseArguments()
 if options.doJECUncert and options.jecshift==0: 
   sys.exit("!!!!ERROR: JEC uncertainty selected byt jecshift not set. Set jecshift either to -1 or 1\n")
 
-if options.usePrunedSubjets and options.useSoftDropSubjets:
-  print("Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed.")
-  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
-elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
+if not options.useSoftDropSubjets:
   print("!!!Warning: no subjets will be processed.!!!")
-  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
+  print("!!!Select soft drop subjets with 'useSoftDropSubjets'.")
 
 # print options
 
@@ -354,7 +351,7 @@ from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
 from RecoBTag.PerformanceMeasurements.variables_cfi import *
 from RecoBTag.PerformanceMeasurements.varGroups_cfi import *
 
-print("!!!! Opening files {}".format(FileNames))
+print("!!!! Opening files {}".format(options.FileNames))
 
 varList = []
 for groupToRead in options.groups:
@@ -379,9 +376,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     MaxEvents              = cms.int32(options.maxEvents),
     ReportEvery            = cms.int32(options.reportEvery),
     UseJetProbaTree        = cms.bool(options.useJetProbaTree),
-    InputTTreeEvtInfo      = cms.string('btaganaFatJets/ttree'),
     InputTTree             = cms.string('btaganaFatJets/ttree'),
-    InputFiles             = cms.vstring(FileNames),
+    InputFiles             = cms.vstring(FileNames[options.FileNames]),
     #InputFiles             = cms.vstring(FileNames_QCD_MuEnriched_800to1000),
     #InputFiles             = cms.vstring(FileNames_QCD_Pt_1000toInf),
     UseFlavorCategories    = cms.bool(options.useFlavorCategories),
@@ -393,7 +389,6 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetDoubleTagging    = cms.bool(options.fatJetDoubleTagging),
     FatJetDoubleBTagging   = cms.bool(options.fatJetDoubleBTagging),
     FatJetDoubleSVBTagging = cms.bool(options.fatJetDoubleSVBTagging),
-    UsePrunedSubjets       = cms.bool(options.usePrunedSubjets),
     UseSoftDropSubjets     = cms.bool(options.useSoftDropSubjets),
     ApplySubJetMuonTagging = cms.bool(options.applySubJetMuonTagging),
     ApplySubJetBTagging    = cms.bool(options.applySubJetBTagging),
@@ -440,16 +435,6 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
       options.triggerSelection
       ),
     TriggerPathNames       = bTagAnalyzerCommon.TriggerPathNames,
-    #TriggerPathNames       = cms.vstring(
-    #  "HLT_BTagMu_Jet300_Mu5_v",
-    #  "HLT_BTagMu_AK8Jet300_Mu5_v",
-    #  "HLT_PFJet200_v",
-    #  "HLT_PFJet260_v",
-    #  "HLT_PFJet320_v",
-    #  "HLT_PFJet400_v",
-    #  "HLT_PFJet450_v",
-    #  "HLT_PFJet500_v",
-    #  ),
     ApplySFs               = cms.bool(options.applySFs),
     btagCSVFile            = cms.string(options.btagCSVFile),
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),
@@ -469,4 +454,4 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
 
 process.p = cms.Path(process.btagval)
 
-open('dump.py', 'w').write(process.dumpPython())
+#open('dump.py', 'w').write(process.dumpPython())
