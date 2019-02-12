@@ -56,9 +56,9 @@ def process_input_dir(input_dir, match, filelist):
     return
 
 
-cfi_template = """FileNames = [
+cfi_template = """FileNames = {'FileNames':[
 INPUT_FILES
-]
+]}
 """
 
 condor_template = """universe              = vanilla
@@ -76,15 +76,15 @@ bash_template = """#!/bin/bash
 
 BATCHDIR=${PWD}
 
-export SCRAM_ARCH=slc6_amd64_gcc530
+export SCRAM_ARCH=slc6_amd64_gcc630
 cd MAIN_WORKDIR
 eval `scram runtime -sh`
 
 cp -v MAIN_WORKDIR/CMSSW_cfg.py $BATCHDIR/CMSSW_cfg.py
-cp -v MAIN_WORKDIR/PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root $BATCHDIR/PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root
-cp -v MAIN_WORKDIR/RunII2017BCDEF_17NovRereco_25ns_PUXsec69200nb.root $BATCHDIR/RunII2017BCDEF_17NovRereco_25ns_PUXsec69200nb.root
-cp -v MAIN_WORKDIR/RunII2017BCDEF_17NovRereco_25ns_PUXsec72450nb.root $BATCHDIR/RunII2017BCDEF_17NovRereco_25ns_PUXsec72450nb.root 
-cp -v MAIN_WORKDIR/RunII2017BCDEF_17NovRereco_25ns_PUXsec65550nb.root $BATCHDIR/RunII2017BCDEF_17NovRereco_25ns_PUXsec65550nb.root 
+cp -v MAIN_WORKDIR/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root $BATCHDIR/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root
+cp -v MAIN_WORKDIR/RunII2016Rereco_25ns_PUXsec69000nb.root $BATCHDIR/RunII2016Rereco_25ns_PUXsec69000nb.root
+cp -v MAIN_WORKDIR/RunII2016Rereco_25ns_PUXsec72450nb.root $BATCHDIR/RunII2016Rereco_25ns_PUXsec72450nb.root 
+cp -v MAIN_WORKDIR/RunII2016Rereco_25ns_PUXsec65550nb.root $BATCHDIR/RunII2016Rereco_25ns_PUXsec65550nb.root
 cp -v DATASET_WORKDIR/input/inputFiles_JOB_NUMBER_cfi.py $BATCHDIR/inputFiles_cfi.py
 cp -v MAIN_WORKDIR/CSVv2.csv $BATCHDIR/
 cd $BATCHDIR
@@ -153,13 +153,13 @@ def main():
   for filename in os.listdir(cfg_dirname):
     if not os.path.isfile(os.path.join(cfg_dirname,filename)):
       continue
-    if re.search("^RunII2017BCDEF_17NovRereco_25ns_PUXsec69200nb.root$", filename):
+    if re.search("^RunII2016Rereco_25ns_PUXsec69000nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^RunII2017BCDEF_17NovRereco_25ns_PUXsec72450nb.root$", filename):
+    if re.search("^RunII2016Rereco_25ns_PUXsec72450nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^RunII2017BCDEF_17NovRereco_25ns_PUXsec65550nb.root$", filename):
+    if re.search("^RunII2016Rereco_25ns_PUXsec65550nb.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
-    if re.search("^PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root$", filename):
+    if re.search("^PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
     if re.search("^CSVv2.csv$", filename):
       shutil.copy(os.path.join(cfg_dirname,filename),main_workdir)
