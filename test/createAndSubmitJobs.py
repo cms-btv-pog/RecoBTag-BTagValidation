@@ -81,12 +81,17 @@ echo "Running CMSSW job"
 cmsRun CMSSW_cfg.py CFG_PARAMETERS
 exitcode=$?
 
-cp -v OUTPUT_FILENAME.root DATASET_WORKDIR/output/OUTPUT_FILENAME_JOB_NUMBER.root
+copytoeos=COPYTOEOS
+
+if [ "$copytoeos" = "true" ]; then
+  /afs/cern.ch/project/eos/installation/cms/bin/eos.select cp OUTPUT_FILENAME.root EOS_OUTDIR/output/OUTPUT_FILENAME_JOB_NUMBER.root
+else
+  cp -v OUTPUT_FILENAME.root DATASET_WORKDIR/output/OUTPUT_FILENAME_JOB_NUMBER.root
+fi 
 
 exit $exitcode
 
 """
-
 
 # usage description
 usage = """Usage: ./createAndSubmitJobs.py [options]\n
@@ -105,6 +110,8 @@ def main():
   parser.add_option('-f', '--fraction', dest='fraction', action='store', default='1.0', help='Fraction of files to be processed. Default value is 1 (This parameter is optional)', metavar='FRACTION')
   parser.add_option("-q", "--queue", dest="queue", action='store', default='8nh', help="LXBatch queue (choose among cmst3 8nm 1nh 8nh 1nd 1nw). Default is '8nh' (This parameter is optional)", metavar="QUEUE")
   parser.add_option("-n", "--no_submission", dest="no_submission", action='store_true', default=False, help="Create the necessary configuration files and skip the job submission (This parameter is optional)")
+  parser.add_option("-e", "--copy_to_eos", dest="copy_to_eos", action='store', default='false', help="Set to 'true' for copying to EOS")
+  parser.add_option("-o", "--eos_output_dir", dest="eos_output_dir", action='store', help="EOS Output directory (This parameter is optional)",metavar="OUTPUT_DIR")
 
   (options, args) = parser.parse_args()
 
@@ -172,12 +179,28 @@ def main():
     dataset_workdir = os.path.join(main_workdir,dataset)
 
     # create the dataset working directory
-    os.mkdir(dataset_workdir)
-    os.mkdir(os.path.join(dataset_workdir,'input'))
-    os.mkdir(os.path.join(dataset_workdir,'output'))
+    if not os.path.exists(dataset_workdir): os.mkdir(dataset_workdir)
+    if not os.path.exists(os.path.join(dataset_workdir,'input')):os.mkdir(os.path.join(dataset_workdir,'input'))
+    if not os.path.exists(os.path.join(dataset_workdir,'output')):os.mkdir(os.path.join(dataset_workdir,'output'))
+#     myTempPATH = '/tmp/rsyarif/BTagValidationJobs/'
+#     if not os.path.exists(os.path.join(myTempPATH,options.main_workdir)):os.mkdir(myTempPATH)
+#     if not os.path.exists(os.path.join(myTempPATH,options.main_workdir)):os.mkdir(os.path.join(myTempPATH,options.main_workdir))
+#     if not os.path.exists(os.path.join(myTempPATH,options.main_workdir,dataset,)):os.mkdir(os.path.join(myTempPATH,options.main_workdir,dataset,))
+#     if not os.path.exists(os.path.join(myTempPATH,options.main_workdir,dataset,'output')):os.mkdir(os.path.join(myTempPATH,options.main_workdir,dataset,'output'))
 
     filelist = []
-    process_input_dir(line_elements[2], options.match, filelist)
+    input_dir = line_elements[2]
+    process_input_dir(input_dir, options.match, filelist)
+
+    if options.copy_to_eos == 'true':
+      eos_outdir = os.path.join(options.eos_output_dir,options.main_workdir)
+      print 'creating directory at cern eos: ', eos_outdir
+      proc = subprocess.Popen( [ '/afs/cern.ch/project/eos/installation/cms/bin/eos.select', 'mkdir', eos_outdir ], stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+      eos_outdir = os.path.join(eos_outdir,dataset)
+      print 'creating directory at cern eos: ', eos_outdir
+      proc = subprocess.Popen( [ '/afs/cern.ch/project/eos/installation/cms/bin/eos.select', 'mkdir', eos_outdir ], stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+      print 'creating directory at cern eos: ', os.path.join(eos_outdir,'output')
+      proc = subprocess.Popen( [ '/afs/cern.ch/project/eos/installation/cms/bin/eos.select', 'mkdir', os.path.join(eos_outdir,'output') ], stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
 
     ##################################################
     njobs = line_elements[1]
@@ -218,12 +241,17 @@ def main():
        bash_script_content = re.sub('JOB_NUMBER',str(ijob),bash_script_content)
        bash_script_content = re.sub('CFG_PARAMETERS',cfg_parameters,bash_script_content)
        bash_script_content = re.sub('OUTPUT_FILENAME',output_filename,bash_script_content)
+       if options.copy_to_eos == 'true': bash_script_content = re.sub('EOS_OUTDIR',eos_outdir,bash_script_content)
+       bash_script_content = re.sub('COPYTOEOS',options.copy_to_eos,bash_script_content)
        bash_script.write(bash_script_content)
        bash_script.close()
 
        if(not options.no_submission):
-         cmd = 'bsub -q ' + options.queue + ' -o ' + os.path.join(dataset_workdir,'output','job_' + str(ijob) + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + str(ijob) + '.sh')
+#          cmd = 'bsub -q ' + options.queue + ' -o ' + os.path.join(dataset_workdir,'output','job_' + str(ijob) + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + str(ijob) + '.sh')
+         cmd = 'bsub -q ' + options.queue + ' -o ' + os.path.join(dataset_workdir,'output','job_' + str(ijob) + '.log')  + ' -e ' + os.path.join(dataset_workdir,'output','error_' + str(ijob) + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + str(ijob) + '.sh')
+#          cmd = 'bsub -q ' + options.queue + ' -e ' + os.path.join(dataset_workdir,'output','error_' + str(ijob) + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + str(ijob) + '.sh')
          os.system(cmd)
+         	
 
   # close all open files
   dataset_list_file.close()

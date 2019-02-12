@@ -91,6 +91,7 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Manage histograms
     void createJetHistos(const TString& histoTag);
     void createJetHistos_DoubleB();
+    void createJetHistos_DeepDoubleX();
     void createJetHistos_SF(const TString& histoTag);
     void createJetHistos_SF_SVmass(const TString& histoTag);
     void createJetHistos_SF_JPhasSV(const TString& histoTag);
@@ -107,6 +108,7 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Fill jet histograms
     void fillJetHistos(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const int nmu, const int nselmuon, const int idxFirstMuon, const double wt);
     void fillJetHistos_DoubleB(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const int nmu, const int nselmuon, const int idxFirstMuon, TLorentzVector muon1_v, TLorentzVector muon2_v, TLorentzVector dimuon_v, const int idxMuon_inFirstSubjet, const int idxMuon_inSecondSubjet, TLorentzVector subjet1_p4 , TLorentzVector subjet2_p4, const double wt);
+    void fillJetHistos_DeepDoubleX(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
     void fillJetHistos_SF(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
     void fillJetHistos_SF_SVmass(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
     void fillJetHistos_SF_JPhasSV(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
@@ -226,8 +228,6 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Lumi reweighting object
     edm::LumiReWeighting LumiWeights_;
 
-    VariableParser varParser;
-
     //// Configurables
     const bool                      DEBUG_;
     const int                       DEBUGlevel_;
@@ -324,6 +324,8 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               jecUncPayloadName_;
     const bool                      doNewJEC_;
     const bool                      doJECUncert_;
+    const bool                      produceDoubleBCommissioning_;
+    const bool                      produceDeepDoubleXCommissioning_;
     const bool                      produceDoubleBSFtemplates_;
     const bool                      produceDoubleBSFtemplatesV2_;
     const bool                      produceDoubleBSFtemplates_JPhasSV_;
@@ -338,6 +340,10 @@ class BTagValidation : public edm::EDAnalyzer {
 
     const BTagCalibration calib; 
     const BTagCalibrationReader reader; 
+
+    std::vector<edm::ParameterSet> groupSet, variableSet;
+    std::unordered_set<std::string> variables;
+    VariableParser variableParser;
 
     //// Event variables
     bool isData;
@@ -461,6 +467,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   jecUncPayloadName_(iConfig.getParameter<std::string>("jecUncPayloadName")),
   doNewJEC_(iConfig.getParameter<bool>("doNewJEC")), 
   doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), 
+  produceDoubleBCommissioning_(iConfig.getParameter<bool>("produceDoubleBCommissioning")), 
+  produceDeepDoubleXCommissioning_(iConfig.getParameter<bool>("produceDeepDoubleXCommissioning")), 
   produceDoubleBSFtemplates_(iConfig.getParameter<bool>("produceDoubleBSFtemplates")), 
   produceDoubleBSFtemplatesV2_(iConfig.getParameter<bool>("produceDoubleBSFtemplatesV2")), 
   produceDoubleBSFtemplates_JPhasSV_(iConfig.getParameter<bool>("produceDoubleBSFtemplates_JPhasSV")), 
@@ -470,9 +478,11 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   runRangeMax_(iConfig.getParameter<int>("runRangeMax")),
   runOnData(iConfig.getParameter<bool>("runOnData")), 
   calib("csvv2", btagCSVFile_),  
-  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
-  //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_),
-  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_),
+  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_),
+  groupSet(iConfig.getParameter<std::vector<edm::ParameterSet>>("groups")),
+  variableSet(iConfig.getParameter<std::vector<edm::ParameterSet>>("variables")),
+  variables(0),
+  variableParser(false)
 {
   //now do what ever initialization is needed
 
@@ -480,12 +490,12 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   nEventsAll = 0;
   nEventsStored = 0;
 
-  std::vector<edm::ParameterSet> groupSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("groups");
+/*  std::vector<edm::ParameterSet> groupSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("groups");
   std::vector<edm::ParameterSet> variableSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("variables");
   std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
   varParser = VariableParser(!runOnData);
   variables = varParser.parseGroupsAndVariables(groupSet, variableSet);
-  varParser.saveStoredVariablesToFile();
+  varParser.saveStoredVariablesToFile();*/
 
   if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
     std::vector<JetCorrectorParameters> vPar;  
@@ -521,6 +531,8 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   	!produceDoubleBSFtemplates_JPnoSV_) 
   	std::cout << "ATTENTION	: NOT creating DoubleB SF templates." << std::endl;
 
+  if(produceDoubleBCommissioning_) std::cout << "ATTENTION	: Creating DoubleB Commissioning plots." << std::endl;
+  if(produceDeepDoubleXCommissioning_) std::cout << "ATTENTION	: Creating DeepDoubleX Commissioning plots." << std::endl;
   if(produceDoubleBSFtemplates_) std::cout << "ATTENTION	: Creating DoubleB SF templates (JP plots)." << std::endl;
   if(produceDoubleBSFtemplatesV2_) std::cout << "ATTENTION	: Creating DoubleB SF templates (sv mass plots)." << std::endl;
   if(produceDoubleBSFtemplates_JPhasSV_) std::cout << "ATTENTION	: Creating DoubleB SF templates (JPhasSV plots)." << std::endl;
@@ -645,28 +657,37 @@ void BTagValidation::beginJob() {
 
     f->Close();
   }
+
+  variables = variableParser.parseGroupsAndVariables(groupSet, variableSet);
+  variableParser.saveStoredVariablesToFile();
   
   if(DEBUG_) std::cout << "Attempting to read EvtInfo trees" << std::endl;		
-  EvtInfo.ReadBranches(JetTreeEvtInfo,varParser);
+  //EvtInfo.ReadBranches(JetTreeEvtInfo,varParser);
+  EvtInfo.ReadBranches(JetTreeEvtInfo,variableParser);
   if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadTree" << std::endl;		
 ;		
 
   if(DEBUG_) std::cout << "Attempting to read FatJetInfo trees" << std::endl;		
-  FatJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo");
+  //FatJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo");
+  FatJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo");
   if(DEBUG_) std::cout << "	Done reading FatJetInfo trees" << std::endl;		
 
   if (usePrunedSubjets_) {
   	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - Pruned" << std::endl;		
-    SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","Pruned");
-    SubJets.ReadBranches(JetTree,varParser,"PrunedSubJetInfo") ;
+    //SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","Pruned");
+    //SubJets.ReadBranches(JetTree,varParser,"PrunedSubJetInfo") ;
+    SubJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo","Pruned");
+    SubJets.ReadBranches(JetTree,variableParser,"PrunedSubJetInfo") ;
   	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - Pruned" << std::endl;		
   }
 
 
   else if (useSoftDropSubjets_) {
   	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - SoftDropPuppi" << std::endl;		
-    SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","SoftDropPuppi");
-    SubJets.ReadBranches(JetTree,varParser,"SoftDropPuppiSubJetInfo") ;
+    //SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","SoftDropPuppi");
+    //SubJets.ReadBranches(JetTree,varParser,"SoftDropPuppiSubJetInfo") ;
+    SubJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo","SoftDropPuppi");
+    SubJets.ReadBranches(JetTree,variableParser,"SoftDropPuppiSubJetInfo") ;
   	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - SoftDropPuppi" << std::endl;		
   }
   else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
@@ -750,7 +771,8 @@ void BTagValidation::beginJob() {
   else if( useSoftDropSubjets_ ) createJetHistos("SoftDropSubJet");
   
   ///Create DoubleB input vars
-  createJetHistos_DoubleB();
+  if(produceDoubleBCommissioning_) createJetHistos_DoubleB();
+  if(produceDeepDoubleXCommissioning_) createJetHistos_DeepDoubleX();
 
   ///Create histos for DoubleB SF calculation/templates
   if(produceDoubleBSFtemplates_) createJetHistos_SF("FatJet");
@@ -869,10 +891,27 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_SSVHP"   ,";SSVHP;;",70,0.,7.);
   AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
-  AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
-  AddHisto(histoTag+"_DeepDoubleBvLQCD" ,";DeepDoubleBvLQCD;;",100,-1.,1.);
+  AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,0,1.);
   AddHisto2D(histoTag+"_JP_DoubleB",";JP vs DoubleB;;", 50, 0., 2.5, 100,-1,1.);  
   AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DoubleB",";M(sv from TagVarCSV) vs DoubleB;;", 100,0,50, 100,-1,1.);  
+  AddHisto(histoTag+"_deepDoubleBvLQCD", "Jet_deepDoubleBvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleBvLHbb", "Jet_deepDoubleBvLHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvLQCD", "Jet_deepDoubleCvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvLHcc", "Jet_deepDoubleCvLHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvBHcc", "Jet_deepDoubleCvBHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvBHbb", "Jet_deepDoubleCvBHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleBvLQCD", "Jet_massIndDeepDoubleBvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleBvLHbb", "Jet_massIndDeepDoubleBvLHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvLQCD", "Jet_massIndDeepDoubleCvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvLHcc", "Jet_massIndDeepDoubleCvLHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvBHcc", "Jet_massIndDeepDoubleCvBHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvBHbb", "Jet_massIndDeepDoubleCvBHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetbbvsLight", "Jet_deepBoostedJetbbvsLight", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetccvsLight", "Jet_deepBoostedJetccvsLight", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetTvsQCD", "Jet_deepBoostedJetTvsQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetZHccvsQCD", "Jet_deepBoostedJetZHccvsQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetWvsQCD", "Jet_deepBoostedJetWvsQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetZHbbvsQCD", "Jet_deepBoostedJetZHbbvsQCD", 100, 0, 1 );
   
   AddHisto(histoTag+"_TCHE_extended1",";TCHE_extended1;;",70,-30.,30.); 
   AddHisto(histoTag+"_TCHP_extended1",";TCHP_extended1;;",70,-30.,30.); 
@@ -988,6 +1027,110 @@ void BTagValidation::createJetHistos_DoubleB() {
   AddHisto("Subjet2_dR",        ";#Delta R(Subjet2,AK8jet) ;;",250,0,5);
 
   // added by rizki - end
+}
+
+void BTagValidation::createJetHistos_DeepDoubleX() {
+
+  // DeepDoubleX and DeepBoostedJet tag variables
+  //
+  AddHisto("FatJet_DeepDoubleX_jetNTracks"     	       ,";jetNTracks;;",40,0,40);
+  AddHisto("FatJet_DeepDoubleX_nSV"  ,";nSV;;",10,0,10);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_0",";trackSip3dSig_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_1",";trackSip3dSig_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_2",";trackSip3dSig_2;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_3",";trackSip3dSig_3;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_0",";tau1_trackSip3dSig_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_1",";tau1_trackSip3dSig_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_0",";tau2_trackSip3dSig_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_1",";tau2_trackSip3dSig_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_0",";trackSip2dSigAboveBottom_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_1",";trackSip2dSigAboveBottom_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip2dSigAboveCharm",";trackSip2dSigAboveCharm;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_0",";tau1_trackEtaRel_0;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_1",";tau1_trackEtaRel_1;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_2",";tau1_trackEtaRel_2;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_0",";tau2_trackEtaRel_0;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_1",";tau2_trackEtaRel_1;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_2",";tau2_trackEtaRel_2;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_vertexMass"    	       ,";tau1_vertexMass;;",500,0.,500);
+  AddHisto("FatJet_DeepDoubleX_tau1_vertexEnergyRatio"      ,";tau1_vertexEnergyRatio;;",100,-1,4);
+  AddHisto("FatJet_DeepDoubleX_tau1_flightDistance2dSig"    ,";tau1_flightDistance2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_vertexDeltaR"    	   ,";tau1_vertexDeltaR;;",100,-1,1);
+  AddHisto("FatJet_DeepDoubleX_tau2_vertexMass"    	       ,";tau2_vertexMass;;",500,0.,500);
+  AddHisto("FatJet_DeepDoubleX_tau2_vertexEnergyRatio"      ,";tau2_vertexEnergyRatio;;",100,-1,4);
+  AddHisto("FatJet_DeepDoubleX_tau2_flightDistance2dSig"    ,";tau2_flightDistance2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_vertexDeltaR"    	   ,";tau2_vertexDeltaR;;",100,-1,1);
+  AddHisto("FatJet_DeepDoubleX_z_ratio"   	     ,";z ratio;;",100,0.,60.);
+  AddHisto("FatJet_DeepDoubleX_charged_EtaRel",";charged_EtaRel;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_PtRatio",";charged_PtRatio;;",100,0,1);
+  AddHisto("FatJet_DeepDoubleX_charged_PParRatio",";charged_PParRatio;;",100,-1,1);
+  AddHisto("FatJet_DeepDoubleX_charged_PtRatio",";charged_PtRatio;;",100,0,1);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip2dVal",";chargwed_Sip2dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip2dSig",";charged_Sip2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip3dVal",";chargwed_Sip3dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip3dSig",";charged_Sip3dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_JetDistVal",";chargwed_JetDistVal;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_sv_d3d"   	     ,";sv d3d;;",100,0.,60.);
+  AddHisto("FatJet_DeepDoubleX_sv_d3dsig", ";sv_d3dsig;;",100,-20,20);
+
+
+  AddHisto("FatJet_DeepBoostedJet_pf_puppiw", ";pf_puppiw;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_hcalFrac", ";pf_hcalFrac;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_VTX_ass", ";pf_VTX_ass;;",10,0,10);
+  AddHisto("FatJet_DeepBoostedJet_pf_lostInnerHits", ";pf_lostInnerHits;;",40,-2,2);
+  AddHisto("FatJet_DeepBoostedJet_pf_quality", ";pf_quality;;",10,0,10);
+  AddHisto("FatJet_DeepBoostedJet_pf_charge", ";pf_charge;;",10,-2,2);
+  AddHisto("FatJet_DeepBoostedJet_pf_isEl", ";pf_isEl;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isMu", ";pf_isMu;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isChargedHad", ";pf_isChargedHad;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isGamma", ";pf_isGamma;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isNeutral", ";pf_isNeutral;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_phirel", ";pf_phirel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_etarel", ";pf_etarel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_deltaR", ";pf_deltaR;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_abseta", ";pf_abseta;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_ptrel_log", ";pf_ptrel_log;;",100,-20,-20);
+  AddHisto("FatJet_DeepBoostedJet_pf_erel_log", ";pf_erel_log;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_pt_log", ";pf_pt_log;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_drminsv", ";pf_drminsv;;",100,-1,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_drsubjet1", ";pf_drsubjet1;;",100,-1,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_drsubjet2", ";pf_drsubjet2;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_normchi2", ";pf_normchi2;;",1000,0,1000);
+  AddHisto("FatJet_DeepBoostedJet_pf_dz", ";pf_dz;;",100,0,2);
+  AddHisto("FatJet_DeepBoostedJet_pf_dzsig", ";pf_dzsig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxy", ";pf_dxy;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxysig", ";pf_dxysig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_dptdpt", ";pf_dptdpt;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_detadeta", ";pf_detadeta;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dphidphi", ";pf_dphidphi;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxydxy", ";pf_dxydxy;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dzdz", ";pf_dzdz;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxydz", ";pf_dxydz;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dphidxy", ";pf_dphidxy;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dlambdadz", ";pf_dlambdadz;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagEtaRel", ";pf_btagEtaRel;;",100,0,10);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagPtRatio", ";pf_btagPtRatio;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagPParRatio", ";pf_btagPParRatio;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip2dVal", ";pf_btagSip2dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip2dSig", ";pf_btagSip2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip3dVal", ";pf_btagSip3dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip3dSig", ";pf_btagSip3dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagJetDistVal", ";pf_btagJetDistVal;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_phirel", ";sv_phirel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_etarel", ";sv_etarel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_deltaR", ";sv_deltaR;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_sv_abseta", ";sv_abseta;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_sv_mass", ";sv_mass;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_ptrel_log", ";sv_ptrel_log;;",100,-10,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_erel_log", ";sv_erel_log;;",100,-10,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_pt_log", ";sv_pt_log;;",100,0,10);
+  AddHisto("FatJet_DeepBoostedJet_sv_ntracks", ";sv_ntracks;;",30,0,30);
+  AddHisto("FatJet_DeepBoostedJet_sv_normchi2", ";sv_normchi2;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_dxy", ";sv_dxy;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_dxysig", ";sv_dxysig;;",1000,0,1000);
+  AddHisto("FatJet_DeepBoostedJet_sv_d3d", ";sv_d3d;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_d3dsig", ";sv_d3dsig;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_costhetasvpv", ";sv_costhetasvpv;;",100,-1,1);
 }
 
 void BTagValidation::createJetHistos_SF(const TString& histoTag) {
@@ -1950,7 +2093,10 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		fillJetHistos(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, wtPU*wtFatJet);
 
 		//fill histo for DoubleB Commissioning Plots: 
-  		fillJetHistos_DoubleB(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, muon1_v, muon2_v, dimuon_v, idxMuon_inFirstSubjet, idxMuon_inSecondSubjet, subjet1_p4, subjet2_p4, wtPU*wtFatJet);
+  		if(produceDoubleBCommissioning_) fillJetHistos_DoubleB(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, muon1_v, muon2_v, dimuon_v, idxMuon_inFirstSubjet, idxMuon_inSecondSubjet, subjet1_p4, subjet2_p4, wtPU*wtFatJet);
+
+		//fill histo for DeepDoubleX Commissioning Plots: 
+  		if(produceDoubleBCommissioning_) fillJetHistos_DeepDoubleX(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
 
 		//fill histo for DoubleB SF calculation / templates: 
 		if(produceDoubleBSFtemplates_) fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
@@ -2327,8 +2473,25 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float csvivfv2          = JetInfo.Jet_CombIVF[iJet];
     float cmvav2            = JetInfo.Jet_cMVAv2[iJet];
     float doubleb           = JetInfo.Jet_DoubleSV[iJet];
-    float deepDoubleb       = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
     float mass_TagVarCSV_sv = JetInfo.TagVarCSV_vertexMass[iJet];
+    float deepDoubleBvLQCD  = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
+    float deepDoubleBvLHbb  = JetInfo.Jet_DeepDoubleBvLHbb[iJet];
+    float deepDoubleCvLQCD  = JetInfo.Jet_DeepDoubleCvLQCD[iJet];
+    float deepDoubleCvLHcc  = JetInfo.Jet_DeepDoubleCvLHcc[iJet];
+    float deepDoubleCvBHcc  = JetInfo.Jet_DeepDoubleCvBHcc[iJet];
+    float deepDoubleCvBHbb  = JetInfo.Jet_DeepDoubleCvBHbb[iJet];
+    float massIndDeepDoubleBvLQCD  = JetInfo.Jet_MassIndDeepDoubleBvLQCD[iJet];
+    float massIndDeepDoubleBvLHbb  = JetInfo.Jet_MassIndDeepDoubleBvLHbb[iJet];
+    float massIndDeepDoubleCvLQCD  = JetInfo.Jet_MassIndDeepDoubleCvLQCD[iJet];
+    float massIndDeepDoubleCvLHcc  = JetInfo.Jet_MassIndDeepDoubleCvLHcc[iJet];
+    float massIndDeepDoubleCvBHcc  = JetInfo.Jet_MassIndDeepDoubleCvBHcc[iJet];
+    float massIndDeepDoubleCvBHbb  = JetInfo.Jet_MassIndDeepDoubleCvBHbb[iJet];
+    float deepBoostedJetbbvsLight = JetInfo.Jet_DeepBoostedJetbbvsLight[iJet];
+    float deepBoostedJetccvsLight = JetInfo.Jet_DeepBoostedJetccvsLight[iJet];
+    float deepBoostedJetTvsQCD = JetInfo.Jet_DeepBoostedJetTvsQCD[iJet];
+    float deepBoostedJetZHccvsQCD = JetInfo.Jet_DeepBoostedJetZHccvsQCD[iJet];
+    float deepBoostedJetWvsQCD = JetInfo.Jet_DeepBoostedJetWvsQCD[iJet];
+    float deepBoostedJetZHbbvsQCD = JetInfo.Jet_DeepBoostedJetZHbbvsQCD[iJet];
 
     if(DEBUG_)std::cout << "got to FillHisto_JP" << std::endl;
     FillHisto(histoTag+"_TCHE",     flav, isGSPbb, isGSPcc ,tche      ,wt);
@@ -2340,11 +2503,28 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
     FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
     FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
-    FillHisto(histoTag+"_DeepDoubleBvLQCD",  flav, isGSPbb, isGSPcc ,deepDoubleb   ,wt);
     FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
     FillHisto2D(histoTag+"_TagVarCSV_sv_mass_vs_jetpt"        ,flav,isGSPbb , isGSPcc, ptjet,mass_TagVarCSV_sv,wt);
     FillHisto2D(histoTag+"_JP_DoubleB", flav,isGSPbb , isGSPcc, jetproba, doubleb, wt);
     FillHisto2D(histoTag+"_TagVarCSV_sv_mass_DoubleB", flav,isGSPbb , isGSPcc, mass_TagVarCSV_sv, doubleb, wt);
+    FillHisto(histoTag+"_deepDoubleBvLQCD",  flav, isGSPbb, isGSPcc ,deepDoubleBvLQCD   ,wt);
+    FillHisto(histoTag+"_deepDoubleBvLHbb",  flav, isGSPbb, isGSPcc ,deepDoubleBvLHbb   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvLQCD",  flav, isGSPbb, isGSPcc ,deepDoubleCvLQCD   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvLHcc",  flav, isGSPbb, isGSPcc ,deepDoubleCvLHcc   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvBHcc",  flav, isGSPbb, isGSPcc ,deepDoubleCvBHcc   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvBHbb",  flav, isGSPbb, isGSPcc ,deepDoubleCvBHbb   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleBvLQCD",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleBvLQCD   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleBvLHbb",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleBvLHbb   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvLQCD",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvLQCD   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvLHcc",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvLHcc   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvBHcc",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvBHcc   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvBHbb",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvBHbb   ,wt);
+    FillHisto(histoTag+"_deepBoostedJetbbvsLight",  flav, isGSPbb, isGSPcc ,deepBoostedJetbbvsLight ,wt);
+    FillHisto(histoTag+"_deepBoostedJetccvsLight",  flav, isGSPcc, isGSPcc ,deepBoostedJetccvsLight ,wt);
+    FillHisto(histoTag+"_deepBoostedJetTvsQCD",  flav, isGSPbb, isGSPcc ,deepBoostedJetTvsQCD ,wt);
+    FillHisto(histoTag+"_deepBoostedJetZHccvsQCD",  flav, isGSPbb, isGSPcc ,deepBoostedJetZHccvsQCD ,wt);
+    FillHisto(histoTag+"_deepBoostedJetWvsQCD",  flav, isGSPbb, isGSPcc ,deepBoostedJetWvsQCD ,wt);
+    FillHisto(histoTag+"_deepBoostedJetZHbbvsQCD", flav, isGSPbb, isGSPcc ,deepBoostedJetZHbbvsQCD ,wt);
     
     FillHisto(histoTag+"_TCHE_extended1",  flav, isGSPbb, isGSPcc ,tche  , wt);
     FillHisto(histoTag+"_TCHP_extended1",  flav, isGSPbb, isGSPcc ,tchp  , wt);
@@ -2434,7 +2614,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float nSV = JetInfo.Jet_nSV_fat[iJet];
 
       float DoubleB = JetInfo.Jet_DoubleSV[iJet];
-      float DeepDoubleBvLQCD = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
+
       // debug - start - rizki
 
 
@@ -2509,7 +2689,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		FillHisto("FatJet_nSV"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, nSV ,   wt);
 
         FillHisto("FatJet_DoubleB",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DoubleB  ,   wt);
-        FillHisto("FatJet_DeepDoubleBvLQCD",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DeepDoubleBvLQCD  ,   wt);
 
 		FillHisto2D("FatJet_DoubleB_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_0 ,wt);
 		FillHisto2D("FatJet_DoubleB_trackSip3dSig_1" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_1 ,wt);
@@ -2525,6 +2704,113 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   
   }
+
+
+void BTagValidation::fillJetHistos_DeepDoubleX(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
+
+      TLorentzVector fatjet_p4;
+      fatjet_p4.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
+
+    FillHisto("FatJet_DeepDoubleX_jetNTracks"     	       , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_jetNTracks[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_nSV"  , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_jetNSecondaryVertices[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_2[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_3", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_3[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackSip3dSig_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackSip3dSig_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackSip3dSig_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackSip3dSig_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip2dSigAboveBottom_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip2dSigAboveBottom_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip2dSigAboveCharm", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip2dSigAboveCharm[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackEtaRel_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackEtaRel_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackEtaRel_2[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackEtaRel_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackEtaRel_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackEtaRel_2[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_vertexMass"    	       , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_vertexMass[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_vertexEnergyRatio"      , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_vertexEnergyRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_flightDistance2dSig"    , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_flightDistance2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_vertexDeltaR"    	   , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_vertexDeltaR[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_vertexMass"    	       , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_vertexMass[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_vertexEnergyRatio"      , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_vertexEnergyRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_flightDistance2dSig"    , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_flightDistance2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_vertexDeltaR"    	   , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_vertexDeltaR[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_z_ratio"   	     , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_z_ratio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_EtaRel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_EtaRel[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_PtRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_PtRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_PParRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_PParRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_PtRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip2dVal[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip2dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip2dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip3dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip3dVal[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip3dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip3dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_JetDistVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_JetDistVal[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_sv_d3d"   	     , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_sv_d3d[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_sv_d3dsig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_sv_d3dsig[iJet], wt );
+
+    FillHisto("FatJet_DeepBoostedJet_pf_puppiw", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_puppiw[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_hcalFrac", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_hcalFrac[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_VTX_ass", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_VTX_ass[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_lostInnerHits", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_lostInnerHits[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_quality", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_quality[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_charge", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_charge[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isEl", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isEl[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isMu", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isMu[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isChargedHad", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isChargedHad[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isGamma", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isGamma[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isNeutral", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isNeutralHad[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_phirel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_phirel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_etarel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_etarel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_deltaR", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_deltaR[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_abseta", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_abseta[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_ptrel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_ptrel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_erel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_erel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_pt_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_pt_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_drminsv", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_drminsv[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_drsubjet1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_drsubjet1[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_drsubjet2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_drsubjet2[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_normchi2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_normchi2[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dzsig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dzsig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxysig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxysig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dptdpt", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dptdpt[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_detadeta", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_detadeta[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dphidphi", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dphidphi[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxydxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxydxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dzdz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dzdz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxydz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxydz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dphidxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dphidxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dlambdadz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dlambdadz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagEtaRel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagEtaRel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagPtRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagPtRatio[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagPParRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagPParRatio[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip2dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip2dVal[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip2dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip2dSig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip3dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip3dVal[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip3dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip3dSig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagJetDistVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagJetDistVal[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_phirel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_phirel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_etarel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_etarel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_deltaR", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_deltaR[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_abseta", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_abseta[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_mass", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_mass[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_ptrel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_ptrel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_erel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_erel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_pt_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_pt_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_ntracks", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_ntracks[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_normchi2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_normchi2[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_dxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_dxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_dxysig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_dxysig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_d3d", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_d3d[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_d3dsig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_d3dsig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_costhetasvpv", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_costhetasvpv[iJet], wt );
+
+  }
+
 
   void BTagValidation::fillJetHistos_SF(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
 

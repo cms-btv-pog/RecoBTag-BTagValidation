@@ -28,6 +28,10 @@ def main():
                     action='store_true', default=False,
                     help="Resubmit unfinished or failed jobs (This parameter is optional)")
 
+  parser.add_option("-o", "--output_dir", dest="output_dir",
+                    help="Output directory (This parameter is optional)",
+                    metavar="eos_OUTPUT_DIR")
+
   (options, args) = parser.parse_args()
 
   # make sure all necessary input parameters are provided
@@ -40,6 +44,16 @@ def main():
   # redefine main_workdir as an absolute path (if not defined in such form already)
   if not re.search("^/", main_workdir):
     main_workdir = os.path.join(os.getcwd(),main_workdir)
+
+
+  if not options.output_dir:
+  	out_workdir = main_workdir
+  	print 'out_workdir: ',out_workdir
+  else:
+  	out_workdir = options.output_dir
+  	os.system('/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select -b fuse mount $HOME/eos')
+  	print 'out_workdir: ',out_workdir
+
 
   # open and read the dataset_list file
   dataset_list_file = open(os.path.join(main_workdir,'datasetList.txt'),'r')
@@ -59,6 +73,13 @@ def main():
     print line_elements[0]
 
     dataset_workdir = os.path.join(main_workdir,workdir)
+    print 'checking input at: ',dataset_workdir
+    dataset_workdir_output = dataset_workdir
+    if options.output_dir:
+    	dataset_workdir_output = os.path.join(out_workdir,options.main_workdir)
+    	dataset_workdir_output = os.path.join(dataset_workdir_output,workdir)
+    	#print 'dataset_workdir_output: ',dataset_workdir_output
+    print 'checking output at: ',dataset_workdir_output
 
     all_jobs = []
     for filename in os.listdir(os.path.join(dataset_workdir,'input')):
@@ -66,7 +87,7 @@ def main():
             all_jobs.append(filename.split('.sh')[0].split('_')[-1])
 
     done_jobs = []
-    for filename in os.listdir(os.path.join(dataset_workdir,'output')):
+    for filename in os.listdir(os.path.join(dataset_workdir_output,'output')):
         if( re.search('.root$', filename) ):
             done_jobs.append(filename.split('.root')[0].split('_')[-1])
 
@@ -92,6 +113,10 @@ def main():
             print 'Done'
     else:
         print 'No unfinished or failed jobs'
+
+  if options.output_dir:
+  	os.system('/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select -b fuse umount $HOME/eos')
+
 
 if __name__ == "__main__":
   main()

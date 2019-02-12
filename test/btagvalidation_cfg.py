@@ -1,6 +1,8 @@
+import sys
 import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
+from pdb import set_trace
 
 options = VarParsing('python')
 
@@ -304,7 +306,7 @@ options.register('applySFs', False,
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('btagCSVFile', 'CSVv2_4invfb.csv',
+options.register('btagCSVFile', 'aux/CSVv2_4invfb.csv',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "CSV file containing b-tagging SFs"
@@ -379,6 +381,16 @@ options.register('FileBFrag', "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File path for doBFrag systematics"
+    )
+options.register('produceDoubleBCommissioning', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DoubleB commissioning plots"
+    )
+options.register('produceDeepDoubleXCommissioning', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DeepDoubleX commissioning plots"
     )
 options.register('produceDoubleBSFtemplates', False,
     VarParsing.multiplicity.singleton,
@@ -464,24 +476,29 @@ from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
 from RecoBTag.PerformanceMeasurements.variables_cfi import *
 from RecoBTag.PerformanceMeasurements.varGroups_cfi import *
 #print bTagAnalyzerCommon.TriggerPathNames
-groupSet_ = groupSet.clone()
-
-for requiredGroup in options.groups:
-  #print(requiredGroup)
-  found=False
-  for existingGroup in groupSet_.groups:
-    if(requiredGroup==existingGroup.group):
-      existingGroup.store=True
-      found=True
-      break
-  if(not found):
-    print('WARNING: The group ' + requiredGroup + ' was not found')
 
 print("!!!! Opening files {}".format(FileNames))
 
+varList = []
+for groupToRead in options.groups:
+  for groupExisting in groupSet.groups:
+    if groupToRead == groupExisting.group:
+      for varname in groupExisting.variables:
+        if "FatJetInfo." in varname:
+          shortvarname = varname.split(".")[1]
+          var = variableDict[shortvarname].clone()
+          var.variable = varname
+        elif "SubJetInfo." in varname:
+          shortvarname = varname.split(".")[1]
+          var = variableDict[shortvarname].clone()
+          var.variable = varname
+        else:
+          var = variableDict[varname].clone()
+        var.store = cms.bool(True)
+        varList.append(var)
+variableToRead = cms.VPSet(varList)
+
 process.btagval = cms.EDAnalyzer('BTagValidation',
-    variableSet,
-    groupSet_,
     DEBUG    = cms.bool(options.DEBUG),
     DEBUGlevel    = cms.int32(options.DEBUGlevel),
     MaxEvents              = cms.int32(options.maxEvents),
@@ -580,6 +597,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     doNewJEC               = cms.bool(options.doNewJEC),
     doJECUncert            = cms.bool(options.doJECUncert),
     File_BFrag				= cms.string(options.FileBFrag),
+    produceDoubleBCommissioning        = cms.bool(options.produceDoubleBCommissioning),
+    produceDeepDoubleXCommissioning    = cms.bool(options.produceDeepDoubleXCommissioning),
     produceDoubleBSFtemplates        = cms.bool(options.produceDoubleBSFtemplates),
     produceDoubleBSFtemplatesV2        = cms.bool(options.produceDoubleBSFtemplatesV2),
     produceDoubleBSFtemplates_JPhasSV        = cms.bool(options.produceDoubleBSFtemplatesJPhasSV),
@@ -587,7 +606,9 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     useRunRange            = cms.bool(options.useRunRange),
     runRangeMin     = cms.int32(options.runRangeMin),
     runRangeMax     = cms.int32(options.runRangeMax),
-    runOnData     = cms.bool(options.runOnData)
+    runOnData     = cms.bool(options.runOnData),
+    variables              = variableToRead,
+    groups = groupSet.groups
 )
 
 #process.btagvalsubjetmu = process.btagval.clone(

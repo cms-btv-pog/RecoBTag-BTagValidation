@@ -23,6 +23,10 @@ def main():
                     help="Output directory (This parameter is optional)",
                     metavar="OUTPUT_DIR")
 
+  parser.add_option("-e", "--is_dir_at_eos", dest="is_dir_at_eos", action='store', default='false', help="Set to 'true' if files are at EOS")
+
+  parser.add_option("-E", "--eospath", dest="eospath", action='store', help="path at EOS")
+
   (options, args) = parser.parse_args()
 
   # make sure all necessary input parameters are provided
@@ -36,6 +40,15 @@ def main():
   if not re.search("^/", main_workdir):
     main_workdir = os.path.join(os.getcwd(),main_workdir)
 
+
+  # if files are at eos
+  if options.is_dir_at_eos=='true':
+  	print 'Combining files at eos.',main_workdir
+  	os.system('/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select -b fuse mount $HOME/eos')
+  	main_workdir = os.path.join(options.eospath,options.main_workdir)
+  	print 'main_workdir : ',main_workdir
+
+
   output_dir = main_workdir
   if options.output_dir:
     output_dir = options.output_dir
@@ -44,7 +57,11 @@ def main():
       output_dir = os.path.join(os.getcwd(),output_dir)
 
   # open and read the dataset_list file
-  dataset_list_file = open(os.path.join(main_workdir,'datasetList.txt'),'r')
+  if options.is_dir_at_eos=='true':
+  	dataset_list_file = open(os.path.join(os.path.join(os.getcwd(),options.main_workdir),'datasetList.txt'),'r')
+	os.system('mkdir -v '+options.output_dir)
+  else:
+  	dataset_list_file = open(os.path.join(main_workdir,'datasetList.txt'),'r')
   dataset_list_lines = dataset_list_file.readlines()
 
   # loop over datasets
@@ -75,6 +92,8 @@ def main():
     # final output for this dataset
     print ''
     print "Final .root file: " + output_root_file
+
+  if options.is_dir_at_eos=='true':os.system('/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select -b fuse umount $HOME/eos')
 
 
 if __name__ == "__main__":
