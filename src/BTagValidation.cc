@@ -1089,7 +1089,7 @@ void BTagValidation::createJetHistos_DeepDoubleX() {
   AddHisto("FatJet_DeepBoostedJet_pf_etarel", ";pf_etarel;;",100,-1,1);
   AddHisto("FatJet_DeepBoostedJet_pf_deltaR", ";pf_deltaR;;",100,0,5);
   AddHisto("FatJet_DeepBoostedJet_pf_abseta", ";pf_abseta;;",100,0,5);
-  AddHisto("FatJet_DeepBoostedJet_pf_ptrel_log", ";pf_ptrel_log;;",100,-20,-20);
+  AddHisto("FatJet_DeepBoostedJet_pf_ptrel_log", ";pf_ptrel_log;;",100,-20,20);
   AddHisto("FatJet_DeepBoostedJet_pf_erel_log", ";pf_erel_log;;",100,-20,20);
   AddHisto("FatJet_DeepBoostedJet_pf_pt_log", ";pf_pt_log;;",100,-20,20);
   AddHisto("FatJet_DeepBoostedJet_pf_drminsv", ";pf_drminsv;;",100,-1,5);
