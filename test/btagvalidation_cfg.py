@@ -333,7 +333,7 @@ process = cms.Process("BTagVal")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cout = cms.untracked.PSet(
-    threshold = cms.untracked.string('INFO'),
+    threshold = cms.untracked.string('ERROR'),
     )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) ) # Keep as such
@@ -403,9 +403,9 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetSoftDropMassMin  = cms.double(options.fatJetSoftDropMassMin),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string('hpvwt_data_mc'),
-    File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PUDist/PUDistMC_2017_25ns_WinterMC_PUScenarioV1_PoissonOOTPU.root'),
+    File_PUDistMC          = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_12/src/RecoBTag/BTagValidation/test/PUDist/PUDistMC_Summer2016_25ns_Moriond17MC_PoissonOOTPU.root'),
     Hist_PUDistMC          = cms.string('pileup'),
-    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/PUDist/RunII2017BCDEF_17NovRereco_25ns_PUXsec69200nb.root'),
+    File_PUDistData        = cms.string('/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_12/src/RecoBTag/BTagValidation/test/PUDist/RunII2016Rereco_25ns_PUXsec69000nb.root'),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
     Hist_FatJetPtWt        = cms.string('fatjetptweight_mc_data'),
