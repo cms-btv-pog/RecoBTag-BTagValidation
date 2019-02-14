@@ -477,7 +477,8 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
           hname << histoTag << "_JP_" << tagger << sel << "_" << pt.first ; 
           AddHisto((hname.str()).c_str(), "; JP; Events;", 50, 0., 2.5);
 
-          if (tagger.compare(std::string("SV")) == 0) continue;
+          if (tagger.compare(std::string("SV")) == 0 || 
+              tagger.find(std::string("_SV")) != std::string::npos) continue;
 
           hname.str(std::string());
           hname << histoTag << "_SVmass_" << tagger << sel << "_" << pt.first ; 
@@ -929,6 +930,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           FillHisto(histoTag+"_nJets", sjabsflav, 0 , 0, nSubJet , wtPU*wtSubJet) ;
           fillJetHistos(SubJets, iSubJet, 0, 0 ,histoTag, nmuSubJet, nselmuonSubJet, idxFirstMuon, wtPU*wtSubJet);
 
+          edm::LogInfo("SoftDropSubJets") << " pt = " << sjpt << " JP = " << sjjp << " SV mass = " << sjsvmass ; 
+
           for (auto const pt : pts_) {
 
             if (sjpt < pt.second.first || sjpt >= pt.second.second) continue;
@@ -1065,6 +1068,16 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
       if (JetInfo.Track_length[iTrk]<5)        passtrklen=true;
       if (fabs(JetInfo.Track_IP2D[iTrk])<0.2)  passTrackIP2D=true;
 
+      edm::LogInfo("TrkPorperties") 
+        << " JetInfo.Track_nHitAll = " << JetInfo.Track_nHitAll[iTrk]
+        << " JetInfo.Track_nHitPixel = " << JetInfo.Track_nHitPixel[iTrk]
+        << " JetInfo.Track_dz = " << JetInfo.Track_dz[iTrk]
+        << " JetInfo.Track_pt = " << JetInfo.Track_pt[iTrk]
+        << " JetInfo.Track_chi2 = " << JetInfo.Track_chi2[iTrk]
+        << " JetInfo.Track_dist = " << JetInfo.Track_dist[iTrk]
+        << " JetInfo.Track_length = " << JetInfo.Track_length[iTrk]
+        << " JetInfo.Track_IP2D = " << JetInfo.Track_IP2D[iTrk] ;
+
       if (passNhit && passPix && passIPz && passPt && passnormchi2 && passtrkdist && passtrklen && passTrackIP2D) {
         ++ntracksel;
         FillHisto(histoTag+"_track_IPs",     flav, isGSPbb , isGSPcc ,JetInfo.Track_IPsig[iTrk]     ,wt);
@@ -1099,6 +1112,8 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
     //FillHisto(histoTag+"_sv_en_ratio",     flav, isGSPbb ,isGSPcc ,sv_en_rat,           wt);
     //FillHisto(histoTag+"_sv_deltaR_jet",   flav, isGSPbb ,isGSPcc ,sv_dR_jet,           wt);
 
+  edm::LogInfo("SVInfo") << " NSV = " << n_sv << " SV 2D flightdist sig = " << flight2DSig_sv ;
+
   }
 
   double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
@@ -1109,8 +1124,11 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
   //double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
   double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
 
+  edm::LogInfo("TrkInfo") << " track multi = " << ntracksel ;
+  edm::LogInfo("SVInfo") << " SV mass = " << mass_TagVarCSV_sv ;
+
   FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
-  
+
   FillHisto(histoTag+"_JP",       flav, isGSPbb, isGSPcc ,jetproba  ,wt);
   //FillHisto(histoTag+"_JBP",      flav, isGSPbb, isGSPcc ,jetbproba ,wt);
   //FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
