@@ -1112,7 +1112,7 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
     //FillHisto(histoTag+"_sv_en_ratio",     flav, isGSPbb ,isGSPcc ,sv_en_rat,           wt);
     //FillHisto(histoTag+"_sv_deltaR_jet",   flav, isGSPbb ,isGSPcc ,sv_dR_jet,           wt);
 
-  edm::LogInfo("SVInfo") << " NSV = " << n_sv << " SV 2D flightdist sig = " << flight2DSig_sv ;
+    edm::LogInfo("SVInfo") << " NSV = " << n_sv << " SV 2D flightdist sig = " << flight2DSig_sv ;
 
   }
 
