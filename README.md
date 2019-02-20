@@ -1,4 +1,4 @@
-BTagValidation for 2016 data and MC with CMSSW_9_4_X reprocessing
+BTagValidation for 2016 data and MC with CMSSW_10_2_X reprocessing
 ==============
 
 Boosted b-tag validation analysis 
@@ -9,9 +9,9 @@ Follow the directions to clone cms-btv-pog/RecoBTag-PerformanceMeasurements at h
 
 After setting up the PerformanceMeasurements package:
 
-cd CMSSW_9_4_12/src      
+cd CMSSW_10_2_7/src      
 
-git clone -b commissioning_94X git://github.com/cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
+git clone -b commissioning_102X git@github.com:cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
 
 scram b -j8
 
