@@ -34,8 +34,8 @@ parameters = {
   'fatJetPtMin'               : 350.,                   # Minimum fat jet Pt
   'fatJetPtMax'               : 1.E6,                   # Maximum fat jet Pt
   'removeProblemJet'          : True,                   # Remove problematic jets from low pT MC bins
-  'usePrunedMass'             : True,                   # Use pruned mass cut
-  'useSoftDropMass'           : False,                  # Use softdrop mass cut
+  'usePrunedMass'             : False,                   # Use pruned mass cut
+  'useSoftDropMass'           : True,                  # Use softdrop mass cut
   'fatJetGroomedMassMin'      : 50.,                     # Minimum fat jet softdrop/pruned mass
   'fatJetGroomedMassMax'      : 1.E6,                   # Maximum fat jet softdrop/pruned mass
   'fatJetTau21Min'            : 0.0,                    # added by rizki"tau2/tau1 jet substructure min cut for fat jets
