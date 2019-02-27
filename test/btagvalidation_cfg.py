@@ -387,10 +387,20 @@ options.register('produceDoubleBCommissioning', False,
     VarParsing.varType.bool,
     "Produce DoubleB commissioning plots"
     )
-options.register('produceDeepDoubleXCommissioning', True,
+options.register('produceDeepDoubleXCommissioning', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Produce DeepDoubleX commissioning plots"
+    )
+options.register('produceDDXSFtemplates', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DDX SF plots/templates"
+    )
+options.register('chooseDDXtagger', 'DDBvL',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "Specify DDX tagger (DoubleB, DDBvL, DDCvL, DDCvB) to use for SF plots/templates (only applicable when produceDDXSFtemplates=True)"
     )
 options.register('produceDoubleBSFtemplates', False,
     VarParsing.multiplicity.singleton,
@@ -599,6 +609,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     File_BFrag				= cms.string(options.FileBFrag),
     produceDoubleBCommissioning        = cms.bool(options.produceDoubleBCommissioning),
     produceDeepDoubleXCommissioning    = cms.bool(options.produceDeepDoubleXCommissioning),
+    produceDDXSFtemplates        = cms.bool(options.produceDDXSFtemplates),
+    chooseDDXtagger        = cms.string(options.chooseDDXtagger),
     produceDoubleBSFtemplates        = cms.bool(options.produceDoubleBSFtemplates),
     produceDoubleBSFtemplatesV2        = cms.bool(options.produceDoubleBSFtemplatesV2),
     produceDoubleBSFtemplates_JPhasSV        = cms.bool(options.produceDoubleBSFtemplatesJPhasSV),
