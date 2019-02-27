@@ -1519,7 +1519,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       h1_nPV_mc_unw    ->Fill(EvtInfo.nPV);
     }
 
-    if( isData || EvtInfo.nPUtrue < 1) continue;  //// in 2017 some MC events contain nPUTrue=0
+    if( isData && EvtInfo.nPUtrue > 4) continue;  //// in 2017 some MC events contain nPUTrue=0
     if(FatJetInfo.nJet <= 0) continue; //// require at least 1 fat jet in the event
     if(DEBUG_)std::cout << "Event selection: pass Fatjet>0 "<< std::endl;
     int nFatJet = 0;
