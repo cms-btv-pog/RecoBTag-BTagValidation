@@ -23,7 +23,7 @@ cmsRun btagvalidation_cfg.py groups=DoubleBCommissioning useSoftDropSubjets=Fals
 
 To produce SF templates for DDX (DDBvL, DDCvL, DDCvB) or DoubleB
 ```
-cmsRun btagvalidation_cfg.py groups=EventInfo,Devdatta,DoubleBCommissioning doNewJEC=False maxEvents=1000 produceDDXSFtemplates=True reportEvery=100 chooseDDXtagger=DDBvL
+cmsRun btagvalidation_cfg.py groups=EventInfo,Devdatta,DoubleBCommissioning doNewJEC=False fatJetTau21Max=1 maxEvents=-1 produceDDXSFtemplates=True DEBUG=False runOnData=False chooseDDXtagger=DDBvL
 ```  
 To redefine WPs for DDX taggers go to (note these names should correspon to chooseDDXtagger) : `aux/DDX.json`
 

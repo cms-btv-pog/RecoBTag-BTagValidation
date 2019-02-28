@@ -455,6 +455,7 @@ if options.usePrunedSubjets and options.useSoftDropSubjets:
 elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
   print("!!!Warning: no subjets will be processed.!!!")
   print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
+  print("!!!Warning: SoftDropSubjetInfo will be used for FatJets.!!!")
 
 # print options
 
