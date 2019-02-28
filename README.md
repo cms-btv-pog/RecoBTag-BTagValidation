@@ -1,4 +1,4 @@
-BTagValidation for 2016 data and MC with CMSSW_9_4_X reprocessing
+BTagValidation for 2016/2017 data and MC with CMSSW_9_4_X reprocessing
 ==============
 
 Boosted b-tag validation analysis 
@@ -10,7 +10,7 @@ Follow the directions to clone cms-btv-pog/RecoBTag-PerformanceMeasurements at h
 After setting up the PerformanceMeasurements package:
 
 ```
-cd CMSSW_9_4_12/src      
+cd CMSSW_9_4_13/src      
 
 git clone -b boostedbb_SFComm_9xx_DeepDoubleX_varGroups git://github.com/cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
 
@@ -18,7 +18,7 @@ scram b -j8
 
 cd RecoBTag/BTagValidation/test/
 
-cmsRun btagvalidation_cfg.py groups=DoubleBCommissioning useSoftDropSubjets=False doNewJEC=False fatJetTau21Max=1 maxEvents=1000
+cmsRun btagvalidation_cfg.py groups=EventInfo,Devdatta,DoubleBCommissioning maxEvents=1000
 ```
 
 To produce SF templates for DDX (DDBvL, DDCvL, DDCvB) or DoubleB
