@@ -1,12 +1,11 @@
 # ------- General options ----------
 # campaign name, needed for list of samples definition, etc...
 
-# campaigns       = ['caseA', 'caseB','caseC','caseD']
-campaigns       = [
-                    'Run2017_QCDMuEnriched',
-					]
+campaigns       = [ 'Run2017SF',
+                    #'Run2017Comm'
+					         ]
 
-btagAna_groups  = [ 'EventInfo', 'Devdatta', 'DoubleBCommissioning' ]
+btagAna_groups  = [ 'EventInfo','Devdatta','DoubleBCommissioning' ]
 
 
 # Choose True if you want to overwrite already existing files/results
@@ -50,7 +49,7 @@ remote_locations = {
     # 'eos' : '/srm-eoscms.cern.ch:8443/srm/v2/server?SFN=', # Used for lcg
   },
   'path'   : {
-      'eos' : '/eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/2017/9_4_X_v03/'
+    'eos' : '/eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/2017/9_4_X_v03/'
     #'eos' : '/eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/2017/9_4_X',   # added by rizki Jan10-2018
     #'eos' : 'store/group/phys_btag/BoostedBTag/BTagNTuples/2017/9_4_X',   # Used for gfal
     # 'eos' : 'eos/cms/store/group/phys_btag/BoostedBTag/BTagNTuples/2017/9_4_X', # Used for lcg
