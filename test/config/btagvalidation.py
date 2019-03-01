@@ -112,6 +112,8 @@ parameters = {
   'triggerLogicIsOR'          : True,
   'produceDoubleBCommissioning' : False,
   'produceDeepDoubleXCommissioning' : False,
+  'produceDDXSFtemplates'     : True,
+  'chooseDDXtagger'           : string('DDBvL'),
   'produceDoubleBSFtemplates' : False,  #use JP
   'produceDoubleBSFtemplatesV2': False, #use SVmass
   'produceDoubleBSFtemplates_JPhasSV': False, #use JPhasSV

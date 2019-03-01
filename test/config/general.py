@@ -28,9 +28,9 @@ groups          = ['DATA', 'QCDMu+']
 # Choose if you want to use batch: False, condor, lxbatch
 batch_type      = 'condor'
 # Number of jobs per sample: -1 = all, x = some arbitrary number
-number_of_jobs  = -1
+number_of_jobs  = 1
 # Number of files per job
-number_of_files = 20
+number_of_files = 2#20
 # Send jobs switch
 send_jobs       = True
 # lxbatch options
