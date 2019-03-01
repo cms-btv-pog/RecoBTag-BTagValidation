@@ -397,6 +397,11 @@ options.register('produceDDXSFtemplates', False,
     VarParsing.varType.bool,
     "Produce DDX SF plots/templates"
     )
+options.register('DDXWPFile', "aux/DDX.json",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "DDX taggers WP file"
+    )
 options.register('chooseDDXtagger', 'DDBvL',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
@@ -611,6 +616,7 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     produceDoubleBCommissioning        = cms.bool(options.produceDoubleBCommissioning),
     produceDeepDoubleXCommissioning    = cms.bool(options.produceDeepDoubleXCommissioning),
     produceDDXSFtemplates        = cms.bool(options.produceDDXSFtemplates),
+    DDXWPFile        = cms.string(options.DDXWPFile),
     chooseDDXtagger        = cms.string(options.chooseDDXtagger),
     produceDoubleBSFtemplates        = cms.bool(options.produceDoubleBSFtemplates),
     produceDoubleBSFtemplatesV2        = cms.bool(options.produceDoubleBSFtemplatesV2),

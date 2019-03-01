@@ -5,7 +5,6 @@ import paths
 
 def string(txt):
   ''' str wrapper since cmsRun/python requires string to have "". '''
-
   return txt.join(["'", "'"])
 
 parameters = {
@@ -15,15 +14,15 @@ parameters = {
   'DEBUG'                     : False,                   # Display debugging statements
   'DEBUGlevel'                : 0,                      # Debugging statements level
   'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_Jet300_Mu5'])), # Trigger selection
-  'useJetProbaTree'           : True,                   # Use jet probability tree
-  'applyFatJetMuonTagging'    : True,                   # Apply muon tagging to fat jets (require 1 muon in fatjet)
-  'applyFatJetMuonTaggingV2'  : False,                  # Apply muon tagging to fat jets (require at least 1 muon in a subjet)
+  'useJetProbaTree'           : False,                   # Use jet probability tree
+  'applyFatJetMuonTagging'    : False,                  # Apply muon tagging to fat jets (require 1 muon in fatjet)
+  'applyFatJetMuonTaggingV2'  : False,                   # Apply muon tagging to fat jets (require at least 1 muon in a subjet)
   'applyFatJetBTagging'       : False,                  # Apply b tagging to fat jets
-  'fatJetDoubleTagging'       : True,                   # Require fat jets to be double-tagged
+  'fatJetDoubleTagging'       : False,                  # Require fat jets to be double-tagged
   'fatJetDoubleBTagging'      : False,                  # Require fat jets to be double-b-tagged
   'fatJetDoubleSVBTagging'    : False,                  # Require fat jets to be double-SV-b-tagged
   'usePrunedSubjets'          : False,                  # Process pruned subjets
-  'useSoftDropSubjets'        : True,                   # Process soft drop subjets
+  'useSoftDropSubjets'        : False,                   # Process soft drop subjets
   'applySubJetMuonTagging'    : False,                  # Apply muon tagging to subjets
   'applySubJetBTagging'       : False,                  # Apply b tagging to subjets
   'dynamicMuonSubJetDR'       : False,                  # Use dynamic muon-subjet dR requirement
@@ -95,8 +94,8 @@ parameters = {
                                 "'" + os.path.join( paths.main, 'aux', 'JECfiles/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt')]
                                 )),
   'jecUncPayloadName'         : string(os.path.join( paths.main, 'aux', 'JECfiles/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt')),                  # JEC uncertainty payload name
-  'doNewJEC'                  : True,                   # Apply new JECs
-  'doJECUncert'               : True,                  # Do JEC uncertainty
+  'doNewJEC'                  : False,                   # Apply new JECs
+  'doJECUncert'               : False,                  # Do JEC uncertainty
   # This file/path doesn't exist
   'FileBFrag'                 : string( os.path.join( paths.main, 'aux', 'PtRelFall12')), # File path for doBFrag systematics
   'FilePVWt'                  : string(''),
@@ -112,6 +111,9 @@ parameters = {
   'triggerLogicIsOR'          : True,
   'produceDoubleBCommissioning' : False,
   'produceDeepDoubleXCommissioning' : False,
+  'produceDDXSFtemplates'     : False,
+  'DDXWPFile'                   : string( os.path.join( paths.main, 'aux', 'DDX.json')),
+  'chooseDDXtagger'           : string('DDBvL'),
   'produceDoubleBSFtemplates' : False,  #use JP
   'produceDoubleBSFtemplatesV2': False, #use SVmass
   'produceDoubleBSFtemplates_JPhasSV': False, #use JPhasSV

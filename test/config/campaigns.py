@@ -10,158 +10,93 @@ def string(txt):
   return txt.join(["'", "'"])
 
 ##############################
+##############################
+SF_run = 'Run2017SF'
+Comm_run = 'Run2017Comm'
 
+samples_data = [  'BTagMu_Run2017B-17Nov2017-v1_v03_20190222',
+                  'BTagMu_Run2017C-17Nov2017-v1_v03_20190222',
+                  'BTagMu_Run2017D-17Nov2017-v1_v03_20190222',
+                  'BTagMu_Run2017E-17Nov2017-v1_v03_20190222',
+                  'BTagMu_Run2017F-17Nov2017-v1_v03_20190222'
+                  ]
+samples_qcd = [   'QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
+                  'QCD_Pt-300to470_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
+                  'QCD_Pt-470to600_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
+                  'QCD_Pt-600to800_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
+                  'QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
+                  'QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222'
+                  ]
+
+# Source for config/general.py
 info = {
-
-  'Run2017_QCDMuEnriched': {
+  SF_run: {
     # Dictionary of all samples with their list of subsamples. They are defined in samples.py
-    'samples' :{
-      'BTagMu_Run2017B-17Nov2017-v1_v03_20190222': ['0'],
-      'BTagMu_Run2017C-17Nov2017-v1_v03_20190222': ['0'],
-      'BTagMu_Run2017D-17Nov2017-v1_v03_20190222': ['0'],
-      'BTagMu_Run2017E-17Nov2017-v1_v03_20190222': ['0'],
-      'BTagMu_Run2017F-17Nov2017-v1_v03_20190222': ['0'],
-      'QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': ['0'],
-      'QCD_Pt-300to470_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': ['0'],
-      'QCD_Pt-470to600_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': ['0'],
-      'QCD_Pt-600to800_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': ['0'],
-      'QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': ['0'],
-      'QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': ['0'],
-    },
+    'samples' :{},
     # Name of the root final with final histograms
-    'final_output'        : 'Run2017_QCDMuEnriched_DoubleMuonTaggedFatJets_histograms_btagval.root',
-    ###'final_output'        : 'Run2017BCD_ReReco_QCDMuEnriched_AK8Jet300orAK4Jet300_Pt350_Final_DoubleMuonTaggedFatJets_histograms_btagval.root',
+    'final_output' : 'Run2017_QCDMuEnriched_DoubleMuonTaggedFatJets_histograms_btagval.root',
     # Dictionary of all variables that need to be changed for each campaign
-    'btagvalidation_cfg'  : {
-      'BTagMu_Run2017B-17Nov2017-v1_v03_20190222': {
-            'runOnData'                 : True,
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),
-            },
-      'BTagMu_Run2017C-17Nov2017-v1_v03_20190222': {
-            'runOnData'                 : True,
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),
-            },
-      'BTagMu_Run2017D-17Nov2017-v1_v03_20190222': {
-            'runOnData'                 : True,
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),
-            },
-      'BTagMu_Run2017E-17Nov2017-v1_v03_20190222': {
-            'runOnData'                 : True,
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),
-            },
-      'BTagMu_Run2017F-17Nov2017-v1_v03_20190222': {
-            'runOnData'                 : True,
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),
-            },
-
-      'QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': {
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),   # File for data/MC weights for PU reweight (official)
-            },
-      'QCD_Pt-300to470_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': {
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),   # File for data/MC weights for PU reweight (official)
-            },
-      'QCD_Pt-600to800_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': {
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),   # File for data/MC weights for PU reweight (official)
-            },
-      'QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': {
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),   # File for data/MC weights for PU reweight (official)
-            },
-      'QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222': {
-            'fatJetPtMin'               : 350,
-            'fatJetTau21Max'            : 1,
-            'produceDeepDoubleXCommissioning' : True,
-            'doNewJEC'                  : False,
-            'fatJetDoubleTagging'       : False,
-            'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_AK4Jet300_Mu5'])),
-            'useSoftDropSubjets'        : True,
-            'useRunRange'               : False,
-            'DEBUG'                     : False,
-            'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017BCDEF_17Nov2017_25ns_PUXsec69200nb.root')),   # File for data/MC weights for PU reweight (official)
-            },
-      },
+    'btagvalidation_cfg'  : { },
+  },
+  Comm_run: {
+    # Dictionary of all samples with their list of subsamples. They are defined in samples.py
+    'samples' :{},
+    # Name of the root final with final histograms
+    'final_output' : 'Run2017_QCDMuEnriched_DoubleMuonTaggedFatJets_histograms_btagval.root',
+    # Dictionary of all variables that need to be changed for each campaign
+    'btagvalidation_cfg'  : { },
   },
 }
+
+# FIll SF Run
+for name in samples_data + samples_qcd:
+      info[SF_run]['samples'][name] = ['0']
+      if name in samples_data: _runOnData = True
+      else: _runOnData = False
+      info[SF_run]['btagvalidation_cfg'][name] = {
+            'DEBUG'                      : False
+            ,'runOnData'                 : _runOnData
+            ,'fatJetPtMin'               : 350.
+            ,'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_Jet300_Mu5']))
+            ,'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017Rereco_RunBCDEF_v1v2topUp_25ns_PUXsec69200nb_Feb8-2018.root'))
+            ,'produceDDXSFtemplates'     : True
+            ,'chooseDDXtagger'           : string('DDBvL')
+            }
+
+
+# FIll Comm Run
+for name in samples_data + samples_qcd:
+      info[Comm_run]['samples'][name] = ['0']
+      if name in samples_data: _runOnData = True
+      else: _runOnData = False
+      info[Comm_run]['btagvalidation_cfg'][name] = {
+            'DEBUG'                      : False
+            ,'runOnData'                 : _runOnData
+            ,'fatJetPtMin'               : 350.
+            ,'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_Jet300_Mu5']))
+            ,'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017Rereco_RunBCDEF_v1v2topUp_25ns_PUXsec69200nb_Feb8-2018.root'))
+            ,'produceDeepDoubleXCommissioning' : False
+            }
+
+# for name in samples_qcd:
+#       info[run_name]['samples'][name] = ['0']
+#       info[run_name]['btagvalidation_cfg'][name] = {
+#             'fatJetPtMin'               : _fatJetPtMin
+#             ,'fatJetTau21Max'            : _fatJetTau21Max
+#             ,'produceDeepDoubleXCommissioning' : _produceDeepDoubleXCommissioning
+#             ,'doNewJEC'                  : _doNewJEC
+#             ,'applyFatJetMuonTagging'    : _applyFatJetMuonTagging
+#             ,'fatJetDoubleTagging'       : _fatJetDoubleTagging
+#             ,'triggerSelection'          : _triggerSelection
+#             ,'useRelaxedMuonID'          : _useRelaxedMuonID
+#             ,'usePrunedMass'             : _usePrunedMass
+#             ,'useSoftDropSubjets'        : _useSoftDropSubjets
+#             ,'fatJetGroomedMassMin'      : _fatJetGroomedMassMin
+#             ,'useRunRange'               : _useRunRange
+#             ,'DEBUG'                     : _DEBUG
+#             ,'FilePUDistData'            : _FilePUDistData
+#             }
+
 
 #  'Run2017BCD_QCDMuEnriched_Pt350': {
 #    # Dictionary of all samples with their list of subsamples. They are defined in samples.py
