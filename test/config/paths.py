@@ -11,5 +11,4 @@ batch_templates     = '/'.join([ main, 'config', 'templates'])
 # When you call voms-proxy-init --voms cms --valid 168:00
 # As a result you get the output like /tmp/x509up_u78012
 # Then copy this x509up_u78012 wherever you want and this is voms_user_proxy
-#proxy           = '/afs/cern.ch/user/a/algomez/x509up_u15148'
-proxy           = '/.automount/home/home__home1/institut_3a/novak/x509up_u31233'
+proxy           = '/afs/cern.ch/user/a/algomez/x509up_u15148'

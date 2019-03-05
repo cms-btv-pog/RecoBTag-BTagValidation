@@ -1,8 +1,8 @@
 # ------- General options ----------
 # campaign name, needed for list of samples definition, etc...
 
-campaigns       = [ 'Run2017SF',
-                    #'Run2017Comm'
+campaigns       = [ #'Run2017SF',
+                    'Run2017Comm'
 					         ]
 
 btagAna_groups  = [ 'EventInfo','Devdatta','DoubleBCommissioning' ]
@@ -27,11 +27,11 @@ groups          = ['DATA', 'QCDMu+']
 # Choose if you want to use batch: False, condor, lxbatch
 batch_type      = 'condor'
 # Number of jobs per sample: -1 = all, x = some arbitrary number
-number_of_jobs  = 1
+number_of_jobs  = -1
 # Number of files per job
-number_of_files = 2#20
+number_of_files = 10
 # Send jobs switch
-send_jobs       = True
+send_jobs       = False
 # lxbatch options
 queue_lxbatch   = 'cmscaf1nh' # LXBatch queue (choose among cmst3 8nm 1nh 8nh 1nd 1nw)
 # batch templates

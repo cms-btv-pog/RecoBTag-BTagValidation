@@ -20,7 +20,8 @@ samples_data = [  'BTagMu_Run2017B-17Nov2017-v1_v03_20190222',
                   'BTagMu_Run2017E-17Nov2017-v1_v03_20190222',
                   'BTagMu_Run2017F-17Nov2017-v1_v03_20190222'
                   ]
-samples_qcd = [   'QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
+samples_qcd = [
+                  'QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
                   'QCD_Pt-300to470_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
                   'QCD_Pt-470to600_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
                   'QCD_Pt-600to800_MuEnrichedPt5_TuneCP5_13TeV_pythia8_v03_20190222',
@@ -73,9 +74,11 @@ for name in samples_data + samples_qcd:
             'DEBUG'                      : False
             ,'runOnData'                 : _runOnData
             ,'fatJetPtMin'               : 350.
+            ,'doFatJetPtReweighting'     : True
+            ,'applyFatJetMuonTaggingV2'  : True
             ,'triggerSelection'          : string( ','.join(['HLT_BTagMu_AK8Jet300_Mu5' + "'", "'" + 'HLT_BTagMu_Jet300_Mu5']))
             ,'FilePUDistData'            : string( os.path.join( paths.main, 'aux', 'RunII2017Rereco_RunBCDEF_v1v2topUp_25ns_PUXsec69200nb_Feb8-2018.root'))
-            ,'produceDeepDoubleXCommissioning' : False
+            ,'produceDeepDoubleXCommissioning' : True
             }
 
 # for name in samples_qcd:
