@@ -315,7 +315,7 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      usePrunedSubjets_ ;
     const bool                      useSoftDropSubjets_ ;
     const bool                      applySFs_;
-    const std::string               btagCSVFile_ ;  
+    const std::string               btagCSVFile_ ; 
     const int                       btagOperatingPoint_ ; 
     const std::string               btagMeasurementType_ ; 
     const std::string               btagSFType_  ; 
@@ -326,7 +326,6 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      produceDoubleBCommissioning_;
     const bool                      produceDeepDoubleXCommissioning_;
     const bool                      produceDDXSFtemplates_;
-    const std::string               DDXWPFile_;
     const std::string               chooseDDXtagger_;
     const bool                      produceDoubleBSFtemplates_;
     const bool                      produceDoubleBSFtemplatesV2_;
@@ -469,7 +468,6 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   produceDoubleBCommissioning_(iConfig.getParameter<bool>("produceDoubleBCommissioning")), 
   produceDeepDoubleXCommissioning_(iConfig.getParameter<bool>("produceDeepDoubleXCommissioning")), 
   produceDDXSFtemplates_(iConfig.getParameter<bool>("produceDDXSFtemplates")), 
-  DDXWPFile_(iConfig.getParameter<std::string>("DDXWPFile")),
   chooseDDXtagger_(iConfig.getParameter<std::string>("chooseDDXtagger")),
   produceDoubleBSFtemplates_(iConfig.getParameter<bool>("produceDoubleBSFtemplates")), 
   produceDoubleBSFtemplatesV2_(iConfig.getParameter<bool>("produceDoubleBSFtemplatesV2")), 
@@ -784,20 +782,16 @@ void BTagValidation::beginJob() {
 
   if(produceDDXSFtemplates_) {
     // Read chooseDDXtagger_ WPs from DDX.
-    std:: cout << "WP file " << DDXWPFile_ << std::endl;
     boost::property_tree::ptree root;
     try {
-    //boost::property_tree::read_json("aux/DDX.json", root);
-    boost::property_tree::read_json(DDXWPFile_, root);
+    boost::property_tree::read_json("aux/DDX.json", root);
     }
     catch(std::exception & e) {
     }
-    std::cout << "Reading WPs for DDX tagger : " << chooseDDXtagger_ << std::endl;
-    //for (auto& wp_pair : root.get_child(xtag)) {
-    for (auto& wp_pair : root.get_child(chooseDDXtagger_)) {
+    std::string xtag = chooseDDXtagger_;
+    for (auto& wp_pair : root.get_child(xtag)) {
         TString wp = wp_pair.first;
         double wp_value = std::stod(wp_pair.second.data());
-        std::cout << "        WP: " << wp << " = " << wp_value << std::endl;
         WPmap.insert (std::pair<TString,double>(wp, wp_value)); 
     } 
     // Define ptbins in one place
