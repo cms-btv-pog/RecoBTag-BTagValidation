@@ -63,6 +63,11 @@ Implementation:
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/map.hpp>
+#include <boost/range/algorithm/copy.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
 
 //
 // class declaration
@@ -91,10 +96,8 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Manage histograms
     void createJetHistos(const TString& histoTag);
     void createJetHistos_DoubleB();
-    void createJetHistos_SF(const TString& histoTag);
-    void createJetHistos_SF_SVmass(const TString& histoTag);
-    void createJetHistos_SF_JPhasSV(const TString& histoTag);
-    void createJetHistos_SF_JPnoSV(const TString& histoTag);
+    void createJetHistos_DeepDoubleX();
+    void createJetHistos_SF(const TString& histoTag, const TString& LTSVvar, const TString& tagger, const std::map<TString,double>& WPmap, const std::map<TString,std::vector<int>>& ptbinmap);
     void AddHisto(const TString& name, const TString& title, const int nbins, const double min, const double max);
     void AddHisto2D(const TString& name, const TString& title, const int nbins, const double min, const double max, const int nbins2, const double min2, const double max2);
 
@@ -107,11 +110,9 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Fill jet histograms
     void fillJetHistos(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const int nmu, const int nselmuon, const int idxFirstMuon, const double wt);
     void fillJetHistos_DoubleB(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const int nmu, const int nselmuon, const int idxFirstMuon, TLorentzVector muon1_v, TLorentzVector muon2_v, TLorentzVector dimuon_v, const int idxMuon_inFirstSubjet, const int idxMuon_inSecondSubjet, TLorentzVector subjet1_p4 , TLorentzVector subjet2_p4, const double wt);
-    void fillJetHistos_SF(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
-    void fillJetHistos_SF_SVmass(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
-    void fillJetHistos_SF_JPhasSV(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
-    void fillJetHistos_SF_JPnoSV(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
-
+    void fillJetHistos_DeepDoubleX(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt);
+    void fillJetHistos_SF(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const TString& LTSVvar, const bool useSVmass, const TString& tagger, const std::map<TString,double>& WPmap, const std::map<TString,std::vector<int>>& ptbinmap, const double wt);
+    
     // b-tagging scale factors
     double scaleFactor(const int partonFlavor, const double jetPt, const double jetEta, const bool isCSVM);
 
@@ -226,8 +227,6 @@ class BTagValidation : public edm::EDAnalyzer {
     //// Lumi reweighting object
     edm::LumiReWeighting LumiWeights_;
 
-    VariableParser varParser;
-
     //// Configurables
     const bool                      DEBUG_;
     const int                       DEBUGlevel_;
@@ -262,15 +261,15 @@ class BTagValidation : public edm::EDAnalyzer {
     const bool                      useSoftDropMass_ ;
     const double                    fatJetGroomedMassMin_;
     const double                    fatJetGroomedMassMax_;
-    const double		                fatJetTau21Min_;
-    const double		                fatJetTau21Max_;
+    const double                        fatJetTau21Min_;
+    const double                        fatJetTau21Max_;
     const double                    SFbShift_;
     const double                    SFlShift_;
     const double                    MuonJetPtRatio_;
     const double                    DiMuonJetPtRatio_;
     const std::vector<std::string>  triggerSelection_;
     const std::vector<std::string>  triggerPathNames_;
-    const bool                    	triggerLogicIsOR_;
+    const bool                      triggerLogicIsOR_;
     const std::string               file_PVWt_ ; 
     const std::string               file_PUDistMC_ ;
     const std::string               file_PUDistData_ ;
@@ -324,13 +323,17 @@ class BTagValidation : public edm::EDAnalyzer {
     const std::string               jecUncPayloadName_;
     const bool                      doNewJEC_;
     const bool                      doJECUncert_;
+    const bool                      produceDoubleBCommissioning_;
+    const bool                      produceDeepDoubleXCommissioning_;
+    const bool                      produceDDXSFtemplates_;
+    const std::string               chooseDDXtagger_;
     const bool                      produceDoubleBSFtemplates_;
     const bool                      produceDoubleBSFtemplatesV2_;
     const bool                      produceDoubleBSFtemplates_JPhasSV_;
     const bool                      produceDoubleBSFtemplates_JPnoSV_;
     const bool                      useRunRange_;
-    const int                      runRangeMin_;
-    const int                      runRangeMax_;
+    const int                       runRangeMin_;
+    const int                       runRangeMax_;
     const bool                      runOnData;
 
     boost::shared_ptr<JetCorrectionUncertainty> ptr_jecUnc_ ; 
@@ -339,15 +342,20 @@ class BTagValidation : public edm::EDAnalyzer {
     const BTagCalibration calib; 
     const BTagCalibrationReader reader; 
 
+    std::vector<edm::ParameterSet> groupSet, variableSet;
+    std::unordered_set<std::string> variables;
+    VariableParser variableParser;
+
     //// Event variables
     bool isData;
     int nEventsAll;
     int nEventsStored;
 
-    static const double DoubleBL_;
-    static const double DoubleBM1_;
-    static const double DoubleBM2_;
-    static const double DoubleBH_;
+
+    ///// DDX SF setup
+    std::map<TString,double>  WPmap;
+    std::map<TString,std::vector<int>> ptbinmap;
+
 };
 
 //
@@ -357,10 +365,6 @@ class BTagValidation : public edm::EDAnalyzer {
 //
 // static data member definitions
 //
-const double BTagValidation::DoubleBL_ = 0.3; 
-const double BTagValidation::DoubleBM1_ = 0.6; 
-const double BTagValidation::DoubleBM2_ = 0.8; 
-const double BTagValidation::DoubleBH_ = 0.9;
 
 //
 // constructors and destructor
@@ -461,6 +465,10 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   jecUncPayloadName_(iConfig.getParameter<std::string>("jecUncPayloadName")),
   doNewJEC_(iConfig.getParameter<bool>("doNewJEC")), 
   doJECUncert_(iConfig.getParameter<bool>("doJECUncert")), 
+  produceDoubleBCommissioning_(iConfig.getParameter<bool>("produceDoubleBCommissioning")), 
+  produceDeepDoubleXCommissioning_(iConfig.getParameter<bool>("produceDeepDoubleXCommissioning")), 
+  produceDDXSFtemplates_(iConfig.getParameter<bool>("produceDDXSFtemplates")), 
+  chooseDDXtagger_(iConfig.getParameter<std::string>("chooseDDXtagger")),
   produceDoubleBSFtemplates_(iConfig.getParameter<bool>("produceDoubleBSFtemplates")), 
   produceDoubleBSFtemplatesV2_(iConfig.getParameter<bool>("produceDoubleBSFtemplatesV2")), 
   produceDoubleBSFtemplates_JPhasSV_(iConfig.getParameter<bool>("produceDoubleBSFtemplates_JPhasSV")), 
@@ -470,9 +478,11 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   runRangeMax_(iConfig.getParameter<int>("runRangeMax")),
   runOnData(iConfig.getParameter<bool>("runOnData")), 
   calib("csvv2", btagCSVFile_),  
-  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_)
-  //reader(&calib, BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_, btagSFType_),
-  //reader(&calib,static_cast<BTagEntry::OperatingPoint>btagOperatingPoint_,btagMeasurementType_,btagSFType_),
+  reader(BTagEntry::OperatingPoint(btagOperatingPoint_), btagMeasurementType_),
+  groupSet(iConfig.getParameter<std::vector<edm::ParameterSet>>("groups")),
+  variableSet(iConfig.getParameter<std::vector<edm::ParameterSet>>("variables")),
+  variables(0),
+  variableParser(false)
 {
   //now do what ever initialization is needed
 
@@ -480,11 +490,12 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   nEventsAll = 0;
   nEventsStored = 0;
 
-  std::vector<edm::ParameterSet> groupSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("groups");
+/*  std::vector<edm::ParameterSet> groupSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("groups");
   std::vector<edm::ParameterSet> variableSet = iConfig.getParameter<std::vector<edm::ParameterSet>>("variables");
   std::unordered_set<std::string> variables; // This unordered_set is going to contain the name of each single variable to be stored in the output tree
   varParser = VariableParser(!runOnData);
   variables = varParser.parseGroupsAndVariables(groupSet, variableSet);
+  varParser.saveStoredVariablesToFile();*/
 
   if ( doNewJEC_ && newJECPayloadNames_.size() > 0 ) {
     std::vector<JetCorrectorParameters> vPar;  
@@ -498,37 +509,40 @@ BTagValidation::BTagValidation(const edm::ParameterSet& iConfig) :
   }
 
   if ( doJECUncert_ ) {  
-    std::cout << "deriving JEC unc using: " << jecUncPayloadName_ << std::endl;  	
-  	ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
+    std::cout << "deriving JEC unc using: " << jecUncPayloadName_ << std::endl;     
+    ptr_jecUnc_ = boost::shared_ptr<JetCorrectionUncertainty>(new JetCorrectionUncertainty(jecUncPayloadName_) ) ; 
   }
 
   if (doPUReweightingOfficial_) LumiWeights_ = edm::LumiReWeighting(file_PUDistMC_, file_PUDistData_, hist_PUDistMC_, hist_PUDistData_) ;
   
   //checks: for weights
-  if (doFatJetPtReweighting_) std::cout << "ATTENTION	: pT reweighting enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
-  if (doNtracksReweighting_)  std::cout << "ATTENTION	: nTracks reweighting enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
-  if (doBFrag_ && doBFragUp_)  std::cout << "ATTENTION	: BFrag (Up) weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
-  if (doBFrag_ && doBFragDown_)  std::cout << "ATTENTION	: BFrag (Down) weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
-  if (doBFrag_ && doBFragUp_ && doBFragDown_)  std::cout << "ATTENTION	: BFrag Up and Down weighting enabled!!!!! File path to be used: "<< file_BFrag_ << std::endl;
-  if (doCDFrag_)  std::cout << "ATTENTION	: CDFrag weighting enabled. " << std::endl;
-  if (doCFrag_)  std::cout << "ATTENTION	: CFrag weighting enabled. " << std::endl;
-  if (doK0L_)  std::cout << "ATTENTION	: K0L weighting enabled. " << std::endl;
+  if (doFatJetPtReweighting_) std::cout << "ATTENTION   : pT reweighting enabled (for MC). File to be used: "<< file_FatJetPtWt_ << std::endl;  
+  if (doNtracksReweighting_)  std::cout << "ATTENTION   : nTracks reweighting enabled (for MC). File to be used: "<< file_NtracksWt_ << std::endl;
+  if (doBFrag_ && doBFragUp_)  std::cout << "ATTENTION  : BFrag (Up) weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doBFrag_ && doBFragDown_)  std::cout << "ATTENTION    : BFrag (Down) weighting enabled. File path to be used: "<< file_BFrag_ << std::endl;
+  if (doBFrag_ && doBFragUp_ && doBFragDown_)  std::cout << "ATTENTION  : BFrag Up and Down weighting enabled!!!!! File path to be used: "<< file_BFrag_ << std::endl;
+  if (doCDFrag_)  std::cout << "ATTENTION   : CDFrag weighting enabled. " << std::endl;
+  if (doCFrag_)  std::cout << "ATTENTION    : CFrag weighting enabled. " << std::endl;
+  if (doK0L_)  std::cout << "ATTENTION  : K0L weighting enabled. " << std::endl;
 
   if(!produceDoubleBSFtemplates_ && 
-  	!produceDoubleBSFtemplatesV2_ &&
-  	!produceDoubleBSFtemplates_JPhasSV_ &&
-  	!produceDoubleBSFtemplates_JPnoSV_) 
-  	std::cout << "ATTENTION	: NOT creating DoubleB SF templates." << std::endl;
+    !produceDoubleBSFtemplatesV2_ &&
+    !produceDoubleBSFtemplates_JPhasSV_ &&
+    !produceDoubleBSFtemplates_JPnoSV_) 
+    std::cout << "ATTENTION : NOT creating DoubleB SF templates." << std::endl;
 
-  if(produceDoubleBSFtemplates_) std::cout << "ATTENTION	: Creating DoubleB SF templates (JP plots)." << std::endl;
-  if(produceDoubleBSFtemplatesV2_) std::cout << "ATTENTION	: Creating DoubleB SF templates (sv mass plots)." << std::endl;
-  if(produceDoubleBSFtemplates_JPhasSV_) std::cout << "ATTENTION	: Creating DoubleB SF templates (JPhasSV plots)." << std::endl;
-  if(produceDoubleBSFtemplates_JPnoSV_) std::cout << "ATTENTION	: Creating DoubleB SF templates (JPnoSV plots)." << std::endl;
+  if(produceDoubleBCommissioning_) std::cout << "ATTENTION  : Creating DoubleB Commissioning plots." << std::endl;
+  if(produceDeepDoubleXCommissioning_) std::cout << "ATTENTION  : Creating DeepDoubleX Commissioning plots." << std::endl;
+  if(produceDoubleBSFtemplates_) std::cout << "ATTENTION    : Creating DoubleB SF templates (JP plots)." << std::endl;
+  if(produceDoubleBSFtemplatesV2_) std::cout << "ATTENTION  : Creating DoubleB SF templates (sv mass plots)." << std::endl;
+  if(produceDoubleBSFtemplates_JPhasSV_) std::cout << "ATTENTION    : Creating DoubleB SF templates (JPhasSV plots)." << std::endl;
+  if(produceDoubleBSFtemplates_JPnoSV_) std::cout << "ATTENTION : Creating DoubleB SF templates (JPnoSV plots)." << std::endl;
+  if(produceDDXSFtemplates_) std::cout << "ATTENTION : Creating DDBvL templats (all)." << std::endl;
 
   if(DEBUG_ && triggerSelection_.size()>1){
-	std::cout << "ATTENTION	: Multiple triggers entered. Will perform the following logic: ";
-	if(!triggerLogicIsOR_) std::cout << " AND " << std::endl; 
-	else std::cout << " OR " << std::endl;
+    std::cout << "ATTENTION : Multiple triggers entered. Will perform the following logic: ";
+    if(!triggerLogicIsOR_) std::cout << " AND " << std::endl; 
+    else std::cout << " OR " << std::endl;
   }
 
 // Pt bins for SFb
@@ -630,6 +644,7 @@ void BTagValidation::beginJob() {
 
   for(unsigned i=0; i<inputFiles_.size(); ++i)
   {
+    std::cout << inputFiles_.at(i).c_str() << std::endl;
     JetTreeEvtInfo->Add(inputFiles_.at(i).c_str());
     JetTree->Add(inputFiles_.at(i).c_str());
 
@@ -643,31 +658,43 @@ void BTagValidation::beginJob() {
 
     f->Close();
   }
-  
-  if(DEBUG_) std::cout << "Attempting to read EvtInfo trees" << std::endl;		
-  EvtInfo.ReadBranches(JetTreeEvtInfo,varParser);
-  if(DEBUG_) std::cout << "	Done reading EvtInfo.ReadTree" << std::endl;		
-;		
 
-  if(DEBUG_) std::cout << "Attempting to read FatJetInfo trees" << std::endl;		
-  FatJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo");
-  if(DEBUG_) std::cout << "	Done reading FatJetInfo trees" << std::endl;		
+  variables = variableParser.parseGroupsAndVariables(groupSet, variableSet);
+  variableParser.saveStoredVariablesToFile();
+  
+  if(DEBUG_) std::cout << "Attempting to read EvtInfo trees" << std::endl;      
+  //EvtInfo.ReadBranches(JetTreeEvtInfo,varParser);
+  EvtInfo.ReadBranches(JetTreeEvtInfo,variableParser);
+  if(DEBUG_) std::cout << " Done reading EvtInfo.ReadTree" << std::endl;        
+;       
+
+  if(DEBUG_) std::cout << "Attempting to read FatJetInfo trees" << std::endl;       
+  //FatJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo");
+  FatJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo");
+  if(DEBUG_) std::cout << " Done reading FatJetInfo trees" << std::endl;        
 
   if (usePrunedSubjets_) {
-  	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - Pruned" << std::endl;		
-    SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","Pruned");
-    SubJets.ReadBranches(JetTree,varParser,"PrunedSubJetInfo") ;
-  	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - Pruned" << std::endl;		
+    if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - Pruned" << std::endl;        
+    //SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","Pruned");
+    //SubJets.ReadBranches(JetTree,varParser,"PrunedSubJetInfo") ;
+    SubJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo","Pruned");
+    SubJets.ReadBranches(JetTree,variableParser,"PrunedSubJetInfo") ;
+    if(DEBUG_) std::cout << "   Done reading SubJetInfo trees - Pruned" << std::endl;       
   }
 
 
   else if (useSoftDropSubjets_) {
-  	if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - SoftDropPuppi" << std::endl;		
-    SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","SoftDropPuppi");
-    SubJets.ReadBranches(JetTree,varParser,"SoftDropPuppiSubJetInfo") ;
-  	if(DEBUG_) std::cout << "	Done reading SubJetInfo trees - SoftDropPuppi" << std::endl;		
+    if(DEBUG_) std::cout << "Attempting to read SubJetInfo trees - SoftDropPuppi" << std::endl;     
+    //SubJetInfo.ReadBranches(JetTree,varParser,"FatJetInfo","SoftDropPuppi");
+    //SubJets.ReadBranches(JetTree,varParser,"SoftDropPuppiSubJetInfo") ;
+    SubJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo","SoftDropPuppi");
+    SubJets.ReadBranches(JetTree,variableParser,"SoftDropPuppiSubJetInfo") ;
+    if(DEBUG_) std::cout << "   Done reading SubJetInfo trees - SoftDropPuppi" << std::endl;        
   }
-  else edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
+  else {
+    SubJetInfo.ReadBranches(JetTree,variableParser,"FatJetInfo","SoftDropPuppi");
+    edm::LogInfo("Error") << ">>>> No subjet type specified\n" ;
+  }
   
   double PtMax = 5000.;
 
@@ -744,19 +771,56 @@ void BTagValidation::beginJob() {
 
   //// Common histograms for both fat jets and subjets
   createJetHistos("FatJet");
-  // if( usePrunedSubjets_ ) createJetHistos("PrunedSubJet");
-  //else if( useSoftDropSubjets_ ) createJetHistos("SoftDropSubJet");
+  if( usePrunedSubjets_ ) createJetHistos("PrunedSubJet");
+  else if( useSoftDropSubjets_ ) createJetHistos("SoftDropSubJet");
   
   ///Create DoubleB input vars
-  createJetHistos_DoubleB();
+  if(produceDoubleBCommissioning_) createJetHistos_DoubleB();
+  if(produceDeepDoubleXCommissioning_) createJetHistos_DeepDoubleX();
 
   ///Create histos for DoubleB SF calculation/templates
-  if(produceDoubleBSFtemplates_) createJetHistos_SF("FatJet");
-  if(produceDoubleBSFtemplatesV2_) createJetHistos_SF_SVmass("FatJet");
-  if(produceDoubleBSFtemplates_JPhasSV_) createJetHistos_SF_JPhasSV("FatJet");
-  if(produceDoubleBSFtemplates_JPnoSV_) createJetHistos_SF_JPnoSV("FatJet");
 
-
+  if(produceDDXSFtemplates_) {
+    // Read chooseDDXtagger_ WPs from DDX.
+    boost::property_tree::ptree root;
+    try {
+    boost::property_tree::read_json("aux/DDX.json", root);
+    }
+    catch(std::exception & e) {
+    }
+    std::string xtag = chooseDDXtagger_;
+    for (auto& wp_pair : root.get_child(xtag)) {
+        TString wp = wp_pair.first;
+        double wp_value = std::stod(wp_pair.second.data());
+        WPmap.insert (std::pair<TString,double>(wp, wp_value)); 
+    } 
+    // Define ptbins in one place
+    ptbinmap = {//{"pt250to300",{250,300}},
+                // {"pt300to350",{300,350}},
+                // {"pt350to400",{350,400}},
+                // {"pt400to450",{400,450}},
+                // {"pt450to500",{450,500}},
+                // {"pt400to470",{400,470}},
+                // {"pt470to2000",{470,2000}},
+                {"pt350to430",{350,430}},
+                {"pt430to2000",{430,2000}},
+                // {"pt250to350",{250,350}},
+                // {"pt350to450",{350,450}},
+                // {"pt300to400",{300,400}},
+                // {"pt400to500",{400,500}},
+                // {"pt500to600",{500,600}},
+                // {"pt600to2000",{600,2000}},
+                // {"pt500to2000",{500,2000}},
+                //{"pt450to2000",{450,2000}},
+                };
+    
+    TString taggerTString = chooseDDXtagger_;
+    createJetHistos_SF("FatJet", "JP",                      taggerTString, WPmap, ptbinmap);
+    createJetHistos_SF("FatJet", "tau1VertexMassCorr",      taggerTString, WPmap, ptbinmap);
+    createJetHistos_SF("FatJet", "JPhasSV",                 taggerTString, WPmap, ptbinmap);
+    createJetHistos_SF("FatJet", "JPnoSV",                  taggerTString, WPmap, ptbinmap);
+  }  
+  
 }
 
 void BTagValidation::createJetHistos(const TString& histoTag) {
@@ -868,9 +932,32 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
-  AddHisto(histoTag+"_DeepDoubleB" ,";DeepDoubleB;;",100,-1.,1.);
   AddHisto2D(histoTag+"_JP_DoubleB",";JP vs DoubleB;;", 50, 0., 2.5, 100,-1,1.);  
-  AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DoubleB",";M(sv from TagVarCSV) vs DoubleB;;", 100,0,50, 100,-1,1.);  
+  AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DoubleB",";M(sv from TagVarCSV) vs DoubleB;;", 100,0,30, 100,-1,1.);  
+  AddHisto2D(histoTag+"_JP_v_DDBvL",";JP vs DDBvL;;", 50, 0., 2.5, 100, 0 ,1.);  
+  AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DDBvL",";M(sv from TagVarCSV) vs DDBvL;;", 100,0,30, 100,0,1.);  
+  AddHisto2D(histoTag+"_JP_v_DDCvL",";JP vs DDCvL;;", 50, 0., 2.5, 100, 0 ,1.);  
+  AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DDCvL",";M(sv from TagVarCSV) vs DDCvL;;", 100,0,30, 100,0,1.);  
+  AddHisto2D(histoTag+"_JP_v_DDCvB",";JP vs DDCvB;;", 50, 0., 2.5, 100, 0 ,1.);  
+  AddHisto2D(histoTag+"_TagVarCSV_sv_mass_DDCvB",";M(sv from TagVarCSV) vs DDCvB;;", 100,0,30, 100,0,1.);  
+  AddHisto(histoTag+"_deepDoubleBvLQCD", "Jet_deepDoubleBvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleBvLHbb", "Jet_deepDoubleBvLHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvLQCD", "Jet_deepDoubleCvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvLHcc", "Jet_deepDoubleCvLHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvBHcc", "Jet_deepDoubleCvBHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_deepDoubleCvBHbb", "Jet_deepDoubleCvBHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleBvLQCD", "Jet_massIndDeepDoubleBvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleBvLHbb", "Jet_massIndDeepDoubleBvLHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvLQCD", "Jet_massIndDeepDoubleCvLQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvLHcc", "Jet_massIndDeepDoubleCvLHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvBHcc", "Jet_massIndDeepDoubleCvBHcc", 100, 0, 1 );
+  AddHisto(histoTag+"_massIndDeepDoubleCvBHbb", "Jet_massIndDeepDoubleCvBHbb", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetbbvsLight", "Jet_deepBoostedJetbbvsLight", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetccvsLight", "Jet_deepBoostedJetccvsLight", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetTvsQCD", "Jet_deepBoostedJetTvsQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetZHccvsQCD", "Jet_deepBoostedJetZHccvsQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetWvsQCD", "Jet_deepBoostedJetWvsQCD", 100, 0, 1 );
+  AddHisto(histoTag+"_deepBoostedJetZHbbvsQCD", "Jet_deepBoostedJetZHbbvsQCD", 100, 0, 1 );
   
   AddHisto(histoTag+"_TCHE_extended1",";TCHE_extended1;;",70,-30.,30.); 
   AddHisto(histoTag+"_TCHP_extended1",";TCHP_extended1;;",70,-30.,30.); 
@@ -900,8 +987,8 @@ void BTagValidation::createJetHistos_DoubleB() {
 
   // Hbb tag vars - added by rizki - start
 
-  AddHisto("FatJet_z_ratio"   	     ,";z ratio;;",100,0.,60.);
-  AddHisto("FatJet_z_ratio_unw"   	     ,";z ratio;;",100,0.,60.);
+  AddHisto("FatJet_z_ratio"          ,";z ratio;;",100,0.,60.);
+  AddHisto("FatJet_z_ratio_unw"          ,";z ratio;;",100,0.,60.);
 
   AddHisto("FatJet_trackSip3dSig_3",";trackSip3dSig_3;;",100,-20,20);
   AddHisto("FatJet_trackSip3dSig_2",";trackSip3dSig_2;;",100,-20,20);
@@ -926,22 +1013,22 @@ void BTagValidation::createJetHistos_DoubleB() {
   AddHisto("FatJet_tau1_trackEtaRel_1",";tau1_trackEtaRel_1;;",400,-20,20);
   AddHisto("FatJet_tau1_trackEtaRel_2",";tau1_trackEtaRel_2;;",400,-20,20);
 
-  AddHisto("FatJet_tau1_vertexMass"    	       ,";tau1_vertexMass;;",500,0.,500);
+  AddHisto("FatJet_tau1_vertexMass"            ,";tau1_vertexMass;;",500,0.,500);
   AddHisto("FatJet_tau1_vertexEnergyRatio"      ,";tau1_vertexEnergyRatio;;",100,-1,4);
   AddHisto("FatJet_tau1_vertexEnergyRatio_unw"      ,";tau1_vertexEnergyRatio (unweighted);;",100,-1,4);
-  AddHisto("FatJet_tau1_vertexDeltaR"    	   ,";tau1_vertexDeltaR;;",100,-1,1);
+  AddHisto("FatJet_tau1_vertexDeltaR"          ,";tau1_vertexDeltaR;;",100,-1,1);
   AddHisto("FatJet_tau1_flightDistance2dSig"    ,";tau1_flightDistance2dSig;;",100,-20,20);
 
-  AddHisto("FatJet_tau2_vertexMass"    	       ,";tau2_vertexMass;;",500,0.,500);
+  AddHisto("FatJet_tau2_vertexMass"            ,";tau2_vertexMass;;",500,0.,500);
   AddHisto("FatJet_tau2_vertexEnergyRatio"      ,";tau2_vertexEnergyRatio;;",100,-1,4);
   AddHisto("FatJet_tau2_flightDistance2dSig"    ,";tau2_flightDistance2dSig;;",100,-20,20);
 
-  AddHisto("FatJet_jetNTracks"     	       ,";jetNTracks;;",40,0,40);
-  AddHisto("FatJet_jetNTracks_unw"     	       ,";jetNTracks (unweighted);;",40,0,40);
+  AddHisto("FatJet_jetNTracks"             ,";jetNTracks;;",40,0,40);
+  AddHisto("FatJet_jetNTracks_unw"             ,";jetNTracks (unweighted);;",40,0,40);
   AddHisto("FatJet_nSV"  ,";nSV;;",10,0,10);
 
   AddHisto("FatJet_DoubleB"    ,";DoubleB;;",100,-1.,1.);
-  AddHisto("FatJet_DeepDoubleB"     ,";DeepDoubleB;;",100,-1.,1.);
+  AddHisto("FatJet_DeepDoubleBvLQCD"     ,";DeepDoubleBvLQCD;;",100,-1.,1.);
 
   AddHisto2D("FatJet_DoubleB_trackSip3dSig_0"           ,";DoubleB ;IP Sig 1st Track;",100,-1.,1.,100,-20,20);
   AddHisto2D("FatJet_DoubleB_trackSip3dSig_1"           ,";DoubleB ;IP Sig 2nd Track;",100,-1.,1.,100,-20,20);
@@ -956,7 +1043,7 @@ void BTagValidation::createJetHistos_DoubleB() {
   
   //All region
     
-  TString Tag_ = "FatJet"	;
+  TString Tag_ = "FatJet"   ;
 
   AddHisto(Tag_+"_mu1_ptRatio",        "p_{T}(#mu) / p_{T}(AK8 jet) (#mu_{0}) ;;",50,0,1);  
   AddHisto(Tag_+"_mu1_ptrel",        ";p_{T,rel}(#mu) [GeV] (#mu_{0});;",50,0,5);
@@ -988,275 +1075,160 @@ void BTagValidation::createJetHistos_DoubleB() {
   // added by rizki - end
 }
 
-void BTagValidation::createJetHistos_SF(const TString& histoTag) {
+void BTagValidation::createJetHistos_DeepDoubleX() {
 
-	//Define your desired pt binnings for SF templates here.
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-   std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "AddHisto for SF " << ptStr.at(ipt) << std::endl;
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	DoubleB "  << std::endl;
-        AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+  // DeepDoubleX and DeepBoostedJet tag variables
+  //
+  AddHisto("FatJet_DeepDoubleX_jetNTracks"             ,";jetNTracks;;",40,0,40);
+  AddHisto("FatJet_DeepDoubleX_nSV"  ,";nSV;;",10,0,10);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_0",";trackSip3dSig_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_1",";trackSip3dSig_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_2",";trackSip3dSig_2;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip3dSig_3",";trackSip3dSig_3;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_0",";tau1_trackSip3dSig_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_1",";tau1_trackSip3dSig_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_0",";tau2_trackSip3dSig_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_1",";tau2_trackSip3dSig_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_0",";trackSip2dSigAboveBottom_0;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_1",";trackSip2dSigAboveBottom_1;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_trackSip2dSigAboveCharm",";trackSip2dSigAboveCharm;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_0",";tau1_trackEtaRel_0;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_1",";tau1_trackEtaRel_1;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_2",";tau1_trackEtaRel_2;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_0",";tau2_trackEtaRel_0;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_1",";tau2_trackEtaRel_1;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_2",";tau2_trackEtaRel_2;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_vertexMass"            ,";tau1_vertexMass;;",500,0.,500);
+  AddHisto("FatJet_DeepDoubleX_tau1_vertexEnergyRatio"      ,";tau1_vertexEnergyRatio;;",100,-1,4);
+  AddHisto("FatJet_DeepDoubleX_tau1_flightDistance2dSig"    ,";tau1_flightDistance2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau1_vertexDeltaR"          ,";tau1_vertexDeltaR;;",100,-1,1);
+  AddHisto("FatJet_DeepDoubleX_tau2_vertexMass"            ,";tau2_vertexMass;;",500,0.,500);
+  AddHisto("FatJet_DeepDoubleX_tau2_vertexEnergyRatio"      ,";tau2_vertexEnergyRatio;;",100,-1,4);
+  AddHisto("FatJet_DeepDoubleX_tau2_flightDistance2dSig"    ,";tau2_flightDistance2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_tau2_vertexDeltaR"          ,";tau2_vertexDeltaR;;",100,-1,1);
+  AddHisto("FatJet_DeepDoubleX_z_ratio"          ,";z ratio;;",100,0.,60.);
+  AddHisto("FatJet_DeepDoubleX_charged_EtaRel",";charged_EtaRel;;",400,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_PtRatio",";charged_PtRatio;;",100,0,1);
+  AddHisto("FatJet_DeepDoubleX_charged_PParRatio",";charged_PParRatio;;",100,-1,1);
+  AddHisto("FatJet_DeepDoubleX_charged_PtRatio",";charged_PtRatio;;",100,0,1);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip2dVal",";chargwed_Sip2dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip2dSig",";charged_Sip2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip3dVal",";chargwed_Sip3dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_Sip3dSig",";charged_Sip3dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_charged_JetDistVal",";chargwed_JetDistVal;;",100,-20,20);
+  AddHisto("FatJet_DeepDoubleX_sv_d3d"           ,";sv d3d;;",100,0.,60.);
+  AddHisto("FatJet_DeepDoubleX_sv_d3dsig", ";sv_d3dsig;;",100,-20,20);
 
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
 
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	JP notag "  << std::endl;
-		AddHisto(histoTag+"_JP_all_"+ptStr.at(ipt), ";JP_all_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << ", no JEC"<<std::endl;
-
-			AddHisto(histoTag+"_JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), "JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), 50, 0., 2.5);
-			AddHisto(histoTag+"_JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), "JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), 50, 0., 2.5);
-
-		}
-
-		AddHisto(histoTag+"_JP_all_JESup_"+ptStr.at(ipt), ";JP_all_JESup_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESup"<<std::endl;
-
-			AddHisto(histoTag+"_JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", "JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", 50, 0., 2.5);
-			AddHisto(histoTag+"_JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", "JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", 50, 0., 2.5);
-
-		}
-
-		AddHisto(histoTag+"_JP_all_JESdown_"+ptStr.at(ipt), ";JP_all_JESdown_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESdown"<<std::endl;
-
-			AddHisto(histoTag+"_JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", "JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", 50, 0., 2.5);
-			AddHisto(histoTag+"_JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", "JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", 50, 0., 2.5);
-
-		}
-
-	}
-
-  // for SF LT method calculation - end
-
+  AddHisto("FatJet_DeepBoostedJet_pf_puppiw", ";pf_puppiw;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_hcalFrac", ";pf_hcalFrac;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_VTX_ass", ";pf_VTX_ass;;",10,0,10);
+  AddHisto("FatJet_DeepBoostedJet_pf_lostInnerHits", ";pf_lostInnerHits;;",40,-2,2);
+  AddHisto("FatJet_DeepBoostedJet_pf_quality", ";pf_quality;;",10,0,10);
+  AddHisto("FatJet_DeepBoostedJet_pf_charge", ";pf_charge;;",10,-2,2);
+  AddHisto("FatJet_DeepBoostedJet_pf_isEl", ";pf_isEl;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isMu", ";pf_isMu;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isChargedHad", ";pf_isChargedHad;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isGamma", ";pf_isGamma;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_isNeutral", ";pf_isNeutral;;",10,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_phirel", ";pf_phirel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_etarel", ";pf_etarel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_deltaR", ";pf_deltaR;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_abseta", ";pf_abseta;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_ptrel_log", ";pf_ptrel_log;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_erel_log", ";pf_erel_log;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_pt_log", ";pf_pt_log;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_drminsv", ";pf_drminsv;;",100,-1,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_drsubjet1", ";pf_drsubjet1;;",100,-1,5);
+  AddHisto("FatJet_DeepBoostedJet_pf_drsubjet2", ";pf_drsubjet2;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_normchi2", ";pf_normchi2;;",1000,0,1000);
+  AddHisto("FatJet_DeepBoostedJet_pf_dz", ";pf_dz;;",100,0,2);
+  AddHisto("FatJet_DeepBoostedJet_pf_dzsig", ";pf_dzsig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxy", ";pf_dxy;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxysig", ";pf_dxysig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_dptdpt", ";pf_dptdpt;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_detadeta", ";pf_detadeta;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dphidphi", ";pf_dphidphi;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxydxy", ";pf_dxydxy;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dzdz", ";pf_dzdz;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dxydz", ";pf_dxydz;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dphidxy", ";pf_dphidxy;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_dlambdadz", ";pf_dlambdadz;;",1000,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagEtaRel", ";pf_btagEtaRel;;",100,0,10);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagPtRatio", ";pf_btagPtRatio;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagPParRatio", ";pf_btagPParRatio;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip2dVal", ";pf_btagSip2dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip2dSig", ";pf_btagSip2dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip3dVal", ";pf_btagSip3dVal;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagSip3dSig", ";pf_btagSip3dSig;;",100,-20,20);
+  AddHisto("FatJet_DeepBoostedJet_pf_btagJetDistVal", ";pf_btagJetDistVal;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_phirel", ";sv_phirel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_etarel", ";sv_etarel;;",100,-1,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_deltaR", ";sv_deltaR;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_sv_abseta", ";sv_abseta;;",100,0,5);
+  AddHisto("FatJet_DeepBoostedJet_sv_mass", ";sv_mass;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_ptrel_log", ";sv_ptrel_log;;",100,-10,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_erel_log", ";sv_erel_log;;",100,-10,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_pt_log", ";sv_pt_log;;",100,0,10);
+  AddHisto("FatJet_DeepBoostedJet_sv_ntracks", ";sv_ntracks;;",30,0,30);
+  AddHisto("FatJet_DeepBoostedJet_sv_normchi2", ";sv_normchi2;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_dxy", ";sv_dxy;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_dxysig", ";sv_dxysig;;",1000,0,1000);
+  AddHisto("FatJet_DeepBoostedJet_sv_d3d", ";sv_d3d;;",100,0,100);
+  AddHisto("FatJet_DeepBoostedJet_sv_d3dsig", ";sv_d3dsig;;",100,0,1);
+  AddHisto("FatJet_DeepBoostedJet_sv_costhetasvpv", ";sv_costhetasvpv;;",100,-1,1);
 }
 
-void BTagValidation::createJetHistos_SF_JPhasSV(const TString& histoTag) {
+void BTagValidation::createJetHistos_SF(const TString& histoTag, const TString& LTSVvar,  
+                                        const TString& tagger, const std::map<TString,double>& WPmap,
+                                        const std::map<TString,std::vector<int>>& ptbinmap) {
 
-	//Define your desired pt binnings for SF templates here. //Must be consistent with createJetHistos_SF!
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-   std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "AddHisto for SF " << ptStr.at(ipt) << std::endl;
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	DoubleB "  << std::endl;
+    std::vector<TString> ptStr;
+    boost::copy(ptbinmap | boost::adaptors::map_keys, std::back_inserter(ptStr));
+    std::vector<TString> WPStr;
+    boost::copy(WPmap | boost::adaptors::map_keys, std::back_inserter(WPStr));
+    float low_tag_bound = 0.;
+    if (tagger == TString("DoubleB")) low_tag_bound  = -1.;
+    float high_LTSV_bound = 2.5;
+    if ( LTSVvar == TString("tau1VertexMassCorr")) high_LTSV_bound = 30.;
+  
+    for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout <<  "  DeepDoubleBvLQCD "  << std::endl;
+        // Not needed for SF measurement
+        // AddHisto(histoTag+"_"+tagger+"_"+ptStr.at(ipt) ,";"+tagger+"_"+ptStr.at(ipt)+";;",100,low_tag_bound, 1.);
 
-        AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  JP notag "  << std::endl;
+        AddHisto(histoTag+"_"+LTSVvar+"_all_"+ptStr.at(ipt), ";"+LTSVvar+"_all_"+ptStr.at(ipt)+";;", 50, 0., high_LTSV_bound);
+        for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
+            if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  " << "WP = " << WPStr.at(iWP) << ", no JEC"<<std::endl;
 
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
+            AddHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt), LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt), 50, 0., high_LTSV_bound);
+            AddHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt), LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt), 50, 0., high_LTSV_bound);
+        }
 
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
+        AddHisto(histoTag+"_"+LTSVvar+"_all_JESup_"+ptStr.at(ipt), ";"+LTSVvar+"_all_JESup_"+ptStr.at(ipt)+";;", 50, 0., high_LTSV_bound);
+        for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
+            if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  " << "WP = " << WPStr.at(iWP) << " JESup"<<std::endl;
 
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	JPhasSV notag "  << std::endl;
-		AddHisto(histoTag+"_JPhasSV_all_"+ptStr.at(ipt), ";JPhasSV_all_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << ", no JEC"<<std::endl;
+            AddHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt)+"_JESup", LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt)+"_JESup", 50, 0., high_LTSV_bound);
+            AddHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt)+"_JESup", LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt)+"_JESup", 50, 0., high_LTSV_bound);
 
-			AddHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), "JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), 50, 0., 2.5);
-			AddHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), "JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), 50, 0., 2.5);
+        }
 
-		}
+        AddHisto(histoTag+"_"+LTSVvar+"_all_JESdown_"+ptStr.at(ipt), ";"+LTSVvar+"_all_JESdown_"+ptStr.at(ipt)+";;", 50, 0., high_LTSV_bound);
+        for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
+            if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  " << "WP = " << WPStr.at(iWP) << " JESdown"<<std::endl;
 
-		AddHisto(histoTag+"_JPhasSV_all_JESup_"+ptStr.at(ipt), ";JPhasSV_all_JESup_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESup"<<std::endl;
+            AddHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt)+"_JESdown", LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt)+"_JESdown", 50, 0., high_LTSV_bound);
+            AddHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt)+"_JESdown", LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt)+"_JESdown", 50, 0., high_LTSV_bound);
 
-			AddHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", "JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", 50, 0., 2.5);
-			AddHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", "JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", 50, 0., 2.5);
+        }
 
-		}
-
-		AddHisto(histoTag+"_JPhasSV_all_JESdown_"+ptStr.at(ipt), ";JPhasSV_all_JESdown_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESdown"<<std::endl;
-
-			AddHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", "JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", 50, 0., 2.5);
-			AddHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", "JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", 50, 0., 2.5);
-
-		}
-
-	}
+    }
 
   // for SF LT method calculation - end
-
 }
 
-void BTagValidation::createJetHistos_SF_JPnoSV(const TString& histoTag) {
-
-	//Define your desired pt binnings for SF templates here. //Must be consistent with createJetHistos_SF!
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-   std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "AddHisto for SF " << ptStr.at(ipt) << std::endl;
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	DoubleB "  << std::endl;
-
-		AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1,1.);
-
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
-
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
-
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	JPnoSV notag "  << std::endl;
-		AddHisto(histoTag+"_JPnoSV_all_"+ptStr.at(ipt), ";JPnoSV_all_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << ", no JEC"<<std::endl;
-
-			AddHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), "JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), 50, 0., 2.5);
-			AddHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), "JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), 50, 0., 2.5);
-
-		}
-
-		AddHisto(histoTag+"_JPnoSV_all_JESup_"+ptStr.at(ipt), ";JPnoSV_all_JESup_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESup"<<std::endl;
-
-			AddHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", "JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", 50, 0., 2.5);
-			AddHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", "JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", 50, 0., 2.5);
-
-		}
-
-		AddHisto(histoTag+"_JPnoSV_all_JESdown_"+ptStr.at(ipt), ";JPnoSV_all_JESdown_"+ptStr.at(ipt)+";;", 50, 0., 2.5);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESdown"<<std::endl;
-
-			AddHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", "JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", 50, 0., 2.5);
-			AddHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", "JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", 50, 0., 2.5);
-
-		}
-
-	}
-
-  // for SF LT method calculation - end
-
-}
-
-void BTagValidation::createJetHistos_SF_SVmass(const TString& histoTag) {
-
-	//Define your desired pt binnings for SF templates here. //Must be consistent with createJetHistos_SF!
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-   std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "AddHisto for SF " << ptStr.at(ipt) << std::endl;
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	DoubleB "  << std::endl;
-
-		AddHisto(histoTag+"_DoubleB_"+ptStr.at(ipt) ,";DoubleB_"+ptStr.at(ipt)+";;",100,-1,1.);
-
-        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "  DeepDoubleB "  << std::endl;
-
-        AddHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt) ,";DeepDoubleB_"+ptStr.at(ipt)+";;",100,-1.,1.);
-
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	tau1VertexMassCorr notag "  << std::endl;
-		AddHisto(histoTag+"_tau1VertexMassCorr_all_"+ptStr.at(ipt), ";tau1VertexMassCorr_all_"+ptStr.at(ipt)+";;", 100, 0., 50.);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << ", no JEC"<<std::endl;
-
-			AddHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), "tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), 100, 0., 50.);
-			AddHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), "tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), 100, 0., 50.);
-
-		}
-
-		AddHisto(histoTag+"_tau1VertexMassCorr_all_JESup_"+ptStr.at(ipt), ";tau1VertexMassCorr_all_JESup_"+ptStr.at(ipt)+";;", 100, 0., 50.);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESup"<<std::endl;
-
-			AddHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", "tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", 100, 0., 50.);
-			AddHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", "tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", 100, 0., 50.);
-
-		}
-
-		AddHisto(histoTag+"_tau1VertexMassCorr_all_JESdown_"+ptStr.at(ipt), ";tau1VertexMassCorr_all_JESdown_"+ptStr.at(ipt)+";;", 100, 0., 50.);
-		for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-			if(DEBUG_ && DEBUGlevel_>1 )std::cout << "	" << "WP = " << WPStr.at(iWP) << " JESdown"<<std::endl;
-
-			AddHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", "tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", 100, 0., 50.);
-			AddHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", "tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", 100, 0., 50.);
-
-		}
-
-	}
-
-  // for SF LT method calculation - end
-
-}
 
 // ------------ method called for each event  ------------
 void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -1273,7 +1245,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   if (doBFrag_)
   {
-	if(DEBUG_)std::cout << "Running BFrag systematics. Initializing weights for BFrag systematics, loading files from: "+file_BFrag_ << std::endl; 
+    if(DEBUG_)std::cout << "Running BFrag systematics. Initializing weights for BFrag systematics, loading files from: "+file_BFrag_ << std::endl; 
     int nPtRelPtBins = 15;
 
     TString PtRelPtBin[] = {
@@ -1326,7 +1298,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     int run = EvtInfo.Run ; 
     int lumi = EvtInfo.LumiBlock ; 
-    if((iEntry%reportEvery_) == 0) edm::LogInfo("EventNumber") << ">>>>> Processing event with run no. " << run << " and lumisection " << lumi << iEntry << " of " << nEntries;
+    if((iEntry%reportEvery_) == 0) edm::LogInfo("EventNumber") << ">>>>> Processing event with run no. " << run << " and lumisection " << lumi << " Evt number: " <<  iEntry << " of " << nEntries;
 
     if(run < 0) {
       isData = false;
@@ -1334,13 +1306,13 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     }
     else if( iEntry == 0 ) edm::LogInfo("IsData") << ">>>>> Running on data\n" ;
 
-	if(isData && useRunRange_){
-		if(DEBUG_) std::cout << "Restricting by run range. Run:" << run <<std::endl;
-		if( run < runRangeMin_ || run > runRangeMax_ ){
-			if (DEBUG_) std::cout <<	"Run is outside range (" << runRangeMin_ <<" - "<< runRangeMax_ <<" ). Skipping run." << std::endl;
-			continue;
-		}
-	}
+    if(isData && useRunRange_){
+        if(DEBUG_) std::cout << "Restricting by run range. Run:" << run <<std::endl;
+        if( run < runRangeMin_ || run > runRangeMax_ ){
+            if (DEBUG_) std::cout <<    "Run is outside range (" << runRangeMin_ <<" - "<< runRangeMax_ <<" ). Skipping run." << std::endl;
+            continue;
+        }
+    }
 
     double wtPU = 1.;
     if ( doPUReweightingOfficial_ && !isData )
@@ -1374,6 +1346,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       h1_nPV_mc_unw    ->Fill(EvtInfo.nPV);
     }
 
+    if( !isData && EvtInfo.nPUtrue < 2) continue;  //// in 2017 some MC events contain nPUTrue=0
     if(FatJetInfo.nJet <= 0) continue; //// require at least 1 fat jet in the event
     if(DEBUG_)std::cout << "Event selection: pass Fatjet>0 "<< std::endl;
     int nFatJet = 0;
@@ -1381,8 +1354,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
 
     //---------------------------- Start fat jet loop ---------------------------------------//
-	bool firstJet=true;
-	bool total_removedProblemJet=0;
+    bool firstJet=true;
+    bool total_removedProblemJet=0;
     for(int iJet = 0; iJet < FatJetInfo.nJet; ++iJet) {
       if(DEBUG_)std::cout << "Fatjet selection: in fatjet loop, FatJetInfo.Jet_pt["<<iJet<<"] = "<< FatJetInfo.Jet_pt[iJet] << std::endl;
 
@@ -1407,7 +1380,6 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       if ( fabs(FatJetInfo.Jet_eta[iJet]) > fatJetAbsEtaMax_ )       continue; //// apply jet eta cut
       if(DEBUG_)std::cout << "Fatjet selection: pass eta cut "<< std::endl;
-
       if ( FatJetInfo.Jet_tightID[iJet]==0 )                         continue; //// apply tight/loose jet ID
       if(DEBUG_)std::cout << "Fatjet selection: pass jet tight ID "<< std::endl;
 
@@ -1449,6 +1421,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       jet_p4.SetPtEtaPhiM(FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_eta[iJet], FatJetInfo.Jet_phi[iJet], FatJetInfo.Jet_mass[iJet]);
 
       if ( SubJetInfo.Jet_nSubJets[iJet] != 2 ) continue ;
+      if(DEBUG_)std::cout << "Fatjet selection: pass nsubjets ==2"<< std::endl;
 
       int iSubJet1 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]] ; //added by rizki
       int iSubJet2 = SubJetInfo.SubJetIdx[SubJetInfo.Jet_nFirstSJ[iJet]+1] ; //added by rizki
@@ -1457,7 +1430,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //// If  processing subjets, discard fat jet with any one subjet having pt = 0
       if( (usePrunedSubjets_ || useSoftDropSubjets_)
           && (SubJets.Jet_pt[iSubJet1]==0. || SubJets.Jet_pt[iSubJet2]==0.) ) continue;
-      if(DEBUG_)std::cout << "Fatjet selection: pass eta cut "<< std::endl;
+      if(DEBUG_)std::cout << "Fatjet selection: subjets pt > 0"<< std::endl;
 
       TLorentzVector subjet1_p4, subjet2_p4;
       subjet1_p4.SetPtEtaPhiM(SubJets.Jet_pt[iSubJet1], SubJets.Jet_eta[iSubJet1], SubJets.Jet_phi[iSubJet1], SubJets.Jet_mass[iSubJet1]);
@@ -1472,7 +1445,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       double subjet_dyphi = sqrt( subjet_dy*subjet_dy + subjet_dphi*subjet_dphi ) ;
 
       ////// If processing subjets, skip fat jets for which the subjets are separated by dR>0.8
-      //if( (usePrunedSubjets_ || useSoftDropSubjets_)  && subjet_dR>fatJetCone ) continue;
+      //////if( (usePrunedSubjets_ || useSoftDropSubjets_)  && subjet_dR>fatJetCone ) continue;
 
       //// If processing subjets, skip infrared unsafe configurations
       if( (usePrunedSubjets_ || useSoftDropSubjets_)
@@ -1618,10 +1591,10 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //       std::cout << "muon2 dR =" << muon2_v.DeltaR(jet_p4) << std::endl;
       //       std::cout << "mu12 dR =" << dimuon_dR << std::endl;
 
-		if(isDoubleMuonTagged==true){
-		  if (dimuon_ptRatio >0.6) continue; //remove spike in final bb discriminator
-		  if(DEBUG_)std::cout << "Fatjet selection: dimuon_ptRatio cut "<< std::endl;
-		}
+        if(isDoubleMuonTagged==true){
+          if (dimuon_ptRatio >0.6) continue; //remove spike in final bb discriminator
+          if(DEBUG_)std::cout << "Fatjet selection: dimuon_ptRatio cut "<< std::endl;
+        }
 
       //-------------------------------------------------------------------------------------------------------------      
       //  Apply Scale factors and reweightings      
@@ -1644,10 +1617,10 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //added by Erich - jetPt reweighting factor
       double wtJetPt = 1.;
       //       if (doFatJetPtReweighting_ && !isData && FatJetInfo.Jet_nbHadrons[iJet] > 1 ) { //added by rizki only temporarily for Hbb tagger signal vs proxy studies. Want to only reweight jets of bgromgsp flavour.
-      edm::LogInfo("Check") << " doFatJetPtReweighting_ = " << doFatJetPtReweighting_ << ",!isData = " << !isData ;
+      if (DEBUG_) edm::LogInfo("Check") << " doFatJetPtReweighting_ = " << doFatJetPtReweighting_ << ",!isData = " << !isData ;
       if (doFatJetPtReweighting_ && !isData) { //original UNCOMMENT!
         wtJetPt *= GetWeightsJetPtBased(file_FatJetPtWt_, hist_FatJetPtWt_, FatJetInfo.Jet_pt[iJet]) ;
-        edm::LogInfo("jetPtWt") << " jetPtWt = " << wtJetPt ;
+        if (DEBUG_) edm::LogInfo("jetPtWt") << " jetPtWt = " << wtJetPt ;
         wtFatJet *= wtJetPt ;
       }
 
@@ -1911,130 +1884,141 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       //// Fill (fat) jet histograms
       //// ----------------------------------------------
 
-		FillHisto2D("FatJet_pt_softdropMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtFatJet);
-		FillHisto("FatJet_Mass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_mass[iJet] ,wtPU*wtFatJet);
-		FillHisto("FatJet_prunedMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massPruned[iJet] ,wtPU*wtFatJet);
-		FillHisto2D("FatJet_prunedMass_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massPruned[iJet] ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
-		FillHisto2D("FatJet_pt_prunedMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_massPruned[iJet] ,wtPU*wtFatJet);
-		FillHisto("FatJet_softdropMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtFatJet);
-		FillHisto("FatJet_softdropMass_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtMassSoftDrop_unw);
-		FillHisto2D("FatJet_softdropMass_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
+        FillHisto2D("FatJet_pt_softdropMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtFatJet);
+        FillHisto("FatJet_Mass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_mass[iJet] ,wtPU*wtFatJet);
+        FillHisto("FatJet_prunedMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massPruned[iJet] ,wtPU*wtFatJet);
+        FillHisto2D("FatJet_prunedMass_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massPruned[iJet] ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
+        FillHisto2D("FatJet_pt_prunedMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet], FatJetInfo.Jet_massPruned[iJet] ,wtPU*wtFatJet);
+        FillHisto("FatJet_softdropMass" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtFatJet);
+        FillHisto("FatJet_softdropMass_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,wtPU*wtMassSoftDrop_unw);
+        FillHisto2D("FatJet_softdropMass_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_massSoftDrop[iJet] ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
 
-		if (usePrunedSubjets_) {
-		  FillHisto("FatJet_massDrop_pruned" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,std::max( SubJets.Jet_mass[iSubJet1]/SubJets.Jet_jes[iSubJet1], SubJets.Jet_mass[iSubJet2]/SubJets.Jet_jes[iSubJet2] )/(FatJetInfo.Jet_massPruned[iJet]/FatJetInfo.Jet_jes[iJet]) ,wtPU*wtFatJet);
-		  FillHisto("FatJet_prunedsubjet_dR" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dR ,wtPU*wtFatJet);
-		  FillHisto("FatJet_prunedsubjet_dyphi" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dyphi ,wtPU*wtFatJet);
-		}
-		else if (useSoftDropSubjets_) {
-		  FillHisto("FatJet_massDrop_softdrop" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,std::max( SubJets.Jet_mass[iSubJet1]/SubJets.Jet_jes[iSubJet1], SubJets.Jet_mass[iSubJet2]/SubJets.Jet_jes[iSubJet2] )/(FatJetInfo.Jet_massSoftDrop[iJet]/FatJetInfo.Jet_jes[iJet]) ,wtPU*wtFatJet);
-		  FillHisto("FatJet_softdropsubjet_dR" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dR ,wtPU*wtFatJet);
-		  FillHisto("FatJet_softdropsubjet_dyphi" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dyphi ,wtPU*wtFatJet);
-		}
+        if (usePrunedSubjets_) {
+          FillHisto("FatJet_massDrop_pruned" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,std::max( SubJets.Jet_mass[iSubJet1]/SubJets.Jet_jes[iSubJet1], SubJets.Jet_mass[iSubJet2]/SubJets.Jet_jes[iSubJet2] )/(FatJetInfo.Jet_massPruned[iJet]/FatJetInfo.Jet_jes[iJet]) ,wtPU*wtFatJet);
+          FillHisto("FatJet_prunedsubjet_dR" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dR ,wtPU*wtFatJet);
+          FillHisto("FatJet_prunedsubjet_dyphi" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dyphi ,wtPU*wtFatJet);
+        }
+        else if (useSoftDropSubjets_) {
+          FillHisto("FatJet_massDrop_softdrop" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,std::max( SubJets.Jet_mass[iSubJet1]/SubJets.Jet_jes[iSubJet1], SubJets.Jet_mass[iSubJet2]/SubJets.Jet_jes[iSubJet2] )/(FatJetInfo.Jet_massSoftDrop[iJet]/FatJetInfo.Jet_jes[iJet]) ,wtPU*wtFatJet);
+          FillHisto("FatJet_softdropsubjet_dR" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dR ,wtPU*wtFatJet);
+          FillHisto("FatJet_softdropsubjet_dyphi" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,subjet_dyphi ,wtPU*wtFatJet);
+        }
 
-		h1_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
-		
-		if(firstJet){
-			h1_leading_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
-			if(DEBUG_)std::cout<<"leading jet pT = " <<  FatJetInfo.Jet_pt[iJet] << std::endl;
-			firstJet=false;
-		}
+        h1_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
+        
+        if(firstJet){
+            h1_leading_fatjet_pt->Fill(FatJetInfo.Jet_pt[iJet],wtPU*wtFatJet);
+            if(DEBUG_)std::cout<<"leading jet pT = " <<  FatJetInfo.Jet_pt[iJet] << std::endl;
+            firstJet=false;
+        }
 
-		FillHisto("FatJet_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
+        FillHisto("FatJet_nsubjettiness" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_tau2[iJet]/FatJetInfo.Jet_tau1[iJet] ,wtPU*wtFatJet);
 
-		FillHisto("FatJet_pt_all_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet] ,wtPU*wtFatJet/wtJetPt); //debug for signal vs proxy reweighting - rizki
+        FillHisto("FatJet_pt_all_unw" ,FatJetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,FatJetInfo.Jet_pt[iJet] ,wtPU*wtFatJet/wtJetPt); //debug for signal vs proxy reweighting - rizki
 
-		//fill histo for general plots: 
-		fillJetHistos(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, wtPU*wtFatJet);
+        //fill histo for general plots: 
+        fillJetHistos(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, wtPU*wtFatJet);
 
-		//fill histo for DoubleB Commissioning Plots: 
-  		fillJetHistos_DoubleB(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, muon1_v, muon2_v, dimuon_v, idxMuon_inFirstSubjet, idxMuon_inSecondSubjet, subjet1_p4, subjet2_p4, wtPU*wtFatJet);
+        //fill histo for DoubleB Commissioning Plots: 
+        if(produceDoubleBCommissioning_) fillJetHistos_DoubleB(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", nmu, nselmuon, idxFirstMuon, muon1_v, muon2_v, dimuon_v, idxMuon_inFirstSubjet, idxMuon_inSecondSubjet, subjet1_p4, subjet2_p4, wtPU*wtFatJet);
 
-		//fill histo for DoubleB SF calculation / templates: 
-		if(produceDoubleBSFtemplates_) fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
-		if(produceDoubleBSFtemplatesV2_ && FatJetInfo.Jet_nSV_fat[iJet]>0) fillJetHistos_SF_SVmass(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
-		if(produceDoubleBSFtemplates_JPhasSV_ && FatJetInfo.Jet_nSV_fat[iJet]>0) fillJetHistos_SF_JPhasSV(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
-		if(produceDoubleBSFtemplates_JPnoSV_ && FatJetInfo.Jet_nSV_fat[iJet]==0) fillJetHistos_SF_JPnoSV(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
+        //fill histo for DeepDoubleX Commissioning Plots: 
+        if(produceDeepDoubleXCommissioning_) fillJetHistos_DeepDoubleX(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", wtPU*wtFatJet);
 
-		/* Uncomment below as needed.
-		//// ------- start process subjets --------------
-		if( usePrunedSubjets_ || useSoftDropSubjets_ ) {
-		  int nTotalFat = 0, nSharedFat = 0; // for track sharing
+        //fill histo for DoubleB SF calculation / templates: 
+        if(produceDDXSFtemplates_) {
+            TString taggerTString = chooseDDXtagger_; // should implement this typefix properly
+            if (DEBUG_) std::cout << "nSV : " << FatJetInfo.Jet_nSV_fat[iJet] << std::endl;            
+            fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "JP", false, taggerTString , WPmap, ptbinmap, wtPU*wtFatJet);
+            // if (FatJetInfo.Jet_nSV_fat[iJet]>0)  fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "tau1VertexMassCorr",   true,  taggerTString,  WPmap, ptbinmap, wtPU*wtFatJet);
+            // if (FatJetInfo.Jet_nSV_fat[iJet]>0)  fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "JPhasSV",              false,  taggerTString, WPmap, ptbinmap, wtPU*wtFatJet);
+            // if (FatJetInfo.Jet_nSV_fat[iJet]==0) fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "JPnoSV",               false,  taggerTString, WPmap, ptbinmap, wtPU*wtFatJet);
+            // // TEMPORARY FIX TODO
+            if (FatJetInfo.Jet_SV_multi[iJet]>0)  fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "tau1VertexMassCorr",   true,  taggerTString,  WPmap, ptbinmap, wtPU*wtFatJet);
+            if (FatJetInfo.Jet_SV_multi[iJet]>0)  fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "JPhasSV",              false,  taggerTString, WPmap, ptbinmap, wtPU*wtFatJet);
+            if (FatJetInfo.Jet_SV_multi[iJet]==0) fillJetHistos_SF(FatJetInfo, iJet, isGSPbb, isGSPcc ,"FatJet", "JPnoSV",               false,  taggerTString, WPmap, ptbinmap, wtPU*wtFatJet);
+        }     
 
-		  for(int sj=0; sj<2; ++sj) {
-			int iSubJet = SubJetInfo.Jet_nFirstSJ[iJet];
-			if( sj==1 ) iSubJet = SubJetInfo.Jet_nLastSJ[iJet];
+        /* Uncomment below as needed.
+        //// ------- start process subjets --------------
+        if( usePrunedSubjets_ || useSoftDropSubjets_ ) {
+          int nTotalFat = 0, nSharedFat = 0; // for track sharing
 
-			int idxFirstMuonSubJet = -1;
-			int nselmuonSubJet = 0;
-			int nmuSubJet = 0;
+          for(int sj=0; sj<2; ++sj) {
+            int iSubJet = SubJetInfo.Jet_nFirstSJ[iJet];
+            if( sj==1 ) iSubJet = SubJetInfo.Jet_nLastSJ[iJet];
 
-			if (SubJets.nPFMuon>0) {
-			  for (int iMu=0; iMu<SubJets.nPFMuon; ++iMu) {
-				if (SubJets.PFMuon_IdxJet[iMu]==iSubJet ) {
-				  ++nmuSubJet;
-				  if (passMuonSelection(iMu, SubJets, iSubJet, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))) {
-					if(nselmuonSubJet == 0) idxFirstMuonSubJet = iMu;
-					++nselmuonSubJet;
-				  }
-				}
-			  }
-			}
+            int idxFirstMuonSubJet = -1;
+            int nselmuonSubJet = 0;
+            int nmuSubJet = 0;
 
-			if(applySubJetMuonTagging_ && nselmuonSubJet==0) continue;  //// if enabled, select muon-tagged subjets
-			if(applySubJetBTagging_ && 
-				(SubJets.Jet_CombIVF[iSubJet]<=subJetBDiscrMin_ || SubJets.Jet_CombIVF[iSubJet]>subJetBDiscrMax_) 
-			  ) continue;  //// if enabled, select b-tagged subjets
+            if (SubJets.nPFMuon>0) {
+              for (int iMu=0; iMu<SubJets.nPFMuon; ++iMu) {
+                if (SubJets.PFMuon_IdxJet[iMu]==iSubJet ) {
+                  ++nmuSubJet;
+                  if (passMuonSelection(iMu, SubJets, iSubJet, (dynamicMuonSubJetDR_ ? subjet_dR/2 : 0.4 ))) {
+                    if(nselmuonSubJet == 0) idxFirstMuonSubJet = iMu;
+                    ++nselmuonSubJet;
+                  }
+                }
+              }
+            }
 
-			//// apply b-tagging scale factors
-			double wtSubJet = 1.;
-			if( applySFs_ && !isData ) {
-			  if( applyFatJetBTagging_ && fatJetDoubleBTagging_ ) wtSubJet *= wtFatJet;
-			  else wtSubJet *= scaleFactor(SubJets.Jet_flavour[iSubJet], SubJets.Jet_pt[iSubJet], SubJets.Jet_eta[iSubJet], (subJetBDiscrMin_>0.25));
-			}
+            if(applySubJetMuonTagging_ && nselmuonSubJet==0) continue;  //// if enabled, select muon-tagged subjets
+            if(applySubJetBTagging_ && 
+                (SubJets.Jet_CombIVF[iSubJet]<=subJetBDiscrMin_ || SubJets.Jet_CombIVF[iSubJet]>subJetBDiscrMax_) 
+              ) continue;  //// if enabled, select b-tagged subjets
 
-			double wtSubJetPt = 1.;
-			if (doSubJetPtReweighting_ && !isData) {
-			  wtSubJetPt *= GetWeightsJetPtBased(file_SubJetPtWt_, hist_SubJetPtWt_, SubJets.Jet_pt[iSubJet]) ;
-			  wtSubJet *= wtSubJetPt ;
-			}
+            //// apply b-tagging scale factors
+            double wtSubJet = 1.;
+            if( applySFs_ && !isData ) {
+              if( applyFatJetBTagging_ && fatJetDoubleBTagging_ ) wtSubJet *= wtFatJet;
+              else wtSubJet *= scaleFactor(SubJets.Jet_flavour[iSubJet], SubJets.Jet_pt[iSubJet], SubJets.Jet_eta[iSubJet], (subJetBDiscrMin_>0.25));
+            }
 
-			//// subjet multiplicity
-			++nSubJet;
+            double wtSubJetPt = 1.;
+            if (doSubJetPtReweighting_ && !isData) {
+              wtSubJetPt *= GetWeightsJetPtBased(file_SubJetPtWt_, hist_SubJetPtWt_, SubJets.Jet_pt[iSubJet]) ;
+              wtSubJet *= wtSubJetPt ;
+            }
 
-			//// fill subjet histograms
-			h1_subjet_pt->Fill(SubJets.Jet_pt[iSubJet],wtPU*wtSubJet);
+            //// subjet multiplicity
+            ++nSubJet;
 
-			std::string sjlabel ;
-			if (usePrunedSubjets_) sjlabel = "PrunedSubJet" ;
-			else if (useSoftDropSubjets_) sjlabel = "SoftDropSubJet" ;
-			//fillJetHistos(SubJets, iSubJet, false, false ,sjlabel, nmuSubJet, nselmuonSubJet, idxFirstMuonSubJet, wtPU*wtSubJet);
+            //// fill subjet histograms
+            h1_subjet_pt->Fill(SubJets.Jet_pt[iSubJet],wtPU*wtSubJet);
 
-			//// track sharing
-			int iSubJetComp = (sj==0 ? SubJetInfo.Jet_nLastSJ[iJet] : SubJetInfo.Jet_nLastSJ[iJet]); // companion subjet index
-			int nTotal = 0, nShared = 0;
+            std::string sjlabel ;
+            if (usePrunedSubjets_) sjlabel = "PrunedSubJet" ;
+            else if (useSoftDropSubjets_) sjlabel = "SoftDropSubJet" ;
+            //fillJetHistos(SubJets, iSubJet, false, false ,sjlabel, nmuSubJet, nselmuonSubJet, idxFirstMuonSubJet, wtPU*wtSubJet);
 
-			for (int iTrk=SubJets.Jet_nFirstTrack[iSubJet]; iTrk<SubJets.Jet_nLastTrack[iSubJet]; ++iTrk) {
-			  if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJet], SubJets.Jet_phi[iSubJet] ) < 0.3 ) {
-				++nTotal;
-				++nTotalFat;
-				if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJetComp], SubJets.Jet_phi[iSubJetComp] ) < 0.3 ) {
-				  ++nShared;
-				  if(sj==0) ++nSharedFat;
-				}
-			  }
-			}
+            //// track sharing
+            int iSubJetComp = (sj==0 ? SubJetInfo.Jet_nLastSJ[iJet] : SubJetInfo.Jet_nLastSJ[iJet]); // companion subjet index
+            int nTotal = 0, nShared = 0;
 
-			p1_SubJetPt_TotalTracks->Fill(SubJets.Jet_pt[iSubJet], nTotal, wtPU*wtSubJet);
-			p1_SubJetPt_SharedTracks->Fill(SubJets.Jet_pt[iSubJet], nShared, wtPU*wtSubJet);
-			if( nTotal>0 ) p1_SubJetPt_SharedTracksRatio->Fill(SubJets.Jet_pt[iSubJet], double(nShared)/double(nTotal), wtPU*wtSubJet);
-		  }
+            for (int iTrk=SubJets.Jet_nFirstTrack[iSubJet]; iTrk<SubJets.Jet_nLastTrack[iSubJet]; ++iTrk) {
+              if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJet], SubJets.Jet_phi[iSubJet] ) < 0.3 ) {
+                ++nTotal;
+                ++nTotalFat;
+                if( reco::deltaR( SubJets.Track_eta[iTrk], SubJets.Track_phi[iTrk], SubJets.Jet_eta[iSubJetComp], SubJets.Jet_phi[iSubJetComp] ) < 0.3 ) {
+                  ++nShared;
+                  if(sj==0) ++nSharedFat;
+                }
+              }
+            }
 
-		  p1_FatJetPt_TotalTracks->Fill(FatJetInfo.Jet_pt[iJet], nTotalFat-nSharedFat, wtPU*wtFatJet);
-		  p1_FatJetPt_SharedTracks->Fill(FatJetInfo.Jet_pt[iJet], nSharedFat, wtPU*wtFatJet);
-		  if( nTotalFat>0 ) p1_FatJetPt_SharedTracksRatio->Fill(FatJetInfo.Jet_pt[iJet], double(nSharedFat)/double(nTotalFat-nSharedFat), wtPU*wtFatJet);
+            p1_SubJetPt_TotalTracks->Fill(SubJets.Jet_pt[iSubJet], nTotal, wtPU*wtSubJet);
+            p1_SubJetPt_SharedTracks->Fill(SubJets.Jet_pt[iSubJet], nShared, wtPU*wtSubJet);
+            if( nTotal>0 ) p1_SubJetPt_SharedTracksRatio->Fill(SubJets.Jet_pt[iSubJet], double(nShared)/double(nTotal), wtPU*wtSubJet);
+          }
 
-		} //// ------- end process subjets --------------
-		*/
+          p1_FatJetPt_TotalTracks->Fill(FatJetInfo.Jet_pt[iJet], nTotalFat-nSharedFat, wtPU*wtFatJet);
+          p1_FatJetPt_SharedTracks->Fill(FatJetInfo.Jet_pt[iJet], nSharedFat, wtPU*wtFatJet);
+          if( nTotalFat>0 ) p1_FatJetPt_SharedTracksRatio->Fill(FatJetInfo.Jet_pt[iJet], double(nSharedFat)/double(nTotalFat-nSharedFat), wtPU*wtFatJet);
+
+        } //// ------- end process subjets --------------
+        */
 
     }    
 
@@ -2042,9 +2026,9 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
     // fill jet multiplicity
     if(DEBUG_)std::cout << "==========FatJetStats========== " << std::endl;
-    if(DEBUG_ && !isData)std::cout << "	removeProblemJet     = " << total_removedProblemJet << std::endl;
-    if(DEBUG_)std::cout << "	Passed all selection = " << nFatJet << std::endl;
-    if(DEBUG_)std::cout << "	Total in event       = " << 	FatJetInfo.nJet << std::endl;
+    if(DEBUG_ && !isData)std::cout << " removeProblemJet     = " << total_removedProblemJet << std::endl;
+    if(DEBUG_)std::cout << "    Passed all selection = " << nFatJet << std::endl;
+    if(DEBUG_)std::cout << "    Total in event       = " <<     FatJetInfo.nJet << std::endl;
     if(DEBUG_)std::cout << "=============================== " << std::endl;
     if(DEBUG_)std::cout << " " << std::endl;
     h1_nFatJet->Fill(nFatJet, wtPU);
@@ -2324,8 +2308,25 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     float csvivfv2          = JetInfo.Jet_CombIVF[iJet];
     float cmvav2            = JetInfo.Jet_cMVAv2[iJet];
     float doubleb           = JetInfo.Jet_DoubleSV[iJet];
-    float deepDoubleb       = JetInfo.Jet_DeepDoubleB[iJet];
     float mass_TagVarCSV_sv = JetInfo.TagVarCSV_vertexMass[iJet];
+    float deepDoubleBvLQCD  = JetInfo.Jet_DeepDoubleBvLQCD[iJet];
+    float deepDoubleBvLHbb  = JetInfo.Jet_DeepDoubleBvLHbb[iJet];
+    float deepDoubleCvLQCD  = JetInfo.Jet_DeepDoubleCvLQCD[iJet];
+    float deepDoubleCvLHcc  = JetInfo.Jet_DeepDoubleCvLHcc[iJet];
+    float deepDoubleCvBHcc  = JetInfo.Jet_DeepDoubleCvBHcc[iJet];
+    float deepDoubleCvBHbb  = JetInfo.Jet_DeepDoubleCvBHbb[iJet];
+    float massIndDeepDoubleBvLQCD  = JetInfo.Jet_MassIndDeepDoubleBvLQCD[iJet];
+    float massIndDeepDoubleBvLHbb  = JetInfo.Jet_MassIndDeepDoubleBvLHbb[iJet];
+    float massIndDeepDoubleCvLQCD  = JetInfo.Jet_MassIndDeepDoubleCvLQCD[iJet];
+    float massIndDeepDoubleCvLHcc  = JetInfo.Jet_MassIndDeepDoubleCvLHcc[iJet];
+    float massIndDeepDoubleCvBHcc  = JetInfo.Jet_MassIndDeepDoubleCvBHcc[iJet];
+    float massIndDeepDoubleCvBHbb  = JetInfo.Jet_MassIndDeepDoubleCvBHbb[iJet];
+    float deepBoostedJetbbvsLight = JetInfo.Jet_DeepBoostedJetbbvsLight[iJet];
+    float deepBoostedJetccvsLight = JetInfo.Jet_DeepBoostedJetccvsLight[iJet];
+    float deepBoostedJetTvsQCD = JetInfo.Jet_DeepBoostedJetTvsQCD[iJet];
+    float deepBoostedJetZHccvsQCD = JetInfo.Jet_DeepBoostedJetZHccvsQCD[iJet];
+    float deepBoostedJetWvsQCD = JetInfo.Jet_DeepBoostedJetWvsQCD[iJet];
+    float deepBoostedJetZHbbvsQCD = JetInfo.Jet_DeepBoostedJetZHbbvsQCD[iJet];
 
     if(DEBUG_)std::cout << "got to FillHisto_JP" << std::endl;
     FillHisto(histoTag+"_TCHE",     flav, isGSPbb, isGSPcc ,tche      ,wt);
@@ -2337,11 +2338,34 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     FillHisto(histoTag+"_CSVIVFv2", flav, isGSPbb, isGSPcc ,csvivfv2  ,wt);
     FillHisto(histoTag+"_cMVAv2",   flav, isGSPbb, isGSPcc ,cmvav2    ,wt);
     FillHisto(histoTag+"_DoubleB",  flav, isGSPbb, isGSPcc ,doubleb   ,wt);
-    FillHisto(histoTag+"_DeepDoubleB",  flav, isGSPbb, isGSPcc ,deepDoubleb   ,wt);
     FillHisto(histoTag+"_TagVarCSV_sv_mass", flav, isGSPbb ,isGSPcc ,mass_TagVarCSV_sv,   wt);
     FillHisto2D(histoTag+"_TagVarCSV_sv_mass_vs_jetpt"        ,flav,isGSPbb , isGSPcc, ptjet,mass_TagVarCSV_sv,wt);
     FillHisto2D(histoTag+"_JP_DoubleB", flav,isGSPbb , isGSPcc, jetproba, doubleb, wt);
     FillHisto2D(histoTag+"_TagVarCSV_sv_mass_DoubleB", flav,isGSPbb , isGSPcc, mass_TagVarCSV_sv, doubleb, wt);
+    FillHisto2D(histoTag+"_JP_v_DDBvL", flav,isGSPbb , isGSPcc, jetproba, deepDoubleBvLHbb, wt);
+    FillHisto2D(histoTag+"_TagVarCSV_sv_mass_DDBvL"  , flav,isGSPbb , isGSPcc, mass_TagVarCSV_sv, deepDoubleBvLHbb, wt);
+    FillHisto2D(histoTag+"_JP_v_DDCvL", flav,isGSPbb , isGSPcc, jetproba, deepDoubleCvLHcc, wt);
+    FillHisto2D(histoTag+"_TagVarCSV_sv_mass_DDCvL"  , flav,isGSPbb , isGSPcc, mass_TagVarCSV_sv, deepDoubleCvLHcc, wt);
+    FillHisto2D(histoTag+"_JP_v_DDCvB", flav,isGSPbb , isGSPcc, jetproba, deepDoubleCvBHcc, wt);
+    FillHisto2D(histoTag+"_TagVarCSV_sv_mass_DDCvB"  , flav,isGSPbb , isGSPcc, mass_TagVarCSV_sv, deepDoubleCvBHcc, wt);
+    FillHisto(histoTag+"_deepDoubleBvLQCD",  flav, isGSPbb, isGSPcc ,deepDoubleBvLQCD   ,wt);
+    FillHisto(histoTag+"_deepDoubleBvLHbb",  flav, isGSPbb, isGSPcc ,deepDoubleBvLHbb   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvLQCD",  flav, isGSPbb, isGSPcc ,deepDoubleCvLQCD   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvLHcc",  flav, isGSPbb, isGSPcc ,deepDoubleCvLHcc   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvBHcc",  flav, isGSPbb, isGSPcc ,deepDoubleCvBHcc   ,wt);
+    FillHisto(histoTag+"_deepDoubleCvBHbb",  flav, isGSPbb, isGSPcc ,deepDoubleCvBHbb   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleBvLQCD",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleBvLQCD   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleBvLHbb",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleBvLHbb   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvLQCD",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvLQCD   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvLHcc",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvLHcc   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvBHcc",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvBHcc   ,wt);
+    FillHisto(histoTag+"_massIndDeepDoubleCvBHbb",  flav, isGSPbb, isGSPcc ,massIndDeepDoubleCvBHbb   ,wt);
+    FillHisto(histoTag+"_deepBoostedJetbbvsLight",  flav, isGSPbb, isGSPcc ,deepBoostedJetbbvsLight ,wt);
+    FillHisto(histoTag+"_deepBoostedJetccvsLight",  flav, isGSPcc, isGSPcc ,deepBoostedJetccvsLight ,wt);
+    FillHisto(histoTag+"_deepBoostedJetTvsQCD",  flav, isGSPbb, isGSPcc ,deepBoostedJetTvsQCD ,wt);
+    FillHisto(histoTag+"_deepBoostedJetZHccvsQCD",  flav, isGSPbb, isGSPcc ,deepBoostedJetZHccvsQCD ,wt);
+    FillHisto(histoTag+"_deepBoostedJetWvsQCD",  flav, isGSPbb, isGSPcc ,deepBoostedJetWvsQCD ,wt);
+    FillHisto(histoTag+"_deepBoostedJetZHbbvsQCD", flav, isGSPbb, isGSPcc ,deepBoostedJetZHbbvsQCD ,wt);
     
     FillHisto(histoTag+"_TCHE_extended1",  flav, isGSPbb, isGSPcc ,tche  , wt);
     FillHisto(histoTag+"_TCHP_extended1",  flav, isGSPbb, isGSPcc ,tchp  , wt);
@@ -2392,7 +2416,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       TLorentzVector fatjet_p4;
       fatjet_p4.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
 
-	
+    
       // ------------------------------------------------
       // ---------- fill fat jet Hbb tagger information -------------- added by rizki - start
       // ------------------------------------------------
@@ -2431,774 +2455,348 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float nSV = JetInfo.Jet_nSV_fat[iJet];
 
       float DoubleB = JetInfo.Jet_DoubleSV[iJet];
-      float DeepDoubleB = JetInfo.Jet_DeepDoubleB[iJet];
+
       // debug - start - rizki
 
 
       //All Region
       TString hTag = "FatJet";
 
-		if(idxMuon_inFirstSubjet > -1){
-		  //         FillHisto(hTag+"_mu1_ptrel",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxMuon_inFirstSubjet] ,wt);
-		  //         FillHisto(hTag+"_mu1_chi2",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_chi2[idxMuon_inFirstSubjet]  ,wt);
-		  FillHisto(hTag+"_muon1_Pt",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.Pt() ,     wt);
-		  FillHisto(hTag+"_muon1_eta",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.Eta() ,    wt);
-		  FillHisto(hTag+"_muon1_phi",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.Phi() ,    wt);      
-		  FillHisto(hTag+"_muon1_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.DeltaR(fatjet_p4) ,    wt);		
-		  FillHisto(hTag+"_muon1_sj1_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.DeltaR(subjet1_p4) ,    wt);		
-		}
-		if(idxMuon_inSecondSubjet > -1){
-		  //         FillHisto(hTag+"_mu2_ptrel",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxMuon_inSecondSubjet] ,wt);
-		  //         FillHisto(hTag+"_mu2_chi2",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_chi2[idxMuon_inSecondSubjet]  ,wt);
-		  FillHisto(hTag+"_muon2_Pt",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.Pt() ,     wt);
-		  FillHisto(hTag+"_muon2_eta",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.Eta() ,    wt);
-		  FillHisto(hTag+"_muon2_phi",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.Phi() ,    wt);      
-		  FillHisto(hTag+"_muon2_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.DeltaR(fatjet_p4) ,    wt);		
-		  FillHisto(hTag+"_muon2_sj2_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.DeltaR(subjet2_p4) ,    wt);		
-		}
-		if(idxMuon_inFirstSubjet > -1 && idxMuon_inSecondSubjet > -1){
-		  FillHisto(hTag+"_dimuon_Pt",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.Pt() ,     wt);
-		  FillHisto(hTag+"_dimuon_eta",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.Eta() ,    wt);
-		  FillHisto(hTag+"_dimuon_phi",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.Phi() ,    wt);      
-		  FillHisto(hTag+"_dimuon_ptRatio",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc , dimuon_v.Pt() / JetInfo.Jet_pt[iJet] ,wt);
-		  FillHisto(hTag+"_dimuon_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.DeltaR(fatjet_p4), wt);
+        if(idxMuon_inFirstSubjet > -1){
+          //         FillHisto(hTag+"_mu1_ptrel",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxMuon_inFirstSubjet] ,wt);
+          //         FillHisto(hTag+"_mu1_chi2",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_chi2[idxMuon_inFirstSubjet]  ,wt);
+          FillHisto(hTag+"_muon1_Pt",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.Pt() ,     wt);
+          FillHisto(hTag+"_muon1_eta",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.Eta() ,    wt);
+          FillHisto(hTag+"_muon1_phi",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.Phi() ,    wt);      
+          FillHisto(hTag+"_muon1_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.DeltaR(fatjet_p4) ,    wt);       
+          FillHisto(hTag+"_muon1_sj1_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon1_v.DeltaR(subjet1_p4) ,    wt);      
+        }
+        if(idxMuon_inSecondSubjet > -1){
+          //         FillHisto(hTag+"_mu2_ptrel",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_ptrel[idxMuon_inSecondSubjet] ,wt);
+          //         FillHisto(hTag+"_mu2_chi2",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,JetInfo.PFMuon_chi2[idxMuon_inSecondSubjet]  ,wt);
+          FillHisto(hTag+"_muon2_Pt",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.Pt() ,     wt);
+          FillHisto(hTag+"_muon2_eta",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.Eta() ,    wt);
+          FillHisto(hTag+"_muon2_phi",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.Phi() ,    wt);      
+          FillHisto(hTag+"_muon2_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.DeltaR(fatjet_p4) ,    wt);       
+          FillHisto(hTag+"_muon2_sj2_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,muon2_v.DeltaR(subjet2_p4) ,    wt);      
+        }
+        if(idxMuon_inFirstSubjet > -1 && idxMuon_inSecondSubjet > -1){
+          FillHisto(hTag+"_dimuon_Pt",     JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.Pt() ,     wt);
+          FillHisto(hTag+"_dimuon_eta",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.Eta() ,    wt);
+          FillHisto(hTag+"_dimuon_phi",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.Phi() ,    wt);      
+          FillHisto(hTag+"_dimuon_ptRatio",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc , dimuon_v.Pt() / JetInfo.Jet_pt[iJet] ,wt);
+          FillHisto(hTag+"_dimuon_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,dimuon_v.DeltaR(fatjet_p4), wt);
 
-		  FillHisto("Subjet1_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,subjet1_p4.DeltaR(fatjet_p4) ,    wt);		
-		  FillHisto("Subjet2_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,subjet2_p4.DeltaR(fatjet_p4) ,    wt);		
-		}
+          FillHisto("Subjet1_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,subjet1_p4.DeltaR(fatjet_p4) ,    wt);        
+          FillHisto("Subjet2_dR",    JetInfo.Jet_flavour[iJet], isGSPbb ,isGSPcc ,subjet2_p4.DeltaR(fatjet_p4) ,    wt);        
+        }
 
-		// debug - end - rizki
+        // debug - end - rizki
 
-		FillHisto("FatJet_z_ratio",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, z_ratio  ,   wt);
+        FillHisto("FatJet_z_ratio",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, z_ratio  ,   wt);
 
-		FillHisto("FatJet_trackSip3dSig_3",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_3  ,   wt);
-		FillHisto("FatJet_trackSip3dSig_2",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_2  ,   wt);
-		FillHisto("FatJet_trackSip3dSig_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_1  ,   wt);
-		FillHisto("FatJet_trackSip3dSig_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_0  ,   wt);
+        FillHisto("FatJet_trackSip3dSig_3",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_3  ,   wt);
+        FillHisto("FatJet_trackSip3dSig_2",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_2  ,   wt);
+        FillHisto("FatJet_trackSip3dSig_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_1  ,   wt);
+        FillHisto("FatJet_trackSip3dSig_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip3dSig_0  ,   wt);
 
-		FillHisto("FatJet_tau1_trackSip3dSig_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackSip3dSig_1  ,   wt);
-		FillHisto("FatJet_tau1_trackSip3dSig_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackSip3dSig_0  ,   wt);
-		FillHisto("FatJet_tau2_trackSip3dSig_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackSip3dSig_1  ,   wt);
-		FillHisto("FatJet_tau2_trackSip3dSig_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackSip3dSig_0  ,   wt);
+        FillHisto("FatJet_tau1_trackSip3dSig_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackSip3dSig_1  ,   wt);
+        FillHisto("FatJet_tau1_trackSip3dSig_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackSip3dSig_0  ,   wt);
+        FillHisto("FatJet_tau2_trackSip3dSig_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackSip3dSig_1  ,   wt);
+        FillHisto("FatJet_tau2_trackSip3dSig_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackSip3dSig_0  ,   wt);
 
-		FillHisto("FatJet_trackSip2dSigAboveCharm_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveCharm_0 ,   wt);
-		FillHisto("FatJet_trackSip2dSigAboveBottom_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_0 ,   wt);
-		FillHisto("FatJet_trackSip2dSigAboveBottom_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_1 ,   wt);
+        FillHisto("FatJet_trackSip2dSigAboveCharm_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveCharm_0 ,   wt);
+        FillHisto("FatJet_trackSip2dSigAboveBottom_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_0 ,   wt);
+        FillHisto("FatJet_trackSip2dSigAboveBottom_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, trackSip2dSigAboveBottom_1 ,   wt);
 
-		FillHisto("FatJet_tau2_trackEtaRel_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_0  ,   wt);
-		FillHisto("FatJet_tau2_trackEtaRel_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_1  ,   wt);
-		FillHisto("FatJet_tau2_trackEtaRel_2",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_2  ,   wt);
+        FillHisto("FatJet_tau2_trackEtaRel_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_0  ,   wt);
+        FillHisto("FatJet_tau2_trackEtaRel_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_1  ,   wt);
+        FillHisto("FatJet_tau2_trackEtaRel_2",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_trackEtaRel_2  ,   wt);
 
-		FillHisto("FatJet_tau1_trackEtaRel_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackEtaRel_0  ,   wt);
-		FillHisto("FatJet_tau1_trackEtaRel_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackEtaRel_1  ,   wt);
-		FillHisto("FatJet_tau1_trackEtaRel_2",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackEtaRel_2  ,   wt);
+        FillHisto("FatJet_tau1_trackEtaRel_0",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackEtaRel_0  ,   wt);
+        FillHisto("FatJet_tau1_trackEtaRel_1",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackEtaRel_1  ,   wt);
+        FillHisto("FatJet_tau1_trackEtaRel_2",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_trackEtaRel_2  ,   wt);
 
-		FillHisto("FatJet_tau1_vertexMass"		,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexMass ,   wt);
-		FillHisto("FatJet_tau1_vertexEnergyRatio"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexEnergyRatio ,   wt);
-		FillHisto("FatJet_tau1_vertexDeltaR"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexDeltaR ,   wt);
-		FillHisto("FatJet_tau1_flightDistance2dSig"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_flightDistance2dSig ,   wt);
+        FillHisto("FatJet_tau1_vertexMass"      ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexMass ,   wt);
+        FillHisto("FatJet_tau1_vertexEnergyRatio"   ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexEnergyRatio ,   wt);
+        FillHisto("FatJet_tau1_vertexDeltaR"    ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_vertexDeltaR ,   wt);
+        FillHisto("FatJet_tau1_flightDistance2dSig" ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau1_flightDistance2dSig ,   wt);
 
-		FillHisto("FatJet_tau2_vertexMass"		,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_vertexMass ,   wt);
-		FillHisto("FatJet_tau2_vertexEnergyRatio"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_vertexEnergyRatio ,   wt);
-		FillHisto("FatJet_tau2_flightDistance2dSig"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_flightDistance2dSig ,   wt);
+        FillHisto("FatJet_tau2_vertexMass"      ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_vertexMass ,   wt);
+        FillHisto("FatJet_tau2_vertexEnergyRatio"   ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_vertexEnergyRatio ,   wt);
+        FillHisto("FatJet_tau2_flightDistance2dSig" ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, tau2_flightDistance2dSig ,   wt);
 
-		FillHisto("FatJet_jetNTracks"		,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, jetNTracks ,   wt);
-		FillHisto("FatJet_nSV"	,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, nSV ,   wt);
+        FillHisto("FatJet_jetNTracks"       ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, jetNTracks ,   wt);
+        FillHisto("FatJet_nSV"  ,      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, nSV ,   wt);
 
         FillHisto("FatJet_DoubleB",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DoubleB  ,   wt);
-        FillHisto("FatJet_DeepDoubleB",      JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, DeepDoubleB  ,   wt);
 
-		FillHisto2D("FatJet_DoubleB_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_0 ,wt);
-		FillHisto2D("FatJet_DoubleB_trackSip3dSig_1" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_1 ,wt);
-		FillHisto2D("FatJet_DoubleB_trackSip3dSig_2" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_2 ,wt);
-		FillHisto2D("FatJet_DoubleB_trackSip3dSig_3" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_3 ,wt);
+        FillHisto2D("FatJet_DoubleB_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_0 ,wt);
+        FillHisto2D("FatJet_DoubleB_trackSip3dSig_1" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_1 ,wt);
+        FillHisto2D("FatJet_DoubleB_trackSip3dSig_2" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_2 ,wt);
+        FillHisto2D("FatJet_DoubleB_trackSip3dSig_3" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,trackSip3dSig_3 ,wt);
 
-		FillHisto2D("FatJet_DoubleB_jetNTracks" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,jetNTracks ,wt);
-		FillHisto2D("FatJet_jetNTracks_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,jetNTracks ,trackSip3dSig_0 , wt);
+        FillHisto2D("FatJet_DoubleB_jetNTracks" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,DoubleB ,jetNTracks ,wt);
+        FillHisto2D("FatJet_jetNTracks_trackSip3dSig_0" ,JetInfo.Jet_flavour[iJet] ,isGSPbb ,isGSPcc ,jetNTracks ,trackSip3dSig_0 , wt);
 
-		// ------------------------------------------------
-		// ---------- fill fat jet Hbb tagger information (end) -------------- added by rizki - end
-		// ------------------------------------------------
+        // ------------------------------------------------
+        // ---------- fill fat jet Hbb tagger information (end) -------------- added by rizki - end
+        // ------------------------------------------------
 
   
   }
 
-  void BTagValidation::fillJetHistos_SF(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
+
+void BTagValidation::fillJetHistos_DeepDoubleX(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
+
+      TLorentzVector fatjet_p4;
+      fatjet_p4.SetPtEtaPhiM(JetInfo.Jet_pt[iJet], JetInfo.Jet_eta[iJet], JetInfo.Jet_phi[iJet], JetInfo.Jet_mass[iJet]);
+
+    FillHisto("FatJet_DeepDoubleX_jetNTracks"              , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_jetNTracks[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_nSV"  , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_jetNSecondaryVertices[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_2[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip3dSig_3", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip3dSig_3[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackSip3dSig_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackSip3dSig_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackSip3dSig_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackSip3dSig_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackSip3dSig_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackSip3dSig_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip2dSigAboveBottom_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip2dSigAboveBottom_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip2dSigAboveBottom_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_trackSip2dSigAboveCharm", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_trackSip2dSigAboveCharm[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackEtaRel_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackEtaRel_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_trackEtaRel_2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_trackEtaRel_2[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_0", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackEtaRel_0[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackEtaRel_1[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_trackEtaRel_2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_trackEtaRel_2[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_vertexMass"             , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_vertexMass[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_vertexEnergyRatio"      , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_vertexEnergyRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_flightDistance2dSig"    , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_flightDistance2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau1_vertexDeltaR"           , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau1_vertexDeltaR[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_vertexMass"             , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_vertexMass[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_vertexEnergyRatio"      , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_vertexEnergyRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_flightDistance2dSig"    , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_flightDistance2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_tau2_vertexDeltaR"           , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_tau2_vertexDeltaR[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_z_ratio"           , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_z_ratio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_EtaRel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_EtaRel[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_PtRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_PtRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_PParRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_PParRatio[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_PtRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip2dVal[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip2dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip2dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip2dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip3dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip3dVal[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_Sip3dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_Sip3dSig[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_charged_JetDistVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_charged_JetDistVal[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_sv_d3d"            , JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_sv_d3d[iJet], wt );
+    FillHisto("FatJet_DeepDoubleX_sv_d3dsig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepDoubleXInput_sv_d3dsig[iJet], wt );
+
+    FillHisto("FatJet_DeepBoostedJet_pf_puppiw", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_puppiw[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_hcalFrac", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_hcalFrac[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_VTX_ass", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_VTX_ass[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_lostInnerHits", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_lostInnerHits[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_quality", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_quality[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_charge", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_charge[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isEl", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isEl[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isMu", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isMu[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isChargedHad", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isChargedHad[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isGamma", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isGamma[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_isNeutral", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_isNeutralHad[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_phirel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_phirel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_etarel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_etarel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_deltaR", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_deltaR[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_abseta", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_abseta[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_ptrel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_ptrel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_erel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_erel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_pt_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_pt_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_drminsv", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_drminsv[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_drsubjet1", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_drsubjet1[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_drsubjet2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_drsubjet2[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_normchi2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_normchi2[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dzsig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dzsig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxysig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxysig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dptdpt", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dptdpt[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_detadeta", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_detadeta[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dphidphi", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dphidphi[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxydxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxydxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dzdz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dzdz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dxydz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dxydz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dphidxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dphidxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_dlambdadz", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_dlambdadz[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagEtaRel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagEtaRel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagPtRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagPtRatio[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagPParRatio", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagPParRatio[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip2dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip2dVal[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip2dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip2dSig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip3dVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip3dVal[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagSip3dSig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagSip3dSig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_pf_btagJetDistVal", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_pf_btagJetDistVal[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_phirel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_phirel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_etarel", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_etarel[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_deltaR", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_deltaR[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_abseta", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_abseta[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_mass", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_mass[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_ptrel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_ptrel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_erel_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_erel_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_pt_log", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_pt_log[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_ntracks", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_ntracks[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_normchi2", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_normchi2[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_dxy", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_dxy[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_dxysig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_dxysig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_d3d", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_d3d[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_d3dsig", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_d3dsig[iJet], wt );
+    FillHisto("FatJet_DeepBoostedJet_sv_costhetasvpv", JetInfo.Jet_flavour[iJet], isGSPbb, isGSPcc, JetInfo.DeepBoostedJetInput_sv_costhetasvpv[iJet], wt );
+
+  }
+
+
+  void BTagValidation::fillJetHistos_SF(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, 
+                                        const TString& histoTag, const TString& LTSVvar, const bool useSVmass,
+                                        const TString& tagger, const std::map<TString,double>&  WPmap, const std::map<TString,std::vector<int>>& ptbinmap, 
+                                        const double wt) {
+
+    if (DEBUG_) std::cout << "FILLING SF HISTOS with " << LTSVvar << std::endl;
 
     float jetpt      = JetInfo.Jet_pt[iJet];
     float jeteta     = JetInfo.Jet_eta[iJet];
-    float jetproba  = JetInfo.Jet_Proba[iJet];
-    float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
-
     int   flav       = JetInfo.Jet_flavour[iJet];
+
+    float LTSV_value  = JetInfo.Jet_Proba[iJet];
+    if (useSVmass) {
+        //LTSV_value  = JetInfo.Jet_tau1_vertexMass_corrected[iJet];
+        // TEMPORARY FIX TODO
+        LTSV_value = JetInfo.TagVarCSV_vertexMass[iJet];
+    }
+    float tagger_value = 0.;
+    if (tagger == TString("DoubleB")) tagger_value  = JetInfo.Jet_DoubleSV[iJet];
+    if (tagger == TString("DDBvL"))   tagger_value  = JetInfo.Jet_DeepDoubleBvLHbb[iJet];
+    if (tagger == TString("DDCvL"))   tagger_value  = JetInfo.Jet_DeepDoubleCvLHcc[iJet];
+    if (tagger == TString("DDCvB"))   tagger_value  = JetInfo.Jet_DeepDoubleCvBHcc[iJet];
+    
+    if (DEBUG_) std::cout << "FILLING JP/SV = "<< LTSV_value << " Filling tagger = "<< tagger_value << std::endl;
+    //if (tagger_value > 0.9 )  std::cout << "FILLING SHIT " << tagger_value << std::endl;
 
     // for SF LT method calculation - start
 
-	double jesup(1.0), jesdown(1.0);
-	if ( doJECUncert_ ) {
-		jesup = GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
-		jesdown = GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
-	}
-
+    double jesup(1.0), jesdown(1.0);
+    if ( doJECUncert_ ) {
+        jesup = GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
+        jesdown = GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
+    }
+            if (DEBUG_) {
             edm::LogInfo("JEC") << " jetpt = " << jetpt 
               << " jes uncert up = " << jesup 
               << " jes uncert down = " << jesdown
               << " jetpt_up = " << jetpt*(1 + jesup)
               << " jetpt_down = " << jetpt*(1+jesdown) ; 
-              
+              }
     double jetpt_up, jetpt_down;
-	jetpt_up =  jetpt*(1 + jesup);
-	jetpt_down = jetpt*(1+jesdown) ;
-    					
-	std::vector<TString> JECstring = {"JECup","JECdown"};
-	
-	std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	std::map<TString,double>  WPmap ={
-										{"DoubleBL",DoubleBL_},
-										{"DoubleBM1",DoubleBM1_},
-										{"DoubleBM2",DoubleBM2_},
-										{"DoubleBH",DoubleBH_}
-										};
-
-	//Make sure this matches with what you've defined in createJetHistos_SF
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-	std::map<TString, std::vector<int> >  ptMap = {
-													{"pt250to300",{250,300}},
-													{"pt300to350",{300,350}},
-													{"pt350to400",{350,400}},
-													{"pt400to450",{400,450}},
-													{"pt450to500",{450,500}},
-													{"pt400to470",{400,470}},
-													{"pt470to2000",{470,2000}},
-													{"pt350to430",{350,430}},
-													{"pt430to2000",{430,2000}},
-													{"pt250to350",{250,350}},
-													{"pt350to450",{350,450}},
-													{"pt300to400",{300,400}},
-													{"pt400to500",{400,500}},
-													{"pt500to600",{500,600}},
-													{"pt600to2000",{600,2000}},
-													{"pt500to2000",{500,2000}},
-													{"pt450to2000",{450,2000}},
-												};
-	
-
-    //new - DoubleB - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
-	}
-	//new - DoubleB  -end
+    jetpt_up =  jetpt*(1 + jesup);
+    jetpt_down = jetpt*(1+jesdown) ;
+                        
+    std::vector<TString> JECstring = {"JECup","JECdown"};
+    
+    std::vector<TString> ptStr;
+    boost::copy(ptbinmap | boost::adaptors::map_keys, std::back_inserter(ptStr));
+    std::vector<TString> WPStr;
+    boost::copy(WPmap | boost::adaptors::map_keys, std::back_inserter(WPStr));
+    // Not needed for SF templates
+    // //new - DoubleB - start 
+    // for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+    //     if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
+    //     //if ( jetpt > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+tagger+"_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,tagger_value  ,wt); //400-450
+    // }
+    // //new - DoubleB  -end
 
     //new - JP nominal - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ", JP notag ," << ptStr.at(ipt) << " nominal " <<std::endl;
-	    if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_all_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt); //400-450
-	}
+    for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << ", JP notag ," << ptStr.at(ipt) << " nominal " <<std::endl;
+        if ( jetpt > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_all_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,LTSV_value  ,wt); //400-450
+    }
 
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JP nominal - end
+    for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap.at(WPStr.at(iWP)) << "(" << iWP <<")" << std::endl;
+        if( tagger_value >= WPmap.at(WPStr.at(iWP)) ){
+          
+            for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+                if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - nominal"<<std::endl;
+                if ( jetpt > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt <= ptbinmap.at(ptStr.at(ipt)).at(1) ) {
+                    FillHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,LTSV_value  ,wt);
+                }
+            }
+        }
+        else if ( tagger_value < WPmap.at(WPStr.at(iWP)) ) {
+            for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+                if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - nominal"<<std::endl;
+                if ( jetpt > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt <= ptbinmap.at(ptStr.at(ipt)).at(1) ){
+                    FillHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,LTSV_value  ,wt); 
+                }
+            }
+        }
+        
+    }
+    //new - JP nominal - end
 
     //new - JEC up - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESup"<<std::endl;
-		if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_all_JESup_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , jetproba,wt); 
-	}
+    for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << ptStr.at(ipt) << " notag - JESup"<<std::endl;
+        if ( jetpt_up > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt_up <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_all_JESup_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , LTSV_value,wt); 
+    }
 
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
+    for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap.at(WPStr.at(iWP)) << "(" << iWP <<")" << std::endl;
+        if( tagger_value >= WPmap.at(WPStr.at(iWP)) ){
 
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
+            for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+                if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECup"<<std::endl;
+                if ( jetpt_up > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt_up <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc , LTSV_value  ,wt);
+            }
+        }
+        else if ( tagger_value < WPmap.at(WPStr.at(iWP)) ) {
 
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JEC up - end
+            for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+                if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECup"<<std::endl;
+                if ( jetpt_up > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt_up <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc ,LTSV_value  ,wt); 
+            }
+        }
+        
+    }
+    //new - JEC up - end
 
     //new - JECdown - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESdown"<<std::endl;
-		if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_all_JESdown_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , jetproba,wt); 
-	}
+    for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << ptStr.at(ipt) << " notag - JESdown"<<std::endl;
+        if ( jetpt_down > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt_down <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_all_JESdown_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , LTSV_value,wt); 
+    }
 
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
+    for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
+        if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap.at(WPStr.at(iWP)) << "(" << iWP <<")" << std::endl;
+        if( tagger_value >= WPmap.at(WPStr.at(iWP)) ){
 
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
+            for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+                if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECdown"<<std::endl;
+                if ( jetpt_down > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt_down <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_pass_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc , LTSV_value  ,wt);
+            }
+        }
+        else if ( tagger_value < WPmap.at(WPStr.at(iWP)) ) {
 
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JP_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JECdown -end
+            for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
+                if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptbinmap.at(ptStr.at(ipt)).at(0) << ","<< ptbinmap.at(ptStr.at(ipt)).at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECdown"<<std::endl;
+                if ( jetpt_down > ptbinmap.at(ptStr.at(ipt)).at(0) && jetpt_down <= ptbinmap.at(ptStr.at(ipt)).at(1) ) FillHisto(histoTag+"_"+LTSVvar+"_"+tagger+"_"+WPStr.at(iWP)+"_fail_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc ,LTSV_value  ,wt); 
+            }
+        }
+        
+    }
+    //new - JECdown -end
 
     // for SF LT method calculation - end
 
   }
 
-  void BTagValidation::fillJetHistos_SF_JPhasSV(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
-
-    float jetpt      = JetInfo.Jet_pt[iJet];
-    float jeteta     = JetInfo.Jet_eta[iJet];
-    float jetproba  = JetInfo.Jet_Proba[iJet];
-    float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
-
-    int   flav       = JetInfo.Jet_flavour[iJet];
-
-    // for SF LT method calculation - start
-
-	double jesup(1.0), jesdown(1.0);
-	if ( doJECUncert_ ) {
-		jesup = GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
-		jesdown = GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
-	}
-
-            edm::LogInfo("JEC") << " jetpt = " << jetpt 
-              << " jes uncert up = " << jesup 
-              << " jes uncert down = " << jesdown
-              << " jetpt_up = " << jetpt*(1 + jesup)
-              << " jetpt_down = " << jetpt*(1+jesdown) ; 
-              
-    double jetpt_up, jetpt_down;
-	jetpt_up =  jetpt*(1 + jesup);
-	jetpt_down = jetpt*(1+jesdown) ;
-    					
-	std::vector<TString> JECstring = {"JECup","JECdown"};
-	
-	std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	std::map<TString,double>  WPmap ={
-										{"DoubleBL",DoubleBL_},
-										{"DoubleBM1",DoubleBM1_},
-										{"DoubleBM2",DoubleBM2_},
-										{"DoubleBH",DoubleBH_}
-										};
-
-	//Make sure this matches with what you've defined in createJetHistos_SF
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-	std::map<TString, std::vector<int> >  ptMap = {
-													{"pt250to300",{250,300}},
-													{"pt300to350",{300,350}},
-													{"pt350to400",{350,400}},
-													{"pt400to450",{400,450}},
-													{"pt450to500",{450,500}},
-													{"pt400to470",{400,470}},
-													{"pt470to2000",{470,2000}},
-													{"pt350to430",{350,430}},
-													{"pt430to2000",{430,2000}},
-													{"pt250to350",{250,350}},
-													{"pt350to450",{350,450}},
-													{"pt300to400",{300,400}},
-													{"pt400to500",{400,500}},
-													{"pt500to600",{500,600}},
-													{"pt600to2000",{600,2000}},
-													{"pt500to2000",{500,2000}},
-													{"pt450to2000",{450,2000}},
-												};
-	
-
-    //new - DoubleB - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
-	}
-	//new - DoubleB  -end
-
-    //new - JPhasSV nominal - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ", JPhasSV notag ," << ptStr.at(ipt) << " nominal " <<std::endl;
-	    if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_all_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt); //400-450
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JPhasSV nominal - end
-
-    //new - JEC up - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESup"<<std::endl;
-		if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_all_JESup_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , jetproba,wt); 
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JEC up - end
-
-    //new - JECdown - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESdown"<<std::endl;
-		if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_all_JESdown_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , jetproba,wt); 
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPhasSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JECdown -end
-
-    // for SF LT method calculation - end
-
-  }
-
-  void BTagValidation::fillJetHistos_SF_JPnoSV(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
-
-    float jetpt      = JetInfo.Jet_pt[iJet];
-    float jeteta     = JetInfo.Jet_eta[iJet];
-    float jetproba  = JetInfo.Jet_Proba[iJet];
-    float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
-
-    int   flav       = JetInfo.Jet_flavour[iJet];
-
-    // for SF LT method calculation - start
-
-	double jesup(1.0), jesdown(1.0);
-	if ( doJECUncert_ ) {
-		jesup = GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
-		jesdown = GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
-	}
-
-            edm::LogInfo("JEC") << " jetpt = " << jetpt 
-              << " jes uncert up = " << jesup 
-              << " jes uncert down = " << jesdown
-              << " jetpt_up = " << jetpt*(1 + jesup)
-              << " jetpt_down = " << jetpt*(1+jesdown) ; 
-              
-    double jetpt_up, jetpt_down;
-	jetpt_up =  jetpt*(1 + jesup);
-	jetpt_down = jetpt*(1+jesdown) ;
-    					
-	std::vector<TString> JECstring = {"JECup","JECdown"};
-	
-	std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	std::map<TString,double>  WPmap ={
-										{"DoubleBL",DoubleBL_},
-										{"DoubleBM1",DoubleBM1_},
-										{"DoubleBM2",DoubleBM2_},
-										{"DoubleBH",DoubleBH_}
-										};
-
-	//Make sure this matches with what you've defined in createJetHistos_SF
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-	std::map<TString, std::vector<int> >  ptMap = {
-													{"pt250to300",{250,300}},
-													{"pt300to350",{300,350}},
-													{"pt350to400",{350,400}},
-													{"pt400to450",{400,450}},
-													{"pt450to500",{450,500}},
-													{"pt400to470",{400,470}},
-													{"pt470to2000",{470,2000}},
-													{"pt350to430",{350,430}},
-													{"pt430to2000",{430,2000}},
-													{"pt250to350",{250,350}},
-													{"pt350to450",{350,450}},
-													{"pt300to400",{300,400}},
-													{"pt400to500",{400,500}},
-													{"pt500to600",{500,600}},
-													{"pt600to2000",{600,2000}},
-													{"pt500to2000",{500,2000}},
-													{"pt450to2000",{450,2000}},
-												};
-	
-
-    //new - DoubleB - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
-    	if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
-
-	}
-	//new - DoubleB  -end
-
-    //new - JPnoSV nominal - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ", JPnoSV notag ," << ptStr.at(ipt) << " nominal " <<std::endl;
-	    if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_all_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt); //400-450
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JPnoSV nominal - end
-
-    //new - JEC up - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESup"<<std::endl;
-		if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_all_JESup_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , jetproba,wt); 
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc , jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JEC up - end
-
-    //new - JECdown - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESdown"<<std::endl;
-		if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_all_JESdown_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , jetproba,wt); 
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc , jetproba  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_JPnoSV_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc ,jetproba  ,wt); 
-			}
-		}
-		
-	}
-	//new - JECdown -end
-
-    // for SF LT method calculation - end
-
-  }
-
-  void BTagValidation::fillJetHistos_SF_SVmass(const JetInfoBranches& JetInfo, const int iJet, const bool isGSPbb, const bool isGSPcc, const TString& histoTag, const double wt) {
-
-    float jetpt      = JetInfo.Jet_pt[iJet];
-    float jeteta     = JetInfo.Jet_eta[iJet];
-    float tau1VertexMassCorr  = JetInfo.Jet_tau1_vertexMass_corrected[iJet];
-    float doubleb   = JetInfo.Jet_DoubleSV[iJet];
-    float deepdoubleb   = JetInfo.Jet_DeepDoubleB[iJet];
-
-    int   flav       = JetInfo.Jet_flavour[iJet];
-
-    // for SF LT method calculation - start
-
-	double jesup(1.0), jesdown(1.0);
-	if ( doJECUncert_ ) {
-		jesup = GetJESUncert(1.0, jetpt, jeteta, jesup) ; 
-		jesdown = GetJESUncert(-1.0, jetpt, jeteta, jesdown) ; 
-	}
-
-            edm::LogInfo("JEC") << " jetpt = " << jetpt 
-              << " jes uncert up = " << jesup 
-              << " jes uncert down = " << jesdown
-              << " jetpt_up = " << jetpt*(1 + jesup)
-              << " jetpt_down = " << jetpt*(1+jesdown) ; 
-              
-    double jetpt_up, jetpt_down;
-	jetpt_up =  jetpt*(1 + jesup);
-	jetpt_down = jetpt*(1+jesdown) ;
-    					
-	std::vector<TString> JECstring = {"JECup","JECdown"};
-	
-	std::vector<TString> WPStr = {"DoubleBL","DoubleBM1","DoubleBM2","DoubleBH"};
-	std::map<TString,double>  WPmap ={
-										{"DoubleBL",DoubleBL_},
-										{"DoubleBM1",DoubleBM1_},
-										{"DoubleBM2",DoubleBM2_},
-										{"DoubleBH",DoubleBH_}
-										};
-
-	//Make sure this matches with what you've defined in createJetHistos_SF
-	std::vector<TString> ptStr = {
-								"pt250to300",
-								"pt300to350",
-								"pt350to400",
-								"pt400to450",
-								"pt450to500",
-								"pt400to470",
-								"pt470to2000",
-								"pt350to430",
-								"pt430to2000",
-								"pt250to350",
-								"pt350to450",
-								"pt300to400",
-								"pt400to500",
-								"pt500to600",
-								"pt600to2000",
-								"pt500to2000",
-								"pt450to2000",
-								};
-	std::map<TString, std::vector<int> >  ptMap = {
-													{"pt250to300",{250,300}},
-													{"pt300to350",{300,350}},
-													{"pt350to400",{350,400}},
-													{"pt400to450",{400,450}},
-													{"pt450to500",{450,500}},
-													{"pt400to470",{400,470}},
-													{"pt470to2000",{470,2000}},
-													{"pt350to430",{350,430}},
-													{"pt430to2000",{430,2000}},
-													{"pt250to350",{250,350}},
-													{"pt350to450",{350,450}},
-													{"pt300to400",{300,400}},
-													{"pt400to500",{400,500}},
-													{"pt500to600",{500,600}},
-													{"pt600to2000",{600,2000}},
-													{"pt500to2000",{500,2000}},
-													{"pt450to2000",{450,2000}},
-												};
-	
-
-    //new - DoubleB - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ","<< ptStr.at(ipt) << " DoubleB "<<std::endl;
-    	if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,doubleb  ,wt); //400-450
-        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_DeepDoubleB_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,deepdoubleb  ,wt); //400-450
-	}
-	//new - DoubleB  -end
-
-    //new - tau1VertexMassCorr nominal - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << ", JP notag ," << ptStr.at(ipt) << " nominal " <<std::endl;
-	    if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_all_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,tau1VertexMassCorr  ,wt); //400-450
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,tau1VertexMassCorr  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - nominal"<<std::endl;
-		        if ( jetpt > ptMap[ptStr.at(ipt)].at(0) && jetpt <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc ,tau1VertexMassCorr  ,wt); 
-			}
-		}
-		
-	}
-	//new - tau1VertexMassCorr nominal - end
-
-    //new - JEC up - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESup"<<std::endl;
-		if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_all_JESup_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , tau1VertexMassCorr,wt); 
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc , tau1VertexMassCorr  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECup"<<std::endl;
-				if ( jetpt_up > ptMap[ptStr.at(ipt)].at(0) && jetpt_up <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESup", flav, isGSPbb, isGSPcc ,tau1VertexMassCorr  ,wt); 
-			}
-		}
-		
-	}
-	//new - JEC up - end
-
-    //new - JECdown - start 
-	for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << ptStr.at(ipt) << " notag - JESdown"<<std::endl;
-		if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_all_JESdown_"+ptStr.at(ipt), flav, isGSPbb, isGSPcc , tau1VertexMassCorr,wt); 
-	}
-
-	for(unsigned int iWP=0; iWP < WPStr.size(); iWP++ ){
-		if(DEBUG_ && DEBUGlevel_>1 )std::cout << "WP = " << WPmap[WPStr.at(iWP)] << "(" << iWP <<")" << std::endl;
-		if( doubleb >= WPmap[WPStr.at(iWP)] ){
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " pass - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"pass_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc , tau1VertexMassCorr  ,wt);
-			}
-		}
-		else if ( doubleb < WPmap[WPStr.at(iWP)] ) {
-
-			for(unsigned int ipt=0; ipt < ptStr.size(); ipt++ ){
-				if(DEBUG_ && DEBUGlevel_>1 )std::cout << ptMap[ptStr.at(ipt)].at(0) << ","<< ptMap[ptStr.at(ipt)].at(1) << "," << WPStr.at(iWP) << ","<< ptStr.at(ipt) << " fail - JECdown"<<std::endl;
-				if ( jetpt_down > ptMap[ptStr.at(ipt)].at(0) && jetpt_down <= ptMap[ptStr.at(ipt)].at(1) ) FillHisto(histoTag+"_tau1VertexMassCorr_"+WPStr.at(iWP)+"fail_"+ptStr.at(ipt)+"_JESdown", flav, isGSPbb, isGSPcc ,tau1VertexMassCorr  ,wt); 
-			}
-		}
-		
-	}
-	//new - JECdown -end
-
-    // for SF LT method calculation - end
-
-  }
+  // 
 
 
   // ------------ method called once each job just after ending the event loop  ------------
@@ -3326,7 +2924,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if( useFlavorCategories_ ) {
           if( isGSPbb ) HistoBtag_map[name+"_bfromg"]->Fill(double(value),weight);
           else if( isGSPcc ) HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
-          //RS>>else if (isGSPcc&&abs(flavour)==4) 		  HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
+          //RS>>else if (isGSPcc&&abs(flavour)==4)        HistoBtag_map[name+"_cfromg"]->Fill(double(value),weight);
           else {
             if (abs(flavour)==5)                          HistoBtag_map[name+"_b"]->Fill(double(value),weight);
             else if (abs(flavour)==4)                     HistoBtag_map[name+"_c"]->Fill(double(value),weight);
@@ -3347,7 +2945,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         if( useFlavorCategories_ ) {
           if( isGSPbb ) HistoBtag2D_map[name+"_bfromg"]->Fill(double(value),double(value2),weight);
           else if( isGSPcc ) HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
-          //RS>>else if (isGSPcc && abs(flavour)==4) 		  HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
+          //RS>>else if (isGSPcc && abs(flavour)==4)          HistoBtag2D_map[name+"_cfromg"]->Fill(double(value),double(value2),weight);
           else {
             if (abs(flavour)==5)                          HistoBtag2D_map[name+"_b"]->Fill(double(value),double(value2),weight);
             else if (abs(flavour)==4)                     HistoBtag2D_map[name+"_c"]->Fill(double(value),double(value2),weight);
@@ -3365,7 +2963,7 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
   if(triggerSelection_.size()==0) ret = true;
   else {
-  	std::vector<bool> triggerBits;
+    std::vector<bool> triggerBits;
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
       triggerBits.push_back(false);
       //if(DEBUG_)std::cout << "i = " << i << std::endl;
@@ -3396,20 +2994,20 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
     
     for(unsigned i=0; i<triggerSelection_.size(); ++i) {
 
-    	// makes trigger logic: AND
-    	if(!triggerBits.at(i) && !isOR){
-    		ret=false;
-    		break;
-    	}
-    	else if(!isOR){
-    		ret=true;
-    	}
+        // makes trigger logic: AND
+        if(!triggerBits.at(i) && !isOR){
+            ret=false;
+            break;
+        }
+        else if(!isOR){
+            ret=true;
+        }
 
-		// makes trigger logic: OR
-    	if(triggerBits.at(i) && isOR){
-    		ret=true;
-    		break;
-    	} 
+        // makes trigger logic: OR
+        if(triggerBits.at(i) && isOR){
+            ret=true;
+            break;
+        } 
     }
     
     

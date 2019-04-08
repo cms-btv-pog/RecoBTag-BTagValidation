@@ -1,0 +1,9 @@
+executable  =  <path_batch_file_wo_ext>.sh
+universe    =  vanilla
+log         =  <path_batch_file_wo_ext>.log
+error       =  <path_batch_file_wo_ext>.err
+output      =  <path_batch_file_wo_ext>.out
+initialdir  =  <path_batch>
+getenv      =  True
++JobFlavour = "workday"
+queue

@@ -1,6 +1,8 @@
+import sys
 import FWCore.ParameterSet.Config as cms
 
 from FWCore.ParameterSet.VarParsing import VarParsing
+from pdb import set_trace
 
 options = VarParsing('python')
 
@@ -304,7 +306,7 @@ options.register('applySFs', False,
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('btagCSVFile', 'CSVv2_4invfb.csv',
+options.register('btagCSVFile', 'aux/CSVv2_4invfb.csv',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "CSV file containing b-tagging SFs"
@@ -354,15 +356,15 @@ options.register('FileZratioWt', "",
     VarParsing.varType.string,
     "File with data/MC weights for Zratio reweighting"
     )
-options.register('newJECPayloadNames',"", 
+options.register('newJECPayloadNames',"",
     VarParsing.multiplicity.list,
     VarParsing.varType.string,
     "New JEC payload names"
     ),
-options.register('jecUncPayloadName', 
+options.register('jecUncPayloadName',
     "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt",
     VarParsing.multiplicity.singleton,
-    VarParsing.varType.string, 
+    VarParsing.varType.string,
     "JEC uncertainty payload name"
     ),
 options.register('doNewJEC', True,
@@ -379,6 +381,31 @@ options.register('FileBFrag', "/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File path for doBFrag systematics"
+    )
+options.register('produceDoubleBCommissioning', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DoubleB commissioning plots"
+    )
+options.register('produceDeepDoubleXCommissioning', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DeepDoubleX commissioning plots"
+    )
+options.register('produceDDXSFtemplates', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Produce DDX SF plots/templates"
+    )
+options.register('DDXWPFile', "aux/DDX.json",
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "DDX taggers WP file"
+    )
+options.register('chooseDDXtagger', 'DDBvL',
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.string,
+    "Specify DDX tagger (DoubleB, DDBvL, DDCvL, DDCvB) to use for SF plots/templates (only applicable when produceDDXSFtemplates=True)"
     )
 options.register('produceDoubleBSFtemplates', False,
     VarParsing.multiplicity.singleton,
@@ -428,11 +455,12 @@ options.register('groups', [],
 options.parseArguments()
 
 if options.usePrunedSubjets and options.useSoftDropSubjets:
-  print "Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed."
-  print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
+  print("Warning: both pruned and soft drop subjets selected. Only pruned subjets will be processed.")
+  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
 elif not options.usePrunedSubjets and not options.useSoftDropSubjets:
-  print "!!!Warning: no subjets will be processed.!!!"
-  print "!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'."
+  print("!!!Warning: no subjets will be processed.!!!")
+  print("!!!Select either pruned subjets with 'usePrunedSubjets' or soft drop subjets with 'useSoftDropSubjets'.")
+  print("!!!Warning: SoftDropSubjetInfo will be used for FatJets.!!!")
 
 # print options
 
@@ -449,9 +477,9 @@ process.source = cms.Source("EmptySource")
 
 ## Output file
 #ext=""
-#if options.usePrunedSubjets: 
+#if options.usePrunedSubjets:
 #  ext="_WithPrunedSubjets"
-#elif options.useSoftDropSubjets: 
+#elif options.useSoftDropSubjets:
 #  ext="_withSoftDropSubjets"
 #outFilename = options.outFilename+ext+".root"
 
@@ -462,24 +490,31 @@ process.TFileService = cms.Service("TFileService",
 from inputFiles_cfi import *
 from RecoBTag.PerformanceMeasurements.bTagAnalyzerCommon_cff import *
 from RecoBTag.PerformanceMeasurements.variables_cfi import *
-from RecoBTag.PerformanceMeasurements.varGroups_cfi import * 
-#print bTagAnalyzerCommon.TriggerPathNames 
-groupSet_ = groupSet.clone()
+from RecoBTag.PerformanceMeasurements.varGroups_cfi import *
+#print bTagAnalyzerCommon.TriggerPathNames
 
-for requiredGroup in options.groups:
-  #print(requiredGroup)
-  found=False
-  for existingGroup in groupSet_.groups:
-    if(requiredGroup==existingGroup.group):
-      existingGroup.store=True
-      found=True
-      break
-  if(not found):
-    print('WARNING: The group ' + requiredGroup + ' was not found')
+print("!!!! Opening files {}".format(FileNames))
+
+varList = []
+for groupToRead in options.groups:
+  for groupExisting in groupSet.groups:
+    if groupToRead == groupExisting.group:
+      for varname in groupExisting.variables:
+        if "FatJetInfo." in varname:
+          shortvarname = varname.split(".")[1]
+          var = variableDict[shortvarname].clone()
+          var.variable = varname
+        elif "SubJetInfo." in varname:
+          shortvarname = varname.split(".")[1]
+          var = variableDict[shortvarname].clone()
+          var.variable = varname
+        else:
+          var = variableDict[varname].clone()
+        var.store = cms.bool(True)
+        varList.append(var)
+variableToRead = cms.VPSet(varList)
 
 process.btagval = cms.EDAnalyzer('BTagValidation',
-    variableSet,
-    groupSet_,
     DEBUG    = cms.bool(options.DEBUG),
     DEBUGlevel    = cms.int32(options.DEBUGlevel),
     MaxEvents              = cms.int32(options.maxEvents),
@@ -503,8 +538,8 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     ApplySubJetBTagging    = cms.bool(options.applySubJetBTagging),
     DynamicMuonSubJetDR    = cms.bool(options.dynamicMuonSubJetDR),
     FatJetBDiscrCut        = cms.double(options.fatJetBDiscrCut),
-    FatJetDoubleSVBDiscrMin= cms.double(options.fatJetDoubleSVBDiscrMin), 
-    FatJetDoubleSVBDiscrMax= cms.double(options.fatJetDoubleSVBDiscrMax), 
+    FatJetDoubleSVBDiscrMin= cms.double(options.fatJetDoubleSVBDiscrMin),
+    FatJetDoubleSVBDiscrMax= cms.double(options.fatJetDoubleSVBDiscrMax),
     SubJetBDiscrMin        = cms.double(options.subJetBDiscrMin),
     SubJetBDiscrMax        = cms.double(options.subJetBDiscrMax),
     MuonPtMin            = cms.double(options.muonPtMin),
@@ -517,15 +552,15 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     FatJetGroomedMassMax  = cms.double(options.fatJetGroomedMassMax),
     File_PVWt              = cms.string(''),
     Hist_PVWt              = cms.string(''),
-    File_PUDistMC          = cms.string(options.FilePUDistMC), 
+    File_PUDistMC          = cms.string(options.FilePUDistMC),
     Hist_PUDistMC          = cms.string('pileup'),
     File_PUDistData        = cms.string(options.FilePUDistData),
     Hist_PUDistData        = cms.string('pileup'),
     File_FatJetPtWt        = cms.string(options.FileFatJetPtWt),
     Hist_FatJetPtWt        = cms.string('FatJet_pt_all_weight_data_mc'),
-    File_NtracksWt         = cms.string(options.FileNtracksWt),                             
+    File_NtracksWt         = cms.string(options.FileNtracksWt),
     Hist_NtracksWt         = cms.string('FatJet_track_multi_weight_data_mc'),
-    File_SubJetPtWt        = cms.string(options.FileSubJetPtWt), 
+    File_SubJetPtWt        = cms.string(options.FileSubJetPtWt),
     Hist_SubJetPtWt        = cms.string('jetptweight_mc_data'),
     File_SubJetPtBalanceWt = cms.string('subjetptbalance_Hbb_QCDbb_pt425_weight.root'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
     Hist_SubJetPtBalanceWt = cms.string('subjetptbalanceweight_mc_data'), #added by rizki for Hbb tagger signal vs proxy studies. File for subjet pt balance reweighting.
@@ -552,10 +587,10 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     DoNtracksReweighting  = cms.bool(options.doNtracksReweighting),
     DoBFrag = cms.bool(options.doBFrag),
     DoBFragUp = cms.bool(options.doBFragUp),
-    DoBFragDown = cms.bool(options.doBFragDown),                                 
+    DoBFragDown = cms.bool(options.doBFragDown),
     DoCDFrag = cms.bool(options.doCDFrag),
     DoCFrag = cms.bool(options.doCFrag),
-    DoK0L = cms.bool(options.doK0L),                                 
+    DoK0L = cms.bool(options.doK0L),
     DoSubJetPtReweighting  = cms.bool(options.doSubJetPtReweighting),
     DoSubJetPtBalanceReweighting  = cms.bool(options.doSubJetPtBalanceReweighting),
     DoMassSoftDropReweighting  = cms.bool(options.doMassSoftDropReweighting),
@@ -572,20 +607,27 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
     btagCSVFile            = cms.string(options.btagCSVFile),
     btagOperatingPoint     = cms.int32(options.btagOperatingPoint),
     btagMeasurementType    = cms.string(options.btagMeasurementType),
-    btagSFType             = cms.string(options.btagSFType), 
-    newJECPayloadNames     = cms.vstring('/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_L1FastJet_AK8PFchs.txt','/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt','/afs/cern.ch/work/r/rsyarif/work/HbbTagVal/Jan10-2018_CommSF_v1/CMSSW_9_4_1/src/RecoBTag/BTagValidation/BTV/aux/JECfiles/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt'), 
-    jecUncPayloadName      = cms.string(options.jecUncPayloadName), 
+    btagSFType             = cms.string(options.btagSFType),
+    newJECPayloadNames     = cms.vstring('aux/JECfiles/Summer16_23Sep2016V3_MC_L1FastJet_AK8PFchs.txt','aux/JECfiles/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt','aux/JECfiles/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt'),
+    jecUncPayloadName      = cms.string(options.jecUncPayloadName),
     doNewJEC               = cms.bool(options.doNewJEC),
-    doJECUncert            = cms.bool(options.doJECUncert),  
-    File_BFrag				= cms.string(options.FileBFrag), 
+    doJECUncert            = cms.bool(options.doJECUncert),
+    File_BFrag				= cms.string(options.FileBFrag),
+    produceDoubleBCommissioning        = cms.bool(options.produceDoubleBCommissioning),
+    produceDeepDoubleXCommissioning    = cms.bool(options.produceDeepDoubleXCommissioning),
+    produceDDXSFtemplates        = cms.bool(options.produceDDXSFtemplates),
+    DDXWPFile        = cms.string(options.DDXWPFile),
+    chooseDDXtagger        = cms.string(options.chooseDDXtagger),
     produceDoubleBSFtemplates        = cms.bool(options.produceDoubleBSFtemplates),
     produceDoubleBSFtemplatesV2        = cms.bool(options.produceDoubleBSFtemplatesV2),
     produceDoubleBSFtemplates_JPhasSV        = cms.bool(options.produceDoubleBSFtemplatesJPhasSV),
     produceDoubleBSFtemplates_JPnoSV        = cms.bool(options.produceDoubleBSFtemplatesJPnoSV),
-    useRunRange            = cms.bool(options.useRunRange),  
+    useRunRange            = cms.bool(options.useRunRange),
     runRangeMin     = cms.int32(options.runRangeMin),
     runRangeMax     = cms.int32(options.runRangeMax),
-    runOnData     = cms.bool(options.runOnData)
+    runOnData     = cms.bool(options.runOnData),
+    variables              = variableToRead,
+    groups = groupSet.groups
 )
 
 #process.btagvalsubjetmu = process.btagval.clone(
@@ -599,3 +641,5 @@ process.btagval = cms.EDAnalyzer('BTagValidation',
 
 process.p = cms.Path(process.btagval)
 #process.p = cms.Path(process.btagval + process.btagvalsubjetmu + process.btagvalsubjetbtag)
+
+#open('dump.py', 'w').write(process.dumpPython())
