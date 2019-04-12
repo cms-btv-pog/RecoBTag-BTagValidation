@@ -453,6 +453,7 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   //AddHisto(histoTag+"_JBP"     ,";JBP;;",50,0.,8.);
   //AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   AddHisto(histoTag+"_DeepCSV" ,";DeepCSV;;",50,0.,1.);
+  AddHisto(histoTag+"_DeepCSV_SV" ,";DeepCSV_SV;;",50,0.,1.);
   //AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
 
@@ -777,8 +778,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           if (!isData && doGSPDown_ && isGSPbb) wtSubJet *= 0.75;
 
           // -------For calculating b-fragmentation systematic
-          if (sjabsflav == 5) {
-            if (doBFrag_){
+          if (doBFrag_){
+            if (sjabsflav == 5) {
               //double sfbFrag = 1.;
               double drMin = 0.8;   
               double WeightBFrag = 1.;
@@ -827,8 +828,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           } //// B fragmentation systematics  
 
           //// CD Frag Systematic
-          if (sjabsflav == 5 || sjabsflav == 4) {
-            if (doCDFrag_) {
+          if (doCDFrag_) {
+            if (sjabsflav == 5 || sjabsflav == 4) {
               double sfCD = 1.;
               double drMin = 0.8;   
               bool isDplusMu = false, isDzeroMu = false, isDsubsMu = false;
@@ -863,8 +864,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           } //// CD fragmentation systematics 
 
           //// c fragmentation
-          if (sjabsflav == 4){
-            if (doCFrag_){
+          if (doCFrag_){
+            if (sjabsflav == 4){
               double sfC = 1.;
               double drMin = 0.8;   
 
@@ -903,8 +904,8 @@ void BTagValidation::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           } //// c fragmentation systematics 
 
           //// K0s Lambda sys
-          if (sjabsflav < 4 || sjabsflav == 21) {
-            if (doK0L_) {
+          if (doK0L_) {
+            if (sjabsflav < 4 || sjabsflav == 21) {
               double sfK0L = 1.;
               int nK0s = 0, nLambda = 0;
               for( int k=0;k<EvtInfo.nGenV0;k++ ) {
@@ -1099,7 +1100,17 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
 
   FillHisto(histoTag+"_sv_multi_0",      flav, isGSPbb , isGSPcc ,n_sv   ,         wt);
 
+  double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
+  double jetproba (JetInfo.Jet_Proba[iJet]);
+  //double jetbproba(JetInfo.Jet_Bprob[iJet]);
+  //double csvivfv2 (JetInfo.Jet_CombIVF[iJet]);
+  double deepcsv  (JetInfo.Jet_DeepCSVBDisc[iJet]);
+  //double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
+  double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
+
   if (n_sv>0) {
+
+    FillHisto(histoTag+"_DeepCSV_SV",  flav, isGSPbb, isGSPcc ,deepcsv   ,wt);
 
     float flight2DSig_sv = JetInfo.SV_flight2D[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_flight2DErr[JetInfo.Jet_nFirstSV[iJet]];
     //float sv_nTrk         = JetInfo.SV_nTrk[JetInfo.Jet_nFirstSV[iJet]] ;
@@ -1115,14 +1126,6 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
     edm::LogInfo("SVInfo") << " NSV = " << n_sv << " SV 2D flightdist sig = " << flight2DSig_sv ;
 
   }
-
-  double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
-  double jetproba (JetInfo.Jet_Proba[iJet]);
-  //double jetbproba(JetInfo.Jet_Bprob[iJet]);
-  //double csvivfv2 (JetInfo.Jet_CombIVF[iJet]);
-  double deepcsv  (JetInfo.Jet_DeepCSVBDisc[iJet]);
-  //double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
-  double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
 
   edm::LogInfo("TrkInfo") << " track multi = " << ntracksel ;
   edm::LogInfo("SVInfo") << " SV mass = " << mass_TagVarCSV_sv ;
