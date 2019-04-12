@@ -251,12 +251,12 @@ options.register('btagSFType', "central",
     VarParsing.varType.bool,
     "Apply b-tagging SFs"
     )
-options.register('FileFatJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/jetpt_data_weight_fatJetPtMin_450_tau-0p5/fatjetpt_DataRun2016Rereco_MC_RunIISummer16_25ns_MINIAOD.root",
+options.register('FileFatJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_10_2_7/src/RecoBTag/BTagValidation/test/dataMC_pt_reweight/FatJetPt_data_mc_weight_BATCH_Moriond2019_RunIIMiniAOD_17June2018.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for fat jet pT reweighting"
     )
-options.register('FileSubJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_9_4_1/src/RecoBTag/BTagValidation/test/SoftDropSubJetPt_data_mc_SubJetMuTagged_QCDMuEnriched_94XMiniAOD.root",
+options.register('FileSubJetPtWt', "/afs/cern.ch/user/d/devdatta/afswork/CMSREL/BTagging/CMSSW_10_2_7/src/RecoBTag/BTagValidation/test/dataMC_pt_reweight/SoftDropSubJetPt_data_mc_weight_BATCH_Moriond2019_RunIIMiniAOD_17June2018.root",
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "File with data/MC weights for subjet pT reweighting"
