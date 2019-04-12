@@ -20,7 +20,7 @@ def main():
                     metavar="MAIN_WORKDIR")
 
   parser.add_option("-q", "--queue", dest="queue",
-                    action='store', default='8nh',
+                    action='store', default='cmscaf1nd',
                     help="LXBatch queue (choose among cmst3 8nm 1nh 8nh 1nd 1nw). Default is '8nh' (This parameter is optional)",
                     metavar="QUEUE")
 
