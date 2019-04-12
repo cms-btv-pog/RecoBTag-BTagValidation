@@ -4,13 +4,13 @@
 import ROOT
 import os
 
-dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/"
-fname = 'Mu_350'
-f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
+dir = "/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_10_2_7/src/RecoBTag/BTagValidation/test/"
+fname = 'BATCH_Moriond2019_RunIIMiniAOD_17June2018'
+f = os.path.join(dir, fname, 'Final_histograms_btagval.root')
 
 
 files_data = [
-f_
+f
 ]
 
 jetpt_data = ROOT.TH1D("jetpt_data", ";pT(all jets);;",500,0.,5000.)
@@ -22,12 +22,12 @@ hpt_qcd = ROOT.TH1D("jetpt_mc", ";pT(all jets);;",500,0.,5000.)
 
 for f in files_data:
   fin = ROOT.TFile.Open(f, "READ")
-  hpt_data = fin.Get("DATA__FatJet_pt_all_data")
-  hpt_qcd_b  = fin.Get("QCD__FatJet_pt_all_b")
-  hpt_qcd_c  = fin.Get("QCD__FatJet_pt_all_c")
-  hpt_qcd_l  = fin.Get("QCD__FatJet_pt_all_l")
-  hpt_qcd_bfromg  = fin.Get("QCD__FatJet_pt_all_bfromg")
-  hpt_qcd_cfromg  = fin.Get("QCD__FatJet_pt_all_cfromg")
+  hpt_data = fin.Get("DATA__SoftDropSubJet_pt_all_data")
+  hpt_qcd_b  = fin.Get("QCD__SoftDropSubJet_pt_all_b")
+  hpt_qcd_c  = fin.Get("QCD__SoftDropSubJet_pt_all_c")
+  hpt_qcd_l  = fin.Get("QCD__SoftDropSubJet_pt_all_l")
+  hpt_qcd_bfromg  = fin.Get("QCD__SoftDropSubJet_pt_all_bfromg")
+  hpt_qcd_cfromg  = fin.Get("QCD__SoftDropSubJet_pt_all_cfromg")
   hpt_qcd = hpt_qcd_b.Clone("hptqcd")
   hpt_qcd.Add(hpt_qcd_c)
   hpt_qcd.Add(hpt_qcd_l)
@@ -51,7 +51,7 @@ for ibin in xrange(1, nbins+1):
   jetpt_mc_reweight.SetBinContent(ibin, nmc*wt)
   print "bin", ibin ," ndata",ndata," nmc",nmc, " wt", wt
   
-fout = ROOT.TFile("FatJetPt_data_mc_weight_"+fname+".root", "RECREATE")
+fout = ROOT.TFile("SoftDropSubJetPt_data_mc_weight_"+fname+".root", "RECREATE")
 fout.cd()
 jetpt_data.Write()
 jetpt_mc_noweight.Write()
@@ -73,7 +73,7 @@ leg.AddEntry(jetpt_data, "data")
 leg.AddEntry(jetpt_mc_noweight, "QCD MC")
 leg.Draw()
 
-c0.SaveAs("FatJetPt_mc_data_noweight_"+fname+".pdf")
+c0.SaveAs("SoftDropSubJetPt_mc_data_noweight_"+fname+".pdf")
   
 c1 = ROOT.TCanvas()
 c1.cd()
@@ -86,4 +86,4 @@ leg.AddEntry(jetpt_data, "data")
 leg.AddEntry(jetpt_mc_reweight, "QCD MC")
 leg.Draw()
 
-c1.SaveAs("FatJetPt_mc_data_reweight_"+fname+".pdf")
+c1.SaveAs("SoftDropSubJetPt_mc_data_reweight_"+fname+".pdf")
