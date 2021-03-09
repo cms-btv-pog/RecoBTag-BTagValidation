@@ -1,4 +1,4 @@
-BTagValidation for UL 2017 data and MC 
+BTagValidation for UL 2018 data and MC 
 ==============
 
 Boosted b-tag validation analysis 
@@ -9,9 +9,9 @@ Follow the directions to clone cms-btv-pog/RecoBTag-PerformanceMeasurements at h
 
 After setting up the PerformanceMeasurements package:
 
-cd CMSSW_10_6_8_patch1/src      
+cd CMSSW_10_6_12/src      
 
-git clone -b commissioning_UL17 git@github.com:cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
+git clone -b commissioning_UL18 git@github.com:cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
 
 scram b -j8
 
