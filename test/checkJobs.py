@@ -36,6 +36,7 @@ def main():
     sys.exit()
 
   main_workdir = options.main_workdir
+  cfg_dirname = os.getcwd()
 
   # redefine main_workdir as an absolute path (if not defined in such form already)
   if not re.search("^/", main_workdir):
@@ -86,8 +87,11 @@ def main():
             for job in failed_jobs:
                 if os.path.exists(os.path.join(dataset_workdir,'output','job_' + job + '.log')):
                     shutil.copyfile(os.path.join(dataset_workdir,'output','job_' + job + '.log'),os.path.join(dataset_workdir,'output','job_' + job + '.log.old'))
-                cmd = 'bsub -q ' + options.queue + ' -o ' + os.path.join(dataset_workdir,'output','job_' + job + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + job + '.sh')
+                #cmd = 'bsub -q ' + options.queue + ' -o ' + os.path.join(dataset_workdir,'output','job_' + job + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + job + '.sh')
+                os.chdir(os.path.join(dataset_workdir,'input'))
+                cmd = 'condor_submit ' +  os.path.join(dataset_workdir,'output','job_' + str(job) + '.log') + ' source ' + os.path.join(dataset_workdir,'input','job_' + str(job) + '.condor')
                 os.system(cmd)
+                os.chdir(cfg_dirname)
 
             print 'Done'
     else:
