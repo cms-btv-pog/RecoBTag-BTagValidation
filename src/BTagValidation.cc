@@ -245,8 +245,8 @@ const std::map<std::string, std::pair<int, int>> BTagValidation::pts_ = {
 const std::vector<std::string> BTagValidation::sels_ = {"pass", "fail"}; 
 
 ////https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
-const double BTagValidation::DeepCSVL_ = 0.1241;
-const double BTagValidation::DeepCSVM_ = 0.4184; 
+const double BTagValidation::DeepCSVL_ = 0.1355;
+const double BTagValidation::DeepCSVM_ = 0.4506; 
 
 //
 // constructors and destructor
