@@ -453,6 +453,7 @@ void BTagValidation::createJetHistos(const TString& histoTag) {
   //AddHisto(histoTag+"_JBP"     ,";JBP;;",50,0.,8.);
   //AddHisto(histoTag+"_CSVIVFv2",";CSVIVFv2;;",50,0.,1.);
   AddHisto(histoTag+"_DeepCSV" ,";DeepCSV;;",50,0.,1.);
+  AddHisto(histoTag+"_DeepCSV_SV" ,";DeepCSV_SV;;",50,0.,1.);
   //AddHisto(histoTag+"_cMVAv2"  ,";cMVAv2;;",50,0.,1.);
   AddHisto(histoTag+"_DoubleB" ,";DoubleB;;",100,-1,1.);
 
@@ -1099,7 +1100,17 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
 
   FillHisto(histoTag+"_sv_multi_0",      flav, isGSPbb , isGSPcc ,n_sv   ,         wt);
 
+  double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
+  double jetproba (JetInfo.Jet_Proba[iJet]);
+  //double jetbproba(JetInfo.Jet_Bprob[iJet]);
+  //double csvivfv2 (JetInfo.Jet_CombIVF[iJet]);
+  double deepcsv  (JetInfo.Jet_DeepCSVBDisc[iJet]);
+  //double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
+  double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
+
   if (n_sv>0) {
+
+    FillHisto(histoTag+"_DeepCSV_SV",  flav, isGSPbb, isGSPcc ,deepcsv   ,wt);
 
     float flight2DSig_sv = JetInfo.SV_flight2D[JetInfo.Jet_nFirstSV[iJet]]/JetInfo.SV_flight2DErr[JetInfo.Jet_nFirstSV[iJet]];
     //float sv_nTrk         = JetInfo.SV_nTrk[JetInfo.Jet_nFirstSV[iJet]] ;
@@ -1115,14 +1126,6 @@ void BTagValidation::fillJetHistos(const JetInfoBranches& JetInfo, const int iJe
     edm::LogInfo("SVInfo") << " NSV = " << n_sv << " SV 2D flightdist sig = " << flight2DSig_sv ;
 
   }
-
-  double mass_TagVarCSV_sv (JetInfo.TagVarCSV_vertexMass[iJet]);
-  double jetproba (JetInfo.Jet_Proba[iJet]);
-  //double jetbproba(JetInfo.Jet_Bprob[iJet]);
-  //double csvivfv2 (JetInfo.Jet_CombIVF[iJet]);
-  double deepcsv  (JetInfo.Jet_DeepCSVBDisc[iJet]);
-  //double cmvav2   (JetInfo.Jet_cMVAv2[iJet]);
-  double doubleb  (JetInfo.Jet_DoubleSV[iJet]);
 
   edm::LogInfo("TrkInfo") << " track multi = " << ntracksel ;
   edm::LogInfo("SVInfo") << " SV mass = " << mass_TagVarCSV_sv ;
