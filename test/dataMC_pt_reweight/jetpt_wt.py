@@ -4,13 +4,15 @@
 import ROOT
 import os
 
-dir = "/afs/cern.ch/user/r/rsyarif/workHere/HbbTagVal/Jan12_SFCommPlots_NoTreeBTagVal/CMSSW_8_0_23/src/RecoBTag/BTagValidation/test/"
+/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_9_4_12/src/RecoBTag/BTagValidation/test/dataMC_pt_reweight/../BATCH_Moriond2019_RunIIMiniAOD_17June2018_Nominal/Final_histograms_btagval.root
+
+dir = "/afs/cern.ch/work/d/devdatta/CMSREL/BTagging/CMSSW_9_4_12/src/RecoBTag/BTagValidation/test/"
 fname = 'Mu_350'
 f = dir+fname+'_merged/Final_DoubleMuonTaggedFatJets_MuonEnrichedJets_dataWithMCJP_histograms_btagval.root'
 
 
 files_data = [
-f_
+f
 ]
 
 jetpt_data = ROOT.TH1D("jetpt_data", ";pT(all jets);;",500,0.,5000.)

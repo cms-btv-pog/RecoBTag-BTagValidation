@@ -31,6 +31,8 @@ def process_input_dir(input_dir, match, filelist):
         if ( match!=None and not re.search(match, filename) ):
             continue
         m1 = re.search('_\d+.root', filename)
+        if not m1:
+          continue
         if name=='':
             name = re.split('_\d+.root', filename)[0]
         jobstring = filename[m1.start():].lstrip('_').replace('.root','').split('_')
@@ -62,6 +64,7 @@ INPUT_FILES
 """
 
 condor_template = """universe              = vanilla
+requirements          = (OpSysAndVer =?= "SLCern6")
 executable            = EXEC
 arguments             = $(ClusterID) $(ProcId)
 output                = OUTPUT/job_JOB_NUMBER.$(ClusterId).$(ProcId).out
