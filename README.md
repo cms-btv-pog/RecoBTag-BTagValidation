@@ -1,4 +1,4 @@
-BTagValidation for UL 2018 data and MC 
+BTagValidation for UL 2016 data and MC 
 ==============
 
 Boosted b-tag validation analysis 
