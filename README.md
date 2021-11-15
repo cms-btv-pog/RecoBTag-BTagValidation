@@ -9,9 +9,9 @@ Follow the directions to clone cms-btv-pog/RecoBTag-PerformanceMeasurements at h
 
 After setting up the PerformanceMeasurements package:
 
-cd CMSSW_10_6_12/src      
+cd CMSSW_10_6_20/src      
 
-git clone -b commissioning_UL18 git@github.com:cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
+git clone -b commissioning_UL16 git@github.com:cms-btv-pog/RecoBTag-BTagValidation.git RecoBTag/BTagValidation
 
 scram b -j8
 
